@@ -36,16 +36,19 @@ class HeadsUpService : Service() {
 
     private lateinit var detector: WalkDetector
     private var lastGuardText = ""
+    private var sensorMgr: SensorManager? = null
 
-    // 屏幕状态：亮屏视为用机
+    // 屏幕状态：亮屏视为用机；灭屏解注册传感器（零事件零唤醒，反正灭屏不可能边走边看）
     private val screenReceiver = object : BroadcastReceiver() {
         override fun onReceive(c: Context, i: Intent) {
             when (i.action) {
                 Intent.ACTION_SCREEN_ON, Intent.ACTION_USER_PRESENT -> {
                     detector.screenOn = true
+                    sensorMgr?.let { detector.register(it) }
                 }
                 Intent.ACTION_SCREEN_OFF -> {
                     detector.screenOn = false
+                    sensorMgr?.let { detector.unregister(it) }
                 }
             }
         }
@@ -60,12 +63,16 @@ class HeadsUpService : Service() {
             onTrigger = { if (Prefs.isEnabled(this)) ReminderManager.fire(this) },
             onTick = { snap ->
                 DetectState.snap = snap
-                refreshGuard(snap.walking, snap.runLen, snap.runNeed, snap.walkElapsedSec)
+                if (!snap.screenOn) notifyGuard("灭屏待机（省电中）")
+                else refreshGuard(snap.walking, snap.runLen, snap.runNeed, snap.walkElapsedSec)
             },
         )
         detector.requiredSteps = Prefs.requiredSteps(this)
-        detector.screenOn = getSystemService(PowerManager::class.java)?.isInteractive ?: true
-        getSystemService(SensorManager::class.java)?.let { detector.register(it) }
+        sensorMgr = getSystemService(SensorManager::class.java)
+        val interactive = getSystemService(PowerManager::class.java)?.isInteractive ?: true
+        detector.screenOn = interactive
+        if (interactive) sensorMgr?.let { detector.register(it) }
+        detector.publishState()
         registerReceiver(
             screenReceiver,
             IntentFilter().apply {
@@ -120,6 +127,10 @@ class HeadsUpService : Service() {
         if (!Prefs.isEnabled(this)) return
         val text = if (walking) "疑似行走 · 连贯步数 $run/$need（已持续 ${elapsed}s）"
         else "静止 · 连贯步数 $run/$need"
+        notifyGuard(text)
+    }
+
+    private fun notifyGuard(text: String) {
         if (text == lastGuardText) return
         lastGuardText = text
         try {
@@ -199,7 +210,7 @@ class HeadsUpService : Service() {
     override fun onDestroy() {
         try { unregisterReceiver(screenReceiver) } catch (_: Exception) { }
         try {
-            getSystemService(SensorManager::class.java)?.let {
+            sensorMgr?.let {
                 if (::detector.isInitialized) detector.unregister(it)
             }
         } catch (_: Exception) { }

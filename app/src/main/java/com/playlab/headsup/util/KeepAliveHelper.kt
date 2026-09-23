@@ -60,9 +60,9 @@ object KeepAliveHelper {
         } catch (_: Exception) { }
     }
 
-    /** 每 15 分钟检查服务是否存活 */
+    /** 每 60 分钟检查服务是否存活（FGS+START_STICKY 是主力，此为低频兜底） */
     fun scheduleKeepAlive(ctx: Context) {
-        val req = PeriodicWorkRequestBuilder<KeepAliveWorker>(15, TimeUnit.MINUTES).build()
+        val req = PeriodicWorkRequestBuilder<KeepAliveWorker>(60, TimeUnit.MINUTES).build()
         WorkManager.getInstance(ctx).enqueueUniquePeriodicWork(
             "headsup_keepalive", ExistingPeriodicWorkPolicy.UPDATE, req
         )

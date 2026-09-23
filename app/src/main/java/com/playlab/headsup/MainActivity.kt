@@ -224,13 +224,19 @@ private fun DetectStatusCard(enabled: Boolean) {
             delay(1000)
         }
     }
-    // heartbeat 与 elapsedRealtime 同基准
+    // heartbeat 与 elapsedRealtime 同基准（心跳已降频至 10s，Doze 下更稀）
     val alive = snap.heartbeat > 0 &&
-        android.os.SystemClock.elapsedRealtime() - snap.heartbeat < 15_000
+        android.os.SystemClock.elapsedRealtime() - snap.heartbeat < 45_000
     Card(Modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Text("检测状态", style = MaterialTheme.typography.titleMedium)
-            StateRow("服务", if (!enabled) "未开启" else if (alive) "运行中" else "异常（被系统杀死？）")
+            StateRow(
+                "服务",
+                if (!enabled) "未开启"
+                else if (!snap.screenOn) "待机（灭屏省电中）"
+                else if (alive) "运行中"
+                else "休眠中/未知（Doze 下心跳变稀属正常）",
+            )
             StateRow(
                 "步态",
                 if (snap.walking) "疑似行走 · 已持续 ${snap.walkElapsedSec}s" else "静止",
@@ -243,8 +249,10 @@ private fun DetectStatusCard(enabled: Boolean) {
                 buildString {
                     if (snap.hasStepDetector) append("步伐 ")
                     if (snap.hasStepCounter) append("计步 ")
-                    if (snap.accelOn) append("加速度")
-                    if (isEmpty()) append("无（每秒刷新，服务运行时才有值）")
+                    if (snap.accelOn) {
+                        append(if (snap.hasStepDetector || snap.hasStepCounter) "加速度(后备)" else "加速度")
+                    }
+                    if (isEmpty()) append("无（灭屏待机或服务未运行）")
                 },
             )
             StateRow("GMS 加速", snap.gms)

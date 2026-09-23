@@ -18,7 +18,9 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            // R8 混淆+裁剪：去未用代码（含 icons-extended 冗余）与资源，降包体积与内存
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
