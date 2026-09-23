@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">看路提醒</string>
+    <string name="desc">走路玩手机时及时提醒，抬头看看路</string>
+    <string name="disclaimer">提醒不能替代注意力，走路时请尽量少看手机</string>
+</resources>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 原生启动主题，Compose 接管后由 Material You 动态配色 -->
+    <style name="Theme.HeadsUp" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@android:color/system_neutral1_50</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+</resources>

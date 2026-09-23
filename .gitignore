@@ -1,0 +1,21 @@
+# Gradle / Android 构建产物
+.gradle/
+build/
+app/build/
+captures/
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# 本地配置（SDK 路径等）
+local.properties
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.DS_Store
+
+# 日志
+*.log
