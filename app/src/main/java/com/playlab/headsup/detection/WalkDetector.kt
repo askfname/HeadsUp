@@ -9,7 +9,6 @@ import android.os.Looper
 import android.os.SystemClock
 import kotlin.math.abs
 import kotlin.math.max
-import kotlin.math.sqrt
 
 /** 检测快照：服务慢心跳刷新，有步伐时实时推送，UI 直接读取 */
 data class DetectSnapshot(
@@ -21,8 +20,7 @@ data class DetectSnapshot(
     val walkElapsedSec: Int = 0,
     val screenOn: Boolean = true,
     val hasStepDetector: Boolean = false,
-    val hasStepCounter: Boolean = false,
-    val accelOn: Boolean = false,
+    val batched: Boolean = false, // 是否观察到批量投递（投递延迟 >1.5s）
     val gms: String = "未知",
 )
 
@@ -31,10 +29,8 @@ object DetectState {
 }
 
 /**
- * 本机步态检测（不依赖 GMS）：
- * 所有步伐事件进同一条流，只有「连续 N 步节律一致」才触发；
- * 节律按硬件事件时间戳计算，ROM 批量投递也不影响；
- * 硬件 45s 无投递则自动启用加速度后备；加速度峰值另有幅度带 + 晃动否决。
+ * 本机步态检测（不依赖 GMS），使用 STEP_DETECTOR（0x12）。
+ * 连续 N 步节律一致才触发；节律按硬件事件时间戳计算，ROM 批量投递也不影响。
  */
 class WalkDetector(
     private val onTrigger: () -> Unit,
@@ -46,45 +42,22 @@ class WalkDetector(
     var gmsStatus = "未知"
 
     private var hasStepDetector = false
-    private var hasStepCounter = false
-    private var accelOn = false
+    private var batchObserved = false // 是否观察到批量投递
 
     private val stepTimes = ArrayDeque<Long>() // 10s 窗口，仅 UI 显示
     private var lastStepTime = 0L
     private var prevInterval = 0L
     private var runLen = 0
     private var runStart = 0L
-    private var runAmpSum = 0f
-    private var runAmpN = 0
-
-    private var lastCounter = -1L
-    private var lastCounterEventTs = 0L // 上次计步事件的硬件时间戳
-    private var smRef: SensorManager? = null
-    private var regElapsed = 0L // 本次注册时刻（存活检查用）
-    private var gotHwStep = false // 本次注册后是否收到过硬件步伐事件
-
-    // 加速度计状态
-    private val grav = FloatArray(3)
-    private var lastPeak = 0L
-    private var windowMax = 0f // 近 3s 线性加速度峰值（防剧烈晃动）
-    private var windowMaxTime = 0L
 
     private val handler = Handler(Looper.getMainLooper())
     private var testMode = false
     private var registered = false
 
-    // 慢心跳（10s，Doze 下可被系统合并）：只做窗口裁剪、峰值过期和快照推送
+    // 慢心跳（10s，Doze 下可被系统合并）：只做窗口裁剪和快照推送
     private val tickTask = object : Runnable {
         override fun run() {
             prune()
-            val now = SystemClock.elapsedRealtime()
-            if (now - windowMaxTime > 3_000) windowMax = 0f
-            // 存活检查：亮屏 45s 仍无硬件事件 → HAL 可能不投递，启用加速度后备
-            if (screenOn && !accelOn && (hasStepDetector || hasStepCounter) &&
-                !gotHwStep && now - regElapsed > 45_000
-            ) {
-                enableAccelFallback()
-            }
             pushSnap()
             handler.postDelayed(this, 10_000)
         }
@@ -97,30 +70,14 @@ class WalkDetector(
         pushSnap()
     }
 
+    // 注册 STEP_DETECTOR（sensor 0x12 + NORMAL 速率）；无硬件则无法检测
     fun register(sm: SensorManager) {
         if (registered) return
         registered = true
-        smRef = sm
-        regElapsed = SystemClock.elapsedRealtime()
-        gotHwStep = false
-        accelOn = false
-        lastCounter = -1L // 计步器累计值跨会话重建基线，避免巨大差分
+        batchObserved = false
         sm.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR)?.let {
             sm.registerListener(this, it, SensorManager.SENSOR_DELAY_NORMAL)
             hasStepDetector = true
-        }
-        if (!hasStepDetector) {
-            sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)?.let {
-                sm.registerListener(this, it, SensorManager.SENSOR_DELAY_NORMAL)
-                hasStepCounter = true
-            }
-        }
-        // 加速度计仅无硬件计步时注册：UI 速率常驻是最大 CPU 开销，有硬件时完全不需要
-        if (!hasStepDetector && !hasStepCounter) {
-            sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)?.let {
-                sm.registerListener(this, it, SensorManager.SENSOR_DELAY_UI)
-                accelOn = true
-            }
         }
         handler.post(tickTask)
     }
@@ -161,30 +118,11 @@ class WalkDetector(
     }
 
     override fun onSensorChanged(e: SensorEvent) {
-        when (e.sensor.type) {
-            Sensor.TYPE_STEP_DETECTOR -> {
-                gotHwStep = true
-                if (e.values[0] == 1f) onStepEvent(at = eventMs(e.timestamp))
-            }
-            Sensor.TYPE_STEP_COUNTER -> {
-                gotHwStep = true
-                val v = e.values[0].toLong()
-                val evTs = eventMs(e.timestamp)
-                if (lastCounter >= 0 && v > lastCounter) {
-                    val d = (v - lastCounter).coerceAtMost(50).toInt()
-                    // 按硬件时间跨度均匀摊开，批量投递下节律依然准确
-                    val span = (evTs - lastCounterEventTs).coerceAtLeast(0)
-                    val gap = if (d > 1 && span > 0) span / d else 0L
-                    for (i in 1..d) {
-                        val at = if (gap >= 250) lastCounterEventTs + gap * i else evTs
-                        onStepEvent(at = at)
-                    }
-                }
-                lastCounter = v
-                lastCounterEventTs = evTs
-            }
-            Sensor.TYPE_ACCELEROMETER -> accelCheck(e.values, e.timestamp)
-        }
+        if (e.sensor.type != Sensor.TYPE_STEP_DETECTOR || e.values[0] != 1f) return
+        val at = eventMs(e.timestamp)
+        // 批量投递标记：事件硬件时间远早于到达时间（>1.5s）
+        if (SystemClock.elapsedRealtime() - at > 1_500) batchObserved = true
+        onStepEvent(at = at)
     }
 
     override fun onAccuracyChanged(s: Sensor?, acc: Int) = Unit
@@ -193,45 +131,8 @@ class WalkDetector(
     private fun eventMs(tsNs: Long) =
         if (tsNs > 0) tsNs / 1_000_000 else SystemClock.elapsedRealtime()
 
-    // 加速度后备：硬件疑似不投递时启用（NORMAL 速率，开销小）
-    private fun enableAccelFallback() {
-        val sm = smRef ?: return
-        try {
-            sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)?.let {
-                if (sm.registerListener(this, it, SensorManager.SENSOR_DELAY_NORMAL)) {
-                    accelOn = true
-                    pushSnap()
-                }
-            }
-        } catch (_: Exception) { }
-    }
-
-    // 加速度计：高通滤波取线性加速度；只记录峰值统计，有硬件计步时不参与计数
-    private fun accelCheck(v: FloatArray, tsNs: Long) {
-        val a = 0.8f
-        for (i in 0..2) grav[i] = a * grav[i] + (1 - a) * v[i]
-        var sum = 0f
-        for (i in 0..2) {
-            val l = v[i] - grav[i]
-            sum += l * l
-        }
-        val mag = sqrt(sum)
-        val evTs = eventMs(tsNs)
-        if (mag > windowMax || evTs - windowMaxTime > 3_000) {
-            windowMax = mag
-            windowMaxTime = evTs
-        }
-        // 幅度带：过小的桌面微振，过大的剧烈晃动等，都不计
-        if (mag in 1.4f..6.0f && evTs - lastPeak > 280) {
-            lastPeak = evTs
-            if (!hasStepDetector && !hasStepCounter) onStepEvent(amp = mag, at = evTs)
-        }
-    }
-
-    /** 融合步伐入口：节律一致性是唯一触发依据 */
-    private fun onStepEvent(amp: Float? = null, at: Long = SystemClock.elapsedRealtime()) {
-        // 剧烈晃动否决：近 3s 出现大冲击时，硬件步伐也不计（走路不会有这种冲击）
-        if (amp == null && windowMax > 9f && at - windowMaxTime < 3_000) return
+    /** 步伐入口：节律一致性是唯一触发依据 */
+    private fun onStepEvent(at: Long = SystemClock.elapsedRealtime()) {
         // 丢弃乱序/重复事件（迟到的批量旧事件不参与节律）
         if (lastStepTime > 0 && at <= lastStepTime) return
 
@@ -247,28 +148,13 @@ class WalkDetector(
             } else {
                 runLen = 1
                 runStart = at
-                runAmpSum = 0f
-                runAmpN = 0
             }
             prevInterval = iv
         } else {
             runLen = 1
             runStart = at
-            runAmpSum = 0f
-            runAmpN = 0
         }
         lastStepTime = at
-        if (amp != null) {
-            runAmpSum += amp
-            runAmpN++
-            // 加速度源本轮平均幅度过大 → 持续晃动，清零
-            if (runAmpN >= 4 && runAmpSum / runAmpN > 4.5f) {
-                runLen = 0
-                runStart = 0L
-                runAmpSum = 0f
-                runAmpN = 0
-            }
-        }
         if (runLen >= requiredSteps && (screenOn || testMode)) {
             runLen = 0
             runStart = 0L
@@ -293,8 +179,7 @@ class WalkDetector(
                 walkElapsedSec = if (runStart == 0L) 0 else ((now - runStart) / 1000).toInt(),
                 screenOn = screenOn,
                 hasStepDetector = hasStepDetector,
-                hasStepCounter = hasStepCounter,
-                accelOn = accelOn,
+                batched = batchObserved,
                 gms = gmsStatus,
             ),
         )

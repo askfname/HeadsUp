@@ -29,8 +29,8 @@ import com.headsup.app.util.KeepAliveHelper
 
 /**
  * 步行检测前台服务：
- * 主链路 = 本机三源融合检测（STEP_DETECTOR/STEP_COUNTER/加速度计，不依赖 GMS）；
- * GMS ActivityRecognition 降级为加速通道（有回调且亮屏则直接提醒）。
+ * 主链路 = 本机 STEP_DETECTOR 检测（不依赖 GMS）；
+ * GMS ActivityRecognition 降级为提示通道（须经活体确认才提醒）。
  */
 class HeadsUpService : Service() {
 
@@ -38,7 +38,7 @@ class HeadsUpService : Service() {
     private var lastGuardText = ""
     private var sensorMgr: SensorManager? = null
 
-    // 屏幕状态：亮屏视为用机；灭屏解注册传感器（零事件零唤醒，反正灭屏不可能边走边看）
+    // 屏幕状态：亮屏视为用机；灭屏解注册传感器（零事件零唤醒，反正灭屏不可能边走边看XD）
     private val screenReceiver = object : BroadcastReceiver() {
         override fun onReceive(c: Context, i: Intent) {
             when (i.action) {

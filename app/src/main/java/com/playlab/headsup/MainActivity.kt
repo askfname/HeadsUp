@@ -235,25 +235,23 @@ private fun DetectStatusCard(enabled: Boolean) {
                 if (!enabled) "未开启"
                 else if (!snap.screenOn) "待机（灭屏省电中）"
                 else if (alive) "运行中"
-                else "休眠中/未知（Doze 下心跳变稀属正常）",
+                else "休眠中/未知",
             )
             StateRow(
                 "步态",
                 if (snap.walking) "疑似行走 · 已持续 ${snap.walkElapsedSec}s" else "静止",
             )
-            StateRow("连贯步数", "${snap.runLen}/${snap.runNeed}（节律一致才累计）")
-            StateRow("窗口步数", "${snap.stepsInWindow}（10s 窗口，仅参考）")
+            StateRow(
+                "连贯步数",
+                "${snap.runLen}/${snap.runNeed}" +
+                    if (snap.batched) "（批量投递）" else "（节律累计）",
+            )
+            StateRow("窗口步数", "${snap.stepsInWindow}（10s 窗口）")
             StateRow("屏幕", if (snap.screenOn) "亮（用机中）" else "灭")
             StateRow(
                 "传感器",
-                buildString {
-                    if (snap.hasStepDetector) append("步伐 ")
-                    if (snap.hasStepCounter) append("计步 ")
-                    if (snap.accelOn) {
-                        append(if (snap.hasStepDetector || snap.hasStepCounter) "加速度(后备)" else "加速度")
-                    }
-                    if (isEmpty()) append("无（灭屏待机或服务未运行）")
-                },
+                if (snap.hasStepDetector) "步伐"
+                else "无步伐传感器（本机不支持检测）",
             )
             StateRow("GMS 加速", snap.gms)
             Spacer(Modifier.height(4.dp))
@@ -278,7 +276,7 @@ private fun DetectStatusCard(enabled: Boolean) {
                 onClick = { HeadsUpService.simulate(ctx) },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = enabled,
-            ) { Text(if (enabled) "模拟步行（走真实检测通路）" else "先打开总开关再模拟") }
+            ) { Text(if (enabled) "模拟步行" else "先打开总开关再模拟") }
         }
     }
 }
