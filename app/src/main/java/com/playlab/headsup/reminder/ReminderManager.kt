@@ -20,6 +20,7 @@ import androidx.core.app.NotificationCompat
 import com.playlab.headsup.MainActivity
 import com.playlab.headsup.R
 import com.playlab.headsup.data.Prefs
+import com.playlab.headsup.util.IndoorDetector
 
 /** 三种提醒：浮动通知 / 弹窗（悬浮窗）/ 全屏 */
 object ReminderManager {
@@ -52,6 +53,8 @@ object ReminderManager {
     fun fire(ctx: Context): Boolean {
         if (!Prefs.canTrigger(ctx)) return false
         if (!isUsable(ctx)) return false // 灭屏/锁屏兜底：延迟回调到此时已无意义
+        // 室内抑制：开关开且 GPS 判室内才拦截，开关关则不用 GPS
+        if (Prefs.isIndoorMute(ctx) && IndoorDetector.isIndoorNow()) return false
         Prefs.markTriggered(ctx)
         ensureChannels(ctx)
         vibrate(ctx)

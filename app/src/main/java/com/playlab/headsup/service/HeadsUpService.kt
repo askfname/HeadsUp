@@ -9,6 +9,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.hardware.SensorManager
+import android.location.LocationManager
 import android.os.Build
 import android.os.IBinder
 import android.os.PowerManager
@@ -26,7 +27,9 @@ import com.playlab.headsup.data.Prefs
 import com.playlab.headsup.detection.DetectState
 import com.playlab.headsup.detection.WalkDetector
 import com.playlab.headsup.reminder.ReminderManager
+import com.playlab.headsup.util.IndoorDetector
 import com.playlab.headsup.util.KeepAliveHelper
+import com.playlab.headsup.util.PermissionHelper
 
 /**
  * 步行检测前台服务：
@@ -42,17 +45,22 @@ class HeadsUpService : Service() {
 
     // 屏幕状态：亮屏视为用机；灭屏解注册传感器（零事件零唤醒，反正灭屏不可能边走边看XD）
     // 锁屏（亮屏但未解锁）与口袋（距离感应器遮挡）同样不累计、不提醒
+    // GPS 与传感器同进退：灭屏/锁屏/定位总开关断连省电，用机才追踪
+    // （室内 verdict 断连后过期失效，按户外放行）
     private val screenReceiver = object : BroadcastReceiver() {
         override fun onReceive(c: Context, i: Intent) {
             when (i.action) {
                 Intent.ACTION_SCREEN_ON, Intent.ACTION_USER_PRESENT -> {
                     refreshUseState()
                     sensorMgr?.let { detector.register(it) }
+                    refreshIndoorTracking()
                 }
                 Intent.ACTION_SCREEN_OFF -> {
                     detector.screenOn = false
                     sensorMgr?.let { detector.unregister(it) }
+                    refreshIndoorTracking()
                 }
+                LocationManager.PROVIDERS_CHANGED_ACTION -> refreshIndoorTracking()
             }
         }
     }
@@ -71,6 +79,19 @@ class HeadsUpService : Service() {
         return detector.screenOn && detector.unlocked && !detector.pocketed
     }
 
+    /** 室内抑制：开关开且 GPS 判室内才拦截；开关关/未知按户外放行 */
+    private fun blockedIndoor(): Boolean =
+        Prefs.isIndoorMute(this) && IndoorDetector.isIndoorNow()
+
+    /** 开关开 + 位置够用 + 定位总开关开 + 亮屏已解锁才追踪 GPS，否则停 */
+    private fun refreshIndoorTracking() {
+        val usable = ::detector.isInitialized && detector.screenOn && detector.unlocked
+        if (Prefs.isEnabled(this) && Prefs.isIndoorMute(this) &&
+            PermissionHelper.isLocationEnough(this) && IndoorDetector.isLocationOn(this) && usable
+        ) IndoorDetector.start(this)
+        else IndoorDetector.stop()
+    }
+
     /** 灵敏度变化才应用：GMS 回调每次都走 start，直接重置会把刚攒的步数清掉 */
     private fun applySensIfChanged() {
         val p = Prefs.gaitParams(this)
@@ -87,22 +108,33 @@ class HeadsUpService : Service() {
         ReminderManager.ensureChannels(this)
         detector = WalkDetector(
             onTrigger = {
+                if (blockedIndoor()) return@WalkDetector // 室内抑制，不计冷却
                 if (Prefs.isEnabled(this) && isUsableNow() && ReminderManager.fire(this)) {
                     detector.noteFired() // 真实发出后闩锁，UI 与提醒同步
                 }
             },
             onTick = { snap ->
-                DetectState.snap = snap
-                if (!snap.screenOn) notifyGuard("灭屏待机（省电中）")
-                else if (!snap.unlocked) notifyGuard("锁屏待机（解锁后才提醒）")
-                else if (snap.pocketed) notifyGuard("疑似在口袋（拿出后才提醒）")
-                else refreshGuard(snap.walking, snap.runLen, snap.runNeed, snap.walkElapsedSec)
+                val withIndoor = snap.copy(
+                    indoor = IndoorDetector.isIndoorNow(),
+                    sats = IndoorDetector.satInfo,
+                )
+                DetectState.snap = withIndoor
+                // 行走驱动 GPS：只在“冷却已过 + 行走中”才开（冷却期内触发必然被拦，verdict 用不上）
+                // 被室内抑制的触发不消耗冷却，抑制成立后 GPS 会持续开着保温 verdict
+                if (withIndoor.walking && Prefs.canTrigger(this)) IndoorDetector.noteWalking()
+                else IndoorDetector.noteIdle()
+                if (!withIndoor.screenOn) notifyGuard("灭屏待机（省电中）")
+                else if (!withIndoor.unlocked) notifyGuard("锁屏待机（解锁后才提醒）")
+                else if (withIndoor.pocketed) notifyGuard("疑似在口袋（拿出后才提醒）")
+                else if (withIndoor.indoor && Prefs.isIndoorMute(this)) notifyGuard("室内（已按设置抑制提醒）")
+                else refreshGuard(withIndoor.walking, withIndoor.runLen, withIndoor.runNeed, withIndoor.walkElapsedSec)
             },
         )
         applySensIfChanged()
         sensorMgr = getSystemService(SensorManager::class.java)
-        refreshUseState()
+        refreshUseState() // 先读真实亮灭屏/锁屏，再决定起传感器与 GPS
         if (detector.screenOn) sensorMgr?.let { detector.register(it) }
+        refreshIndoorTracking()
         detector.publishState()
         registerReceiver(
             screenReceiver,
@@ -110,6 +142,7 @@ class HeadsUpService : Service() {
                 addAction(Intent.ACTION_SCREEN_ON)
                 addAction(Intent.ACTION_SCREEN_OFF)
                 addAction(Intent.ACTION_USER_PRESENT)
+                addAction(LocationManager.PROVIDERS_CHANGED_ACTION)
             },
         )
     }
@@ -119,7 +152,11 @@ class HeadsUpService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         // 灵敏度切换后重进即生效（仅变化时重置，避免 GMS 回调把累计清掉）
-        if (::detector.isInitialized) applySensIfChanged()
+        if (::detector.isInitialized) {
+        applySensIfChanged()
+            refreshUseState() // 后台进来的启动也要带最新亮锁屏态，GPS 才跟得上
+            refreshIndoorTracking()
+        }
         when (intent?.action) {
             ACTION_SIMULATE -> {
                 Prefs.resetCooldown(this)
@@ -127,7 +164,7 @@ class HeadsUpService : Service() {
             }
             // GMS 只是提示：必须经检测器活体确认此刻处于行走状态，才执行 fire
             ACTION_GMS_HINT -> {
-                if (Prefs.isEnabled(this) && isUsableNow() &&
+                if (!blockedIndoor() && Prefs.isEnabled(this) && isUsableNow() &&
                     ::detector.isInitialized && detector.isWalkingNow() &&
                     ReminderManager.fire(this)
                 ) {
@@ -243,6 +280,7 @@ class HeadsUpService : Service() {
     }
 
     override fun onDestroy() {
+        IndoorDetector.stop()
         try { unregisterReceiver(screenReceiver) } catch (_: Exception) { }
         try {
             sensorMgr?.let {

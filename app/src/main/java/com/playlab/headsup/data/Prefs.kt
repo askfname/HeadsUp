@@ -28,6 +28,25 @@ object Prefs {
     fun setCooldown(ctx: Context, v: Int) =
         sp(ctx).edit().putInt(K_COOLDOWN, v.coerceIn(30, 300)).apply()
 
+    /** 室内不提醒：开 + 够用才抑制；关则完全不用 GPS，走正常逻辑 */
+    fun isIndoorMute(ctx: Context) = sp(ctx).getBoolean("indoor_mute", false)
+    fun setIndoorMute(ctx: Context, v: Boolean) =
+        sp(ctx).edit().putBoolean("indoor_mute", v).apply()
+
+    /** 位置兼容模式：系统不提供始终允许入口时前台即够用（API29 并申确认后置位） */
+    fun isLocationCompat(ctx: Context) = sp(ctx).getBoolean("location_compat", false)
+    fun setLocationCompat(ctx: Context, v: Boolean) =
+        sp(ctx).edit().putBoolean("location_compat", v).apply()
+
+    /** 申请过的权限：系统不再弹窗（不再询问）时直接引导去设置 */
+    fun wasAsked(ctx: Context, perm: String) =
+        sp(ctx).getStringSet("asked_perms", emptySet()).orEmpty().contains(perm)
+
+    fun markAsked(ctx: Context, perm: String) {
+        val cur = sp(ctx).getStringSet("asked_perms", emptySet()).orEmpty().toMutableSet()
+        if (cur.add(perm)) sp(ctx).edit().putStringSet("asked_perms", cur).apply()
+    }
+
     /** 灵敏度三档：0=灵敏/ 1=标准 / 2=严格 */
     fun getSensitivity(ctx: Context) = sp(ctx).getInt("sensitivity", 1)
     fun setSensitivity(ctx: Context, v: Int) =

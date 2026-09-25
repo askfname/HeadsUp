@@ -24,16 +24,19 @@ object KeepAliveHelper {
     @SuppressLint("BatteryLife")
     fun requestBatteryWhitelist(ctx: Context) {
         try {
-            ctx.startActivity(Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
-                data = Uri.parse("package:${ctx.packageName}")
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            })
+            ctx.startActivity(batteryWhitelistIntent(ctx).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
         } catch (_: Exception) {
             ctx.startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS).apply {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             })
         }
     }
+
+    /** 电池白名单意图（供设置返回回调启动，返回后可立即刷新状态） */
+    fun batteryWhitelistIntent(ctx: Context) =
+        Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
+            data = Uri.parse("package:${ctx.packageName}")
+        }
 
     /** 跳转厂商自启动管理页（小米/华为/OPPO/vivo/一加/魅族） */
     fun openAutoStart(ctx: Context) {
@@ -69,11 +72,16 @@ object KeepAliveHelper {
     }
 
     fun openAppSettings(ctx: Context) {
-        ctx.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-            data = Uri.parse("package:${ctx.packageName}")
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        })
+        try {
+            ctx.startActivity(appDetailsIntent(ctx).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        } catch (_: Exception) { }
     }
+
+    /** 应用详情页意图（供设置返回回调启动，返回后可立即刷新状态） */
+    fun appDetailsIntent(ctx: Context) =
+        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = Uri.parse("package:${ctx.packageName}")
+        }
 
     fun deviceHint(): String = when (Build.MANUFACTURER.lowercase()) {
         "xiaomi", "redmi" -> "小米：设置 → 应用设置 → 授权管理 → 自启动"

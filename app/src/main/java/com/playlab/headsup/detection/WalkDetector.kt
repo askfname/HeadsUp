@@ -26,6 +26,8 @@ data class DetectSnapshot(
     val gms: String = "未知",
     val lastTriggerAt: Long = 0L, // 上次真实提醒时刻（elapsedRealtime，批量投递下UI同步用）
     val simulating: Boolean = false, // 模拟步行状态
+    val indoor: Boolean = false, // GPS 判室内（仅“室内不提醒”开时更新）
+    val sats: String = "未知", // 强星/总数（跨机型对比信号用）
 )
 
 object DetectState {
