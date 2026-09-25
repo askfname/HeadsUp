@@ -1,4 +1,4 @@
-package com.headsup.app.service
+package com.playlab.headsup.service
 
 import android.app.AlarmManager
 import android.app.PendingIntent
@@ -15,17 +15,18 @@ import android.os.PowerManager
 import android.os.SystemClock
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import android.app.KeyguardManager
 import com.google.android.gms.location.ActivityRecognition
 import com.google.android.gms.location.ActivityTransition
 import com.google.android.gms.location.ActivityTransitionRequest
 import com.google.android.gms.location.DetectedActivity
-import com.headsup.app.MainActivity
-import com.headsup.app.R
-import com.headsup.app.data.Prefs
-import com.headsup.app.detection.DetectState
-import com.headsup.app.detection.WalkDetector
-import com.headsup.app.reminder.ReminderManager
-import com.headsup.app.util.KeepAliveHelper
+import com.playlab.headsup.MainActivity
+import com.playlab.headsup.R
+import com.playlab.headsup.data.Prefs
+import com.playlab.headsup.detection.DetectState
+import com.playlab.headsup.detection.WalkDetector
+import com.playlab.headsup.reminder.ReminderManager
+import com.playlab.headsup.util.KeepAliveHelper
 
 /**
  * 步行检测前台服务：
@@ -37,13 +38,15 @@ class HeadsUpService : Service() {
     private lateinit var detector: WalkDetector
     private var lastGuardText = ""
     private var sensorMgr: SensorManager? = null
+    private var lastSensSig = "" // 灵敏度签名，变化才重置累计（否则每次 start 都会清零行走态）
 
     // 屏幕状态：亮屏视为用机；灭屏解注册传感器（零事件零唤醒，反正灭屏不可能边走边看XD）
+    // 锁屏（亮屏但未解锁）与口袋（距离感应器遮挡）同样不累计、不提醒
     private val screenReceiver = object : BroadcastReceiver() {
         override fun onReceive(c: Context, i: Intent) {
             when (i.action) {
                 Intent.ACTION_SCREEN_ON, Intent.ACTION_USER_PRESENT -> {
-                    detector.screenOn = true
+                    refreshUseState()
                     sensorMgr?.let { detector.register(it) }
                 }
                 Intent.ACTION_SCREEN_OFF -> {
@@ -54,24 +57,52 @@ class HeadsUpService : Service() {
         }
     }
 
+    /** 从系统刷新亮灭屏/锁屏状态并同步给检测器 */
+    private fun refreshUseState() {
+        val interactive = getSystemService(PowerManager::class.java)?.isInteractive ?: true
+        val locked = getSystemService(KeyguardManager::class.java)?.isKeyguardLocked ?: false
+        detector.screenOn = interactive
+        detector.unlocked = !locked
+    }
+
+    /** 触发前复核：灭屏/锁屏/口袋直接拦截（防锁屏亮屏、口袋亮屏、GMS 延迟回调） */
+    private fun isUsableNow(): Boolean {
+        refreshUseState()
+        return detector.screenOn && detector.unlocked && !detector.pocketed
+    }
+
+    /** 灵敏度变化才应用：GMS 回调每次都走 start，直接重置会把刚攒的步数清掉 */
+    private fun applySensIfChanged() {
+        val p = Prefs.gaitParams(this)
+        val sig = "${p.steps}-${p.minIv}-${p.maxIv}-${p.absMs}-${p.ratio}-${p.gyro}-${p.accMin}-${p.accMax}-${p.cand}-${p.maxMiss}-${p.idleMs}"
+        if (sig == lastSensSig) return
+        lastSensSig = sig
+        detector.applySensitivity(p.steps, p.minIv, p.maxIv, p.absMs, p.ratio, p.gyro, p.accMin, p.accMax, p.cand, p.maxMiss, p.idleMs)
+    }
+
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onCreate() {
         super.onCreate()
         ReminderManager.ensureChannels(this)
         detector = WalkDetector(
-            onTrigger = { if (Prefs.isEnabled(this)) ReminderManager.fire(this) },
+            onTrigger = {
+                if (Prefs.isEnabled(this) && isUsableNow() && ReminderManager.fire(this)) {
+                    detector.noteFired() // 真实发出后闩锁，UI 与提醒同步
+                }
+            },
             onTick = { snap ->
                 DetectState.snap = snap
                 if (!snap.screenOn) notifyGuard("灭屏待机（省电中）")
+                else if (!snap.unlocked) notifyGuard("锁屏待机（解锁后才提醒）")
+                else if (snap.pocketed) notifyGuard("疑似在口袋（拿出后才提醒）")
                 else refreshGuard(snap.walking, snap.runLen, snap.runNeed, snap.walkElapsedSec)
             },
         )
-        detector.requiredSteps = Prefs.requiredSteps(this)
+        applySensIfChanged()
         sensorMgr = getSystemService(SensorManager::class.java)
-        val interactive = getSystemService(PowerManager::class.java)?.isInteractive ?: true
-        detector.screenOn = interactive
-        if (interactive) sensorMgr?.let { detector.register(it) }
+        refreshUseState()
+        if (detector.screenOn) sensorMgr?.let { detector.register(it) }
         detector.publishState()
         registerReceiver(
             screenReceiver,
@@ -87,10 +118,8 @@ class HeadsUpService : Service() {
     private var gmsSubscribedAt = 0L
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        // 参数可变（灵敏度切换后重进即生效）
-        if (::detector.isInitialized) {
-            detector.requiredSteps = Prefs.requiredSteps(this)
-        }
+        // 灵敏度切换后重进即生效（仅变化时重置，避免 GMS 回调把累计清掉）
+        if (::detector.isInitialized) applySensIfChanged()
         when (intent?.action) {
             ACTION_SIMULATE -> {
                 Prefs.resetCooldown(this)
@@ -98,13 +127,19 @@ class HeadsUpService : Service() {
             }
             // GMS 只是提示：必须经检测器活体确认此刻处于行走状态，才执行 fire
             ACTION_GMS_HINT -> {
-                if (Prefs.isEnabled(this) &&
-                    ::detector.isInitialized && detector.isWalkingNow()
-                ) {
+                if (Prefs.isEnabled(this) && isUsableNow() &&
+                    ::detector.isInitialized && detector.isWalkingNow() &&
                     ReminderManager.fire(this)
+                ) {
+                    detector.noteFired()
                 }
             }
             ACTION_RESUBSCRIBE -> needsSubscribe = true
+            // 授权后重注册传感器：无身体活动权限时注册的监听收不到事件，必须重新注册
+            ACTION_REREGISTER -> {
+                refreshUseState()
+                sensorMgr?.let { detector.reregister(it, detector.screenOn) }
+            }
         }
         startForegroundGuard()
         // 节流订阅（避免重订阅自激循环）
@@ -194,7 +229,7 @@ class HeadsUpService : Service() {
     override fun onTaskRemoved(rootIntent: Intent?) {
         try {
             val pi = PendingIntent.getBroadcast(
-                this, 0, Intent("com.headsup.app.action.RESTART_SERVICE").setPackage(packageName),
+                this, 0, Intent("com.playlab.headsup.action.RESTART_SERVICE").setPackage(packageName),
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
             )
             val am = getSystemService(AlarmManager::class.java)
@@ -218,15 +253,25 @@ class HeadsUpService : Service() {
     }
 
     companion object {
-        const val ACTION_SIMULATE = "com.headsup.app.action.SIMULATE"
-        const val ACTION_GMS_HINT = "com.headsup.app.action.GMS_HINT"
-        const val ACTION_RESUBSCRIBE = "com.headsup.app.action.RESUBSCRIBE"
+        const val ACTION_SIMULATE = "com.playlab.headsup.action.SIMULATE"
+        const val ACTION_GMS_HINT = "com.playlab.headsup.action.GMS_HINT"
+        const val ACTION_RESUBSCRIBE = "com.playlab.headsup.action.RESUBSCRIBE"
+        const val ACTION_REREGISTER = "com.playlab.headsup.action.REREGISTER"
         private const val TAG = "HeadsUpService"
 
         fun start(ctx: Context) {
             val i = Intent(ctx, HeadsUpService::class.java)
             if (Build.VERSION.SDK_INT >= 26) ctx.startForegroundService(i)
             else ctx.startService(i)
+        }
+
+        /** 身体活动权限授予后：传感器必须重注册才会来事件，只重订阅 GMS 不够 */
+        fun reregister(ctx: Context) {
+            try {
+                val i = Intent(ctx, HeadsUpService::class.java).setAction(ACTION_REREGISTER)
+                if (Build.VERSION.SDK_INT >= 26) ctx.startForegroundService(i)
+                else ctx.startService(i)
+            } catch (_: Exception) { }
         }
 
         fun stop(ctx: Context) {

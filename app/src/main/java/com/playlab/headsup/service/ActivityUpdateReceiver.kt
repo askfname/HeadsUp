@@ -1,4 +1,4 @@
-package com.headsup.app.service
+package com.playlab.headsup.service
 
 import android.app.NotificationManager
 import android.content.BroadcastReceiver
@@ -8,7 +8,7 @@ import com.google.android.gms.location.ActivityTransition
 import com.google.android.gms.location.ActivityTransitionEvent
 import com.google.android.gms.location.ActivityTransitionResult
 import com.google.android.gms.location.DetectedActivity
-import com.headsup.app.data.Prefs
+import com.playlab.headsup.data.Prefs
 
 /**
  * GMS 步行回调 + 通知按钮消除。
@@ -17,9 +17,9 @@ import com.headsup.app.data.Prefs
  */
 class ActivityUpdateReceiver : BroadcastReceiver() {
     override fun onReceive(ctx: Context, intent: Intent) {
-        if (intent.action == "com.headsup.app.action.DISMISS") {
+        if (intent.action == "com.playlab.headsup.action.DISMISS") {
             ctx.getSystemService(NotificationManager::class.java)
-                ?.cancel(com.headsup.app.reminder.ReminderManager.NOTIFY_ID)
+                ?.cancel(com.playlab.headsup.reminder.ReminderManager.NOTIFY_ID)
             return
         }
         if (!Prefs.isEnabled(ctx)) return

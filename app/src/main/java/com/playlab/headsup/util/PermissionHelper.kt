@@ -1,4 +1,4 @@
-package com.headsup.app.util
+package com.playlab.headsup.util
 
 import android.Manifest
 import android.app.NotificationManager

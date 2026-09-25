@@ -1,4 +1,4 @@
-package com.headsup.app.ui.theme
+package com.playlab.headsup.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme

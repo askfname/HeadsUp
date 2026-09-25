@@ -1,4 +1,4 @@
-package com.headsup.app.util
+package com.playlab.headsup.util
 
 import android.annotation.SuppressLint
 import android.content.ComponentName
@@ -11,7 +11,7 @@ import android.provider.Settings
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import com.headsup.app.worker.KeepAliveWorker
+import com.playlab.headsup.worker.KeepAliveWorker
 import java.util.concurrent.TimeUnit
 
 /** 保活：电池白名单 / 厂商自启 / WorkManager */

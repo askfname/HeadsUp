@@ -1,5 +1,6 @@
-package com.headsup.app.reminder
+package com.playlab.headsup.reminder
 
+import android.app.KeyguardManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -9,15 +10,16 @@ import android.graphics.PixelFormat
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.os.PowerManager
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
 import android.view.Gravity
 import android.view.WindowManager
 import androidx.core.app.NotificationCompat
-import com.headsup.app.MainActivity
-import com.headsup.app.R
-import com.headsup.app.data.Prefs
+import com.playlab.headsup.MainActivity
+import com.playlab.headsup.R
+import com.playlab.headsup.data.Prefs
 
 /** 三种提醒：浮动通知 / 弹窗（悬浮窗）/ 全屏 */
 object ReminderManager {
@@ -46,9 +48,10 @@ object ReminderManager {
 
     fun randomTitle() = TITLES.random()
 
-    /** 统一入口：按用户选择的模式提醒 */
-    fun fire(ctx: Context) {
-        if (!Prefs.canTrigger(ctx)) return
+    /** 统一入口：按用户选择的模式提醒，返回是否真正发出（冷却/灭屏/锁屏会被拦截） */
+    fun fire(ctx: Context): Boolean {
+        if (!Prefs.canTrigger(ctx)) return false
+        if (!isUsable(ctx)) return false // 灭屏/锁屏兜底：延迟回调到此时已无意义
         Prefs.markTriggered(ctx)
         ensureChannels(ctx)
         vibrate(ctx)
@@ -57,6 +60,15 @@ object ReminderManager {
             Prefs.MODE_FULL -> showFullScreen(ctx)
             else -> showFloat(ctx)
         }
+        return true
+    }
+
+    /** 最终门：仅亮屏 + 已解锁才提醒（锁屏/灭屏走动不打扰，口袋由服务层距离感应器拦截） */
+    fun isUsable(ctx: Context): Boolean {
+        val interactive = ctx.getSystemService(PowerManager::class.java)?.isInteractive ?: true
+        if (!interactive) return false
+        if (ctx.getSystemService(KeyguardManager::class.java)?.isKeyguardLocked == true) return false
+        return true
     }
 
     /** 供设置页测试：跳过冷却直接提醒 */
@@ -94,7 +106,7 @@ object ReminderManager {
     }
 
     private fun dismissPI(ctx: Context) = PendingIntent.getBroadcast(
-        ctx, 2, Intent("com.headsup.app.action.DISMISS").setPackage(ctx.packageName),
+        ctx, 2, Intent("com.playlab.headsup.action.DISMISS").setPackage(ctx.packageName),
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
     )
 
@@ -122,9 +134,7 @@ object ReminderManager {
                 WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
-                    WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
-                    WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, // 不抢焦点、不点亮锁屏
                 PixelFormat.TRANSLUCENT
             ).apply { gravity = Gravity.TOP; y = 80 }
             wm.addView(card, params)

@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.headsup.app"
+    namespace = "com.playlab.headsup"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.headsup.app"
+        applicationId = "com.playlab.headsup"
         minSdk = 29
         targetSdk = 34
         versionCode = 1

@@ -1,4 +1,4 @@
-package com.headsup.app
+package com.playlab.headsup
 
 import android.Manifest
 import android.content.Intent
@@ -25,14 +25,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.headsup.app.data.Prefs
-import com.headsup.app.detection.DetectState
-import com.headsup.app.reminder.ReminderManager
-import com.headsup.app.service.HeadsUpService
+import com.playlab.headsup.data.Prefs
+import com.playlab.headsup.detection.DetectState
+import com.playlab.headsup.reminder.ReminderManager
+import com.playlab.headsup.service.HeadsUpService
 import kotlinx.coroutines.delay
-import com.headsup.app.ui.theme.HeadsUpTheme
-import com.headsup.app.util.KeepAliveHelper
-import com.headsup.app.util.PermissionHelper
+import com.playlab.headsup.ui.theme.HeadsUpTheme
+import com.playlab.headsup.util.KeepAliveHelper
+import com.playlab.headsup.util.PermissionHelper
 
 /** 主界面：开关 / 提醒方式 / 权限 / 保活，Material You 单页布局 */
 class MainActivity : ComponentActivity() {
@@ -49,14 +49,25 @@ private fun HomeScreen() {
     var enabled by remember { mutableStateOf(Prefs.isEnabled(ctx)) }
     var mode by remember { mutableStateOf(Prefs.getMode(ctx)) }
     var cooldown by remember { mutableStateOf(Prefs.getCooldown(ctx)) }
+    var sens by remember { mutableStateOf(Prefs.getSensitivity(ctx)) }
     var tick by remember { mutableIntStateOf(0) }
 
     val permLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) {
         tick++
-        // 权限后授予：强制 GMS 重订阅（start 本身已节流订阅）
-        if (Prefs.isEnabled(ctx)) HeadsUpService.resubscribe(ctx)
+        // 权限后授予：传感器重注册（缺权限时注册的监听收不到事件）+ GMS 重订阅
+        if (Prefs.isEnabled(ctx)) {
+            HeadsUpService.reregister(ctx)
+            HeadsUpService.resubscribe(ctx)
+        }
+    }
+
+    // 进程重启后服务可能已死：进前台即拉起
+    LaunchedEffect(Unit) {
+        if (Prefs.isEnabled(ctx)) {
+            try { HeadsUpService.start(ctx) } catch (_: Exception) { }
+        }
     }
 
     fun requestCore() {
@@ -100,7 +111,7 @@ private fun HomeScreen() {
                     Column(Modifier.weight(1f)) {
                         Text(if (enabled) "守护中" else "已关闭", style = MaterialTheme.typography.titleLarge)
                         Text(
-                            if (enabled) "走路玩手机时会提醒你" else "打开后在后台检测步行",
+                            if (enabled) "走路看手机时会提醒你" else "打开后在后台检测步行",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -141,6 +152,31 @@ private fun HomeScreen() {
                         },
                         valueRange = 30f..300f, steps = 8
                     )
+                    Spacer(Modifier.height(4.dp))
+                    Text("灵敏度", style = MaterialTheme.typography.bodyMedium)
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        FilterChip(
+                            selected = sens == 0, onClick = {
+                                sens = 0; Prefs.setSensitivity(ctx, 0)
+                                if (enabled) HeadsUpService.start(ctx)
+                            },
+                            label = { Text("灵敏") },
+                        )
+                        FilterChip(
+                            selected = sens == 1, onClick = {
+                                sens = 1; Prefs.setSensitivity(ctx, 1)
+                                if (enabled) HeadsUpService.start(ctx)
+                            },
+                            label = { Text("标准") },
+                        )
+                        FilterChip(
+                            selected = sens == 2, onClick = {
+                                sens = 2; Prefs.setSensitivity(ctx, 2)
+                                if (enabled) HeadsUpService.start(ctx)
+                            },
+                            label = { Text("严格") },
+                        )
+                    }
                     Button(onClick = { ReminderManager.test(ctx) }, modifier = Modifier.fillMaxWidth()) {
                         Icon(Icons.Default.Notifications, null)
                         Spacer(Modifier.width(8.dp))
@@ -162,7 +198,7 @@ private fun HomeScreen() {
                             arrayOf(Manifest.permission.POST_NOTIFICATIONS)
                         ) else KeepAliveHelper.openAppSettings(ctx)
                     }
-                    PermRow("位置（可选）", "判断户外，对标原版", PermissionHelper.hasFineLocation(ctx)) {
+                    PermRow("位置（可选）", "判断户外", PermissionHelper.hasFineLocation(ctx)) {
                         permLauncher.launch(
                             arrayOf(
                                 Manifest.permission.ACCESS_FINE_LOCATION,
@@ -217,12 +253,17 @@ private fun HomeScreen() {
 private fun DetectStatusCard(enabled: Boolean) {
     val ctx = LocalContext.current
     var snap by remember { mutableStateOf(DetectState.snap) }
-    var sens by remember { mutableStateOf(Prefs.getSensitivity(ctx)) }
     LaunchedEffect(Unit) {
         while (true) {
             snap = DetectState.snap
             delay(1000)
         }
+    }
+    // 灵敏度只读显示，每秒随快照同步刷新
+    val sensDesc = when (Prefs.getSensitivity(ctx)) {
+        0 -> "灵敏（8步·≤2s/步）"
+        2 -> "严格（16步·≤1.5s/步）"
+        else -> "标准（12步·≤1.7s/步）"
     }
     // heartbeat 与 elapsedRealtime 同基准（心跳已降频至 10s，Doze 下更稀）
     val alive = snap.heartbeat > 0 &&
@@ -234,12 +275,20 @@ private fun DetectStatusCard(enabled: Boolean) {
                 "服务",
                 if (!enabled) "未开启"
                 else if (!snap.screenOn) "待机（灭屏省电中）"
+                else if (!snap.unlocked) "待机（锁屏中）"
+                else if (snap.pocketed) "待机（口袋中）"
                 else if (alive) "运行中"
                 else "休眠中/未知",
             )
+            // 真实提醒后 8s 内显示“已提醒”，与批量投递下整串步伐一次处理完保持同步
+            val firedAgoSec = if (snap.lastTriggerAt > 0)
+                (android.os.SystemClock.elapsedRealtime() - snap.lastTriggerAt) / 1000
+            else Long.MAX_VALUE
             StateRow(
                 "步态",
-                if (snap.walking) "疑似行走 · 已持续 ${snap.walkElapsedSec}s" else "静止",
+                if (snap.walking && snap.runLen >= 3) "疑似行走 · 已持续 ${snap.walkElapsedSec}s"
+                else if (firedAgoSec < 8) "已提醒 · ${firedAgoSec}s前"
+                else "静止",
             )
             StateRow(
                 "连贯步数",
@@ -247,36 +296,33 @@ private fun DetectStatusCard(enabled: Boolean) {
                     if (snap.batched) "（批量投递）" else "（节律累计）",
             )
             StateRow("窗口步数", "${snap.stepsInWindow}（10s 窗口）")
-            StateRow("屏幕", if (snap.screenOn) "亮（用机中）" else "灭")
+            StateRow("屏幕", if (!snap.screenOn) "灭" else if (!snap.unlocked) "亮·锁屏" else "亮·已解锁")
+            StateRow("遮挡", if (snap.pocketed) "是（口袋）" else "否")
             StateRow(
                 "传感器",
                 if (snap.hasStepDetector) "步伐"
                 else "无步伐传感器（本机不支持检测）",
             )
+            StateRow("灵敏度", sensDesc)
             StateRow("GMS 加速", snap.gms)
-            Spacer(Modifier.height(4.dp))
-            Text("灵敏度", style = MaterialTheme.typography.bodyMedium)
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                FilterChip(
-                    selected = sens == 0, onClick = {
-                        sens = 0; Prefs.setSensitivity(ctx, 0)
-                        if (enabled) HeadsUpService.start(ctx)
-                    },
-                    label = { Text("快速·约8s") },
-                )
-                FilterChip(
-                    selected = sens == 1, onClick = {
-                        sens = 1; Prefs.setSensitivity(ctx, 1)
-                        if (enabled) HeadsUpService.start(ctx)
-                    },
-                    label = { Text("标准·约12s") },
-                )
+            // 一键拉起（正常不用点，打开页面会自动拉起）
+            if (enabled && !alive) {
+                OutlinedButton(
+                    onClick = { HeadsUpService.start(ctx) },
+                    modifier = Modifier.fillMaxWidth(),
+                ) { Text("重启检测服务") }
             }
             OutlinedButton(
                 onClick = { HeadsUpService.simulate(ctx) },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = enabled,
-            ) { Text(if (enabled) "模拟步行" else "先打开总开关再模拟") }
+                enabled = enabled && !snap.simulating,
+            ) {
+                Text(
+                    if (!enabled) "请先打开总开关再模拟"
+                    else if (snap.simulating) "模拟步行中…"
+                    else "模拟步行"
+                )
+            }
         }
     }
 }

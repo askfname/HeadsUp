@@ -1,10 +1,10 @@
-package com.headsup.app.service
+package com.playlab.headsup.service
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.headsup.app.data.Prefs
-import com.headsup.app.util.KeepAliveHelper
+import com.playlab.headsup.data.Prefs
+import com.playlab.headsup.util.KeepAliveHelper
 
 /** 开机 / 更新 / 被杀后自启 */
 class BootReceiver : BroadcastReceiver() {

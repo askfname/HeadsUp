@@ -4,9 +4,9 @@
 
     <!-- 身体活动：步行 / 跑步 / 上下楼检测 -->
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
-    <!-- 通知：提醒必备 -->
+    <!-- 通知 -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <!-- 位置：判断户外（可选） -->
+    <!-- 位置（可选） -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
@@ -17,12 +17,13 @@
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <!-- 弹窗提醒需要悬浮窗 -->
+    <!-- 弹窗提醒悬浮窗 -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
+        android:name=".HeadsUpApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -61,7 +62,7 @@
             android:name=".service.ActivityUpdateReceiver"
             android:exported="false">
             <intent-filter>
-                <action android:name="com.headsup.app.action.ACTIVITY_UPDATE" />
+                <action android:name="com.playlab.headsup.action.ACTIVITY_UPDATE" />
             </intent-filter>
         </receiver>
 
@@ -74,7 +75,7 @@
                 <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
-                <action android:name="com.headsup.app.action.RESTART_SERVICE" />
+                <action android:name="com.playlab.headsup.action.RESTART_SERVICE" />
             </intent-filter>
         </receiver>
     </application>

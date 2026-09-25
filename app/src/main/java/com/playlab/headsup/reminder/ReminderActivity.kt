@@ -1,4 +1,4 @@
-package com.headsup.app.reminder
+package com.playlab.headsup.reminder
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -11,7 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.headsup.app.ui.theme.HeadsUpTheme
+import com.playlab.headsup.ui.theme.HeadsUpTheme
 
 /** 全屏提醒页（强制打断） */
 class ReminderActivity : ComponentActivity() {
