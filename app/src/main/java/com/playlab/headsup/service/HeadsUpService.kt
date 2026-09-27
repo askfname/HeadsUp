@@ -111,6 +111,8 @@ class HeadsUpService : Service() {
                 if (blockedIndoor()) return@WalkDetector // 室内抑制，不计冷却
                 if (Prefs.isEnabled(this) && isUsableNow() && ReminderManager.fire(this)) {
                     detector.noteFired() // 真实发出后闩锁，UI 与提醒同步
+                    // 发出后冷却期内 verdict 用不上，后台立即关 GPS（冷却过期 tick 会按需再开）
+                    IndoorDetector.noteIdle()
                 }
             },
             onTick = { snap ->
@@ -169,6 +171,7 @@ class HeadsUpService : Service() {
                     ReminderManager.fire(this)
                 ) {
                     detector.noteFired()
+                    IndoorDetector.noteIdle()
                 }
             }
             ACTION_RESUBSCRIBE -> needsSubscribe = true

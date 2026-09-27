@@ -17,8 +17,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
@@ -298,7 +298,7 @@ private fun HomeScreen(resumeSeq: Int) {
                 title = { Text("看路提醒") },
                 navigationIcon = {
                     FilledTonalIconButton(onClick = {}, modifier = Modifier.padding(start = 8.dp)) {
-                        Icon(Icons.Default.DirectionsWalk, null)
+                        Icon(Icons.AutoMirrored.Filled.DirectionsWalk, null)
                     }
                 }
             )
@@ -361,7 +361,7 @@ private fun HomeScreen(resumeSeq: Int) {
                         Column(Modifier.weight(1f)) {
                             Text("室内不提醒", style = MaterialTheme.typography.bodyLarge)
                             Text(
-                                "即使在室内也要当心被家具等物品绊倒哦",
+                                "即使在室内也要当心被家具等物品绊倒",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -590,10 +590,10 @@ private fun DetectStatusCard(enabled: Boolean) {
                 !Prefs.isLocationCompat(ctx)
             StateRow(
                 "室内",
-                if (!locEnough && needAlways) "未判断（需始终允许位置）"
-                else if (!locEnough) "未判断（需位置权限）"
-                else if (!Prefs.isIndoorMute(ctx)) "未判断（开关已关）"
-                else if (!IndoorDetector.isLocationOn(ctx)) "未判断（定位总开关已关）"
+                if (!locEnough && needAlways) "未知（需始终允许位置）"
+                else if (!locEnough) "未知（需位置权限）"
+                else if (!Prefs.isIndoorMute(ctx)) "未知（未启用）"
+                else if (!IndoorDetector.isLocationOn(ctx)) "未知（定位已关闭）"
                 else if (snap.indoor) "是（抑制提醒）" else "否",
             )
             StateRow(

@@ -5,7 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DirectionsWalk
+import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material3.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,7 +28,7 @@ class ReminderActivity : ComponentActivity() {
                         verticalArrangement = Arrangement.Center
                     ) {
                         FilledTonalIconButton(onClick = {}, modifier = Modifier.size(96.dp)) {
-                            Icon(Icons.Default.DirectionsWalk, null, Modifier.size(56.dp))
+                            Icon(Icons.AutoMirrored.Filled.DirectionsWalk, null, Modifier.size(56.dp))
                         }
                         Spacer(Modifier.height(24.dp))
                         Text(ReminderManager.randomTitle(), style = MaterialTheme.typography.headlineMedium)
