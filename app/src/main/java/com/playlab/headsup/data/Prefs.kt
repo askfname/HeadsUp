@@ -28,10 +28,71 @@ object Prefs {
     fun setCooldown(ctx: Context, v: Int) =
         sp(ctx).edit().putInt(K_COOLDOWN, v.coerceIn(30, 300)).apply()
 
-    /** 室内不提醒：开 + 够用才抑制；关则完全不用 GPS，走正常逻辑 */
+    /** 室内不提醒：开 + GPS 授权才抑制；关则完全不用 GPS，走正常逻辑 */
     fun isIndoorMute(ctx: Context) = sp(ctx).getBoolean("indoor_mute", false)
     fun setIndoorMute(ctx: Context, v: Boolean) =
         sp(ctx).edit().putBoolean("indoor_mute", v).apply()
+
+    /** 室内判断参数：只判室内，达阈值即室内，其余按室外 */
+    data class IndoorParams(
+        val visIndoor: Int = 8, // 室内强星数上限
+        val ratioIndoor: Float = 0.4f, // 室内占比上限
+        val gpsAcc: Float = 10f, // 精度优于此值按室外（越小越易判室内）
+    )
+
+    private const val K_IN_VIS_IN = "indoor_c_vis_in"
+    private const val K_IN_RATIO_IN = "indoor_c_ratio_in"
+    private const val K_IN_GPS_ACC = "indoor_c_gps_acc"
+
+    // 旧版参数键：仅用于清理
+    private const val K_IN_VIS_OUT_OLD = "indoor_c_vis_out"
+    private const val K_IN_FIX_OUT_OLD = "indoor_c_fix_out"
+    private const val K_IN_RATIO_OUT_OLD = "indoor_c_ratio_out"
+    private const val K_IN_CONFIRM_OLD = "indoor_c_confirm"
+
+    // 有效参数：自定义缺省项回落默认
+    fun getIndoorParams(ctx: Context): IndoorParams {
+        val s = sp(ctx)
+        val d = IndoorParams()
+        return IndoorParams(
+            visIndoor = if (s.contains(K_IN_VIS_IN)) s.getInt(K_IN_VIS_IN, d.visIndoor) else d.visIndoor,
+            ratioIndoor = if (s.contains(K_IN_RATIO_IN)) s.getFloat(K_IN_RATIO_IN, d.ratioIndoor) else d.ratioIndoor,
+            gpsAcc = if (s.contains(K_IN_GPS_ACC)) s.getFloat(K_IN_GPS_ACC, d.gpsAcc) else d.gpsAcc,
+        )
+    }
+
+    // 无任何自定义时返回 null（调用方用默认）
+    fun getIndoorCustomOrNull(ctx: Context): IndoorParams? =
+        if (hasIndoorCustom(ctx)) getIndoorParams(ctx) else null
+
+    fun hasIndoorCustom(ctx: Context): Boolean {
+        val s = sp(ctx)
+        return s.contains(K_IN_VIS_IN) || s.contains(K_IN_RATIO_IN) ||
+            s.contains(K_IN_GPS_ACC)
+    }
+
+    // null 表示该项恢复默认；全 null 等同清空
+    fun saveIndoorCustom(
+        ctx: Context,
+        visIndoor: Int?, ratioIndoor: Float?, gpsAcc: Float?,
+    ) {
+        val e = sp(ctx).edit()
+        if (visIndoor == null) e.remove(K_IN_VIS_IN) else e.putInt(K_IN_VIS_IN, visIndoor)
+        if (ratioIndoor == null) e.remove(K_IN_RATIO_IN) else e.putFloat(K_IN_RATIO_IN, ratioIndoor)
+        if (gpsAcc == null) e.remove(K_IN_GPS_ACC) else e.putFloat(K_IN_GPS_ACC, gpsAcc)
+        e.remove(K_IN_VIS_OUT_OLD).remove(K_IN_FIX_OUT_OLD)
+            .remove(K_IN_RATIO_OUT_OLD).remove(K_IN_CONFIRM_OLD)
+        e.apply()
+    }
+
+    fun clearIndoorParams(ctx: Context) {
+        sp(ctx).edit()
+            .remove(K_IN_VIS_IN).remove(K_IN_RATIO_IN)
+            .remove(K_IN_GPS_ACC)
+            .remove(K_IN_VIS_OUT_OLD).remove(K_IN_FIX_OUT_OLD)
+            .remove(K_IN_RATIO_OUT_OLD).remove(K_IN_CONFIRM_OLD)
+            .apply()
+    }
 
     /** 位置兼容模式：系统不提供始终允许入口时前台即够用（API29 并申确认后置位） */
     fun isLocationCompat(ctx: Context) = sp(ctx).getBoolean("location_compat", false)

@@ -15,10 +15,12 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
@@ -26,6 +28,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -51,7 +54,7 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onPause() {
-        IndoorDetector.setUiOpen(false) // 离开主页：GPS 转后台占空采样
+        IndoorDetector.setUiOpen(false) // 离开主页：GPS 取消追踪
         super.onPause()
     }
 
@@ -70,14 +73,15 @@ private fun HomeScreen(resumeSeq: Int) {
     var cooldown by remember { mutableStateOf(Prefs.getCooldown(ctx)) }
     var sens by remember { mutableStateOf(Prefs.getSensitivity(ctx)) }
     var indoorMute by remember { mutableStateOf(Prefs.isIndoorMute(ctx)) }
-    var pendingIndoor by remember { mutableStateOf(false) } // 想开但权限不足，授权后自动补开
-    var pendingEnable by remember { mutableStateOf(false) } // 想开守护但缺核心权限，等授权结果
-    var pendingPopup by remember { mutableStateOf(false) } // 想切弹窗但缺悬浮窗权限，授权后才切换
+    var pendingIndoor by remember { mutableStateOf(false) } // 权限不足，授权后自动补开
+    var pendingEnable by remember { mutableStateOf(false) } // 开启守护但缺核心权限，等授权结果
+    var pendingPopup by remember { mutableStateOf(false) } // 弹窗提醒缺悬浮窗权限，授权后才切换
     var showLocDialog by remember { mutableStateOf(false) } // 引导去开位置权限
     var showCoreDialog by remember { mutableStateOf(false) } // 引导去开身体活动/通知
+    var showIndoorHelp by remember { mutableStateOf(false) } // “室内不提醒”功能说明 + 高级设置
     var tick by remember { mutableIntStateOf(0) }
 
-    // 系统不再弹窗（不再询问）则直接引导，免得点击无反应
+    // 系统不再弹窗（不再询问）则直接引导
     fun requestRuntime(
         checkPerms: Array<String>,
         onDead: () -> Unit,
@@ -105,7 +109,7 @@ private fun HomeScreen(resumeSeq: Int) {
         )
     }
 
-    // 开关落盘与服务启停（回调里也要用，声明在 launcher 之前）
+    // 开关落盘与服务启停
     fun applyEnabled(on: Boolean) {
         enabled = on
         Prefs.setEnabled(ctx, on)
@@ -125,14 +129,17 @@ private fun HomeScreen(resumeSeq: Int) {
         mode = Prefs.getMode(ctx)
         cooldown = Prefs.getCooldown(ctx)
         sens = Prefs.getSensitivity(ctx)
+        // 同步高级设置参数
+        IndoorDetector.applyCustom(Prefs.getIndoorCustomOrNull(ctx))
         val enough = PermissionHelper.isLocationEnough(ctx)
         var m = Prefs.isIndoorMute(ctx)
-        if (m && !enough) { m = false; Prefs.setIndoorMute(ctx, false) } // 权限被收回则跟随关闭
+        // 权限被收回则跟随关闭
+        if (m && !enough) { m = false; Prefs.setIndoorMute(ctx, false) }
         if (pendingIndoor && enough) {
             m = true; Prefs.setIndoorMute(ctx, true); pendingIndoor = false
         }
         indoorMute = m
-        // 悬浮窗：设置页回来已授权才切到弹窗，否则保持原选项
+        // 悬浮窗已授权才切到弹窗，否则保持原选项
         if (pendingPopup) {
             pendingPopup = false
             if (PermissionHelper.hasOverlay(ctx)) {
@@ -149,7 +156,7 @@ private fun HomeScreen(resumeSeq: Int) {
         }
     }
 
-    // 系统设置页返回立即刷新（悬浮窗/电池/应用详情页靠它，onResume 兜底）
+    // 系统设置页返回立即刷新
     val settingsLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { refreshAll() }
@@ -157,7 +164,7 @@ private fun HomeScreen(resumeSeq: Int) {
     val permLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) {
-        // 守护开关跟随核心权限：拒绝则保持关闭，不先开
+        // 守护开关跟随核心权限
         if (pendingEnable) {
             pendingEnable = false
             if (PermissionHelper.coreGranted(ctx)) applyEnabled(true)
@@ -169,7 +176,7 @@ private fun HomeScreen(resumeSeq: Int) {
             HeadsUpService.reregister(ctx)
             HeadsUpService.resubscribe(ctx)
         }
-        // 室内开关跟随权限：够用即开；29 并申后仍缺后台看系统能力；拒绝则引导
+        // 室内开关跟随权限；29 并申后仍缺后台看系统能力；拒绝则引导
         if (pendingIndoor) {
             if (PermissionHelper.isLocationEnough(ctx)) {
                 indoorMute = true; Prefs.setIndoorMute(ctx, true); pendingIndoor = false
@@ -178,7 +185,7 @@ private fun HomeScreen(resumeSeq: Int) {
                 indoorMute = false; Prefs.setIndoorMute(ctx, false)
                 showLocDialog = true
             } else if (Build.VERSION.SDK_INT == 29 && !bgRationale()) {
-                // Q 允许一次并申，系统不给后台入口即视为给足：前台够用，不再打扰
+                // 允许一次并申，系统不给后台入口即视为给足
                 Prefs.setLocationCompat(ctx, true)
                 indoorMute = true; Prefs.setIndoorMute(ctx, true); pendingIndoor = false
                 if (Prefs.isEnabled(ctx)) HeadsUpService.start(ctx)
@@ -200,7 +207,7 @@ private fun HomeScreen(resumeSeq: Int) {
         }
     }
 
-    // 每次回到前台重读权限：去设置页改完/仅此次过期都要跟随
+    // 每次回到前台重读权限
     LaunchedEffect(resumeSeq) {
         if (resumeSeq > 0) refreshAll()
     }
@@ -255,7 +262,7 @@ private fun HomeScreen(resumeSeq: Int) {
         }
     }
 
-    // 室内勾选跟随权限：够用直接开，否则只走申请流程，不落盘开启
+    // 室内勾选跟随权限：够用直接开，否则只走申请流程
     fun onIndoorCheck(want: Boolean) {
         if (!want) {
             pendingIndoor = false
@@ -274,7 +281,7 @@ private fun HomeScreen(resumeSeq: Int) {
         }
     }
 
-    // 守护开关跟随核心权限：缺权限只走申请，不先开
+    // 守护开关跟随核心权限：缺权限走申请
     fun onEnabledCheck(want: Boolean) {
         if (!want) {
             pendingEnable = false
@@ -314,7 +321,7 @@ private fun HomeScreen(resumeSeq: Int) {
                     Column(Modifier.weight(1f)) {
                         Text(if (enabled) "守护中" else "已关闭", style = MaterialTheme.typography.titleLarge)
                         Text(
-                            if (enabled) "走路看手机时会提醒你" else "打开后在后台检测步行",
+                            if (enabled) "走路时看手机会提醒你" else "开启守护监测行走状态",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -334,7 +341,7 @@ private fun HomeScreen(resumeSeq: Int) {
                         if (PermissionHelper.hasOverlay(ctx)) {
                             mode = it; Prefs.setMode(ctx, it)
                         } else {
-                            // 无权限只跳设置，不切换选项，回来授权后才切
+                            // 无权限只跳设置，不切换选项
                             pendingPopup = true
                             try {
                                 settingsLauncher.launch(overlayIntent())
@@ -346,7 +353,7 @@ private fun HomeScreen(resumeSeq: Int) {
                         mode = it; Prefs.setMode(ctx, it); tick++
                     }
                     Spacer(Modifier.height(4.dp))
-                    // 室内不提醒：勾选态跟随位置权限（无后台入口的系统以前台为准），无权限只走申请不生效
+                    // 室内不提醒：勾选态跟随位置权限
                     val indoorChecked = indoorMute && PermissionHelper.isLocationEnough(ctx)
                     Row(
                         Modifier.fillMaxWidth()
@@ -365,6 +372,10 @@ private fun HomeScreen(resumeSeq: Int) {
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
+                        }
+                        // 功能说明入口
+                        IconButton(onClick = { showIndoorHelp = true }) {
+                            Icon(Icons.Filled.Info, contentDescription = "功能说明")
                         }
                     }
                     Spacer(Modifier.height(4.dp))
@@ -431,13 +442,13 @@ private fun HomeScreen(resumeSeq: Int) {
                         "位置（可选）",
                         if (PermissionHelper.requiresAlwaysLocation(ctx) &&
                             !Prefs.isLocationCompat(ctx)
-                        ) "室内判断需始终允许" else "室内判断需要位置",
+                        ) "室内不提醒需始终允许" else "室内不提醒需要位置权限",
                         PermissionHelper.isLocationEnough(ctx)
                     ) {
                         requestLocation()
                     }
                     if (mode == Prefs.MODE_POPUP)
-                        PermRow("悬浮窗", "弹窗提醒必备", PermissionHelper.hasOverlay(ctx)) {
+                        PermRow("悬浮窗", "弹窗提醒必须", PermissionHelper.hasOverlay(ctx)) {
                             try { settingsLauncher.launch(overlayIntent()) } catch (_: Exception) { }
                         }
                     @Suppress("unused") val _tick = tick // 订阅刷新
@@ -480,7 +491,15 @@ private fun HomeScreen(resumeSeq: Int) {
             )
         }
 
-        // 位置引导：区分的系统要“始终允许”，不区分的系统允许即可
+        // 室内不提醒功能说明 + 高级设置
+        if (showIndoorHelp) {
+            IndoorHelpDialog(
+                onDismiss = { showIndoorHelp = false },
+                onChanged = { tick++ },
+            )
+        }
+
+        // 位置引导
         if (showLocDialog) {
             val needAlways = PermissionHelper.requiresAlwaysLocation(ctx)
             AlertDialog(
@@ -488,8 +507,8 @@ private fun HomeScreen(resumeSeq: Int) {
                 title = { Text(if (needAlways) "需要始终允许位置" else "需要位置权限") },
                 text = {
                     Text(
-                        if (needAlways) "室内判断需在后台获取位置，请在应用信息 → 权限 → 位置中选择“始终允许”。"
-                        else "室内判断需要位置权限，请在应用信息 → 权限中允许位置访问。"
+                        if (needAlways) "室内不提醒需在后台获取位置，请在应用信息 → 权限 → 位置中选择“始终允许”。"
+                        else "室内不提醒需要位置权限，请在应用信息 → 权限中允许位置访问。"
                     )
                 },
                 confirmButton = {
@@ -506,7 +525,7 @@ private fun HomeScreen(resumeSeq: Int) {
             )
         }
 
-        // 核心权限被长期拒绝：系统不再弹窗，引导去设置开启
+        // 核心权限被多次拒绝：系统不再弹窗，引导去设置开启
         if (showCoreDialog) {
             AlertDialog(
                 onDismissRequest = { showCoreDialog = false; pendingEnable = false },
@@ -526,6 +545,115 @@ private fun HomeScreen(resumeSeq: Int) {
             )
         }
     }
+}
+
+/** 室内不提醒功能说明 + 高级设置：自定义室内阈值，空即默认 */
+@Composable
+private fun IndoorHelpDialog(
+    onDismiss: () -> Unit,
+    onChanged: () -> Unit,
+) {
+    val ctx = LocalContext.current
+    val d = Prefs.IndoorParams()
+    var expanded by remember { mutableStateOf(false) }
+    var err by remember { mutableStateOf("") }
+    // 输入框初始显示有效参数（无自定义即默认）
+    val eff = remember { Prefs.getIndoorParams(ctx) }
+    var fVisIn by remember { mutableStateOf(eff.visIndoor.toString()) }
+    var fRatioIn by remember { mutableStateOf(eff.ratioIndoor.toString()) }
+    var fGpsAcc by remember { mutableStateOf(eff.gpsAcc.toString()) }
+
+    // 空=默认，超范围报错；成功后自动关闭
+    fun save() {
+        val visIn = fVisIn.trim().let {
+            if (it.isEmpty()) null else it.toIntOrNull()?.takeIf { v -> v in 0..30 }
+        }
+        val ratioIn = fRatioIn.trim().let {
+            if (it.isEmpty()) null else it.toFloatOrNull()?.takeIf { v -> v in 0f..1f }
+        }
+        val gpsAcc = fGpsAcc.trim().let {
+            if (it.isEmpty()) null else it.toFloatOrNull()?.takeIf { v -> v in 5f..50f }
+        }
+        // 非空但非法即报错
+        if ((fVisIn.trim().isNotEmpty() && visIn == null) ||
+            (fRatioIn.trim().isNotEmpty() && ratioIn == null) ||
+            (fGpsAcc.trim().isNotEmpty() && gpsAcc == null)
+        ) {
+            err = "参数超范围或格式错误，已取消保存"
+            return
+        }
+        Prefs.saveIndoorCustom(ctx, visIn, ratioIn, gpsAcc)
+        IndoorDetector.applyCustom(Prefs.getIndoorCustomOrNull(ctx))
+        err = ""
+        onChanged()
+        onDismiss()
+    }
+
+    fun reset() {
+        Prefs.clearIndoorParams(ctx)
+        IndoorDetector.applyCustom(null)
+        fVisIn = d.visIndoor.toString()
+        fRatioIn = d.ratioIndoor.toString()
+        fGpsAcc = d.gpsAcc.toString()
+        err = ""
+        onChanged()
+    }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("功能说明") },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState())) {
+                Text(
+                    "“室内不提醒”功能受限于设备 GPS 硬件和所处环境差异，可能无法正确判断室内外，必要时可使用高级设置手动调整参数：",
+                    style = MaterialTheme.typography.bodySmall,
+                )
+                TextButton(onClick = { expanded = !expanded }) {
+                    Text(if (expanded) "高级设置 ▾" else "高级设置 ▸")
+                }
+                if (expanded) {
+                    TuneField("强星数", fVisIn, "默认 ${d.visIndoor}（0~30）", KeyboardType.Number) { fVisIn = it }
+                    TuneField("强星占比", fRatioIn, "默认 ${d.ratioIndoor}（0~1）", KeyboardType.Decimal) { fRatioIn = it }
+                    TuneField("GPS 精度（米）", fGpsAcc, "默认 ${d.gpsAcc}（5~50）", KeyboardType.Decimal) { fGpsAcc = it }
+                    Text(
+                        "参数说明：强星数/强星占比越大室内不提醒越灵敏，GPS 精度越小室内不提醒越灵敏。",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    if (err.isNotEmpty()) {
+                        Text(err, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+                    }
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Button(onClick = ::save, modifier = Modifier.weight(1f)) { Text("保存") }
+                        OutlinedButton(onClick = ::reset, modifier = Modifier.weight(1f)) { Text("恢复默认") }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) { Text("关闭") }
+        },
+    )
+}
+
+/** 高级设置单行输入 */
+@Composable
+private fun TuneField(
+    label: String,
+    value: String,
+    placeholder: String,
+    kb: KeyboardType,
+    onValue: (String) -> Unit,
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValue,
+        label = { Text(label) },
+        placeholder = { Text(placeholder) },
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(keyboardType = kb),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
+    )
 }
 
 /** 实时检测状态卡：每秒刷新服务心跳/步态/传感器/GMS 状态 */
@@ -584,21 +712,29 @@ private fun DetectStatusCard(enabled: Boolean) {
                 else "无步伐传感器（本机不支持检测）",
             )
             StateRow("灵敏度", sensDesc)
-            // 室内态跟随位置权限：够用才判断，否则提示缺的权限
+            // 室内态跟随位置权限
             val locEnough = PermissionHelper.isLocationEnough(ctx)
             val needAlways = PermissionHelper.requiresAlwaysLocation(ctx) &&
                 !Prefs.isLocationCompat(ctx)
+            // 直读检测器实时值（快照只在步伐/10s心跳刷新，会滞后）；信号中断不显示旧值
+            val tracking = locEnough && IndoorDetector.isLocationOn(ctx)
+            val liveSats = IndoorDetector.satInfo
+            val satsFresh = tracking && IndoorDetector.isGnssFresh()
+            val liveIndoor = if (tracking) IndoorDetector.isIndoorNow() else snap.indoor
             StateRow(
                 "室内",
                 if (!locEnough && needAlways) "未知（需始终允许位置）"
                 else if (!locEnough) "未知（需位置权限）"
                 else if (!Prefs.isIndoorMute(ctx)) "未知（未启用）"
                 else if (!IndoorDetector.isLocationOn(ctx)) "未知（定位已关闭）"
-                else if (snap.indoor) "是（抑制提醒）" else "否",
+                else if (snap.indoorPending) "确认中…"
+                else if (liveIndoor) "是（抑制提醒）" else "否",
             )
             StateRow(
                 "卫星",
-                if (locEnough && IndoorDetector.isLocationOn(ctx)) "${snap.sats}（定位/可见/总数）" else "未追踪"
+                if (!tracking) "未追踪"
+                else if (!satsFresh) "等待信号…"
+                else "$liveSats（定位/强星/总数）"
             )
             StateRow("GMS 加速", snap.gms)
             // 一键拉起（正常不用点，打开页面会自动拉起）

@@ -41,7 +41,7 @@ object ReminderManager {
         )
         nm.createNotificationChannel(
             NotificationChannel(CH_ALERT, "看路提醒", NotificationManager.IMPORTANCE_HIGH).apply {
-                description = "走路玩手机时的提醒"
+                description = "看路提醒的浮动通知"
                 enableVibration(true)
             }
         )

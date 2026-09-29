@@ -11,9 +11,9 @@ import com.google.android.gms.location.DetectedActivity
 import com.playlab.headsup.data.Prefs
 
 /**
- * GMS 步行回调 + 通知按钮消除。
+ * GMS 步行回调 + 通知按钮消除
  * 注意：GMS 回调可能延迟数分钟到达，这里只转交 Hint 给服务，
- * 由服务用检测器活体状态二次确认后才提醒；且不再重启服务（避免重订阅自激循环）。
+ * 由服务用检测器活体状态二次确认后才提醒；且不再重启服务（避免重订阅自激循环）
  */
 class ActivityUpdateReceiver : BroadcastReceiver() {
     override fun onReceive(ctx: Context, intent: Intent) {

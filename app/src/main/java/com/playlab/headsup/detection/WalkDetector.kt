@@ -27,6 +27,7 @@ data class DetectSnapshot(
     val lastTriggerAt: Long = 0L, // 上次真实提醒时刻（elapsedRealtime，批量投递下UI同步用）
     val simulating: Boolean = false, // 模拟步行状态
     val indoor: Boolean = false, // GPS 判室内（仅“室内不提醒”开时更新）
+    val indoorPending: Boolean = false, // 位置未决、提醒挂起中
     val sats: String = "未知", // 强星/总数（跨机型对比信号用）
 )
 
@@ -35,10 +36,10 @@ object DetectState {
 }
 
 /**
- * 本机步态检测（不依赖 GMS），使用 STEP_DETECTOR（0x12）。
- * 连续 N 步节律一致才触发；节律按硬件事件时间戳计算，ROM 批量投递也不影响。
- * 防误触：步伐节律 + 加速度/陀螺仪动作幅度双重确认，原地晃动因旋转过大/幅度超限被打断；
- * 锁屏或口袋（距离感应器遮挡）时直接丢弃步伐，不累计。
+ * 本机步态检测（不依赖 GMS），使用 STEP_DETECTOR（0x12）
+ * 连续 N 步节律一致才触发；节律按硬件事件时间戳计算，ROM 批量投递也不影响
+ * 防误触：步伐节律 + 加速度/陀螺仪动作幅度双重确认，原地晃动因旋转过大/幅度超限被打断
+ * 锁屏或口袋（距离感应器遮挡）时直接丢弃步伐，不累计
  */
 class WalkDetector(
     private val onTrigger: () -> Unit,
@@ -184,8 +185,8 @@ class WalkDetector(
     }
 
     /**
-     * 熔断门：此刻是否处于行走状态（连贯步数≥档位门限 且 5s 内有步伐，且在用机、无遮挡、动作幅度正常）。
-     * 所有提醒触发前必须过此门，防止过期信号（延迟的 GMS 回调等）在静止时触发。
+     * 熔断门：此刻是否处于行走状态（连贯步数≥档位门限 且 5s 内有步伐，且在用机、无遮挡、动作幅度正常）
+     * 所有提醒触发前必须过此门，防止过期信号（延迟的 GMS 回调等）在静止时触发
      */
     fun isWalkingNow(): Boolean {
         if (runLen < candSteps) return false
@@ -195,6 +196,9 @@ class WalkDetector(
         if (now - lastStepTime >= 5_000) return false
         return gaitOk(now)
     }
+
+    /** 模拟步行中：端到端测试走即时通路，不挂起等 GPS */
+    fun isSimulating() = testMode
 
     /** 模拟步行：走真实检测通路（供设置页端到端测试），起止都推送快照供按钮置灰 */
     fun injectTestBurst() {
@@ -268,8 +272,8 @@ class WalkDetector(
     }
 
     /**
-     * 动作幅度门：本轮窗口内加速度标准差过大（剧烈晃动）或陀螺仪均值过大（大幅旋转）则判假。
-     * 样本不足（传感器缺失/刚启动）时放行，避免误杀。
+     * 动作幅度门：本轮窗口内加速度标准差过大（剧烈晃动）或陀螺仪均值过大（大幅旋转）则判假
+     * 样本不足（传感器缺失/刚启动）时放行，避免误杀
      */
     private fun gaitOk(now: Long): Boolean {
         val from = if (runStart > 0) runStart else now - 6_000
@@ -351,9 +355,9 @@ class WalkDetector(
             handler.postDelayed(resetTask, idleResetMs)
             return
         }
+        // 触发线：达连贯步数即回调（不清零：抑制/挂起不消耗步数，冷却防重发，显示不断链）
         if (runLen >= requiredSteps && (testMode || (screenOn && unlocked && !pocketed && gaitOk(at)))) {
-            resetRun()
-            // 不清空 stepTimes：窗口步数留作 UI 证据，10s 自然滑出
+            // 不清空 runLen/stepTimes：连续行走保持显示，停走由 resetTask 清零
             onTrigger()
         }
         // 每次步伐后重约定点：超时无后续即判停走（单次延迟任务，开销可忽略）
