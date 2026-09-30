@@ -34,6 +34,7 @@
             android:name=".reminder.ReminderActivity"
             android:exported="false"
             android:launchMode="singleTop"
+            android:excludeFromRecents="true"
             android:showWhenLocked="true"
             android:turnScreenOn="true"
             android:theme="@style/Theme.HeadsUp" />
@@ -63,6 +64,7 @@
             android:exported="false">
             <intent-filter>
                 <action android:name="com.playlab.headsup.action.ACTIVITY_UPDATE" />
+                <action android:name="com.playlab.headsup.action.DISMISS" />
             </intent-filter>
         </receiver>
 

@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="seed">#6750A4</color>
+    <!-- 桌面图标：低版本回退色，v31+ 由壁纸动态取色覆盖 -->
+    <color name="ic_launcher_background">#EADDFF</color>
+    <color name="ic_launcher_foreground">#21005D</color>
 </resources>

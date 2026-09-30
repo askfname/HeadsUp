@@ -3,6 +3,7 @@ package com.playlab.headsup.reminder
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
@@ -17,6 +18,7 @@ import com.playlab.headsup.ui.theme.HeadsUpTheme
 class ReminderActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge() // 沉浸式：系统栏透明，图标深浅自动适配
         setShowWhenLocked(true)
         setTurnScreenOn(true)
         setContent {
@@ -40,7 +42,7 @@ class ReminderActivity : ComponentActivity() {
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Spacer(Modifier.height(32.dp))
-                        Button(onClick = { finish() }, modifier = Modifier.fillMaxWidth()) {
+                        Button(onClick = { finishAndRemoveTask() }, modifier = Modifier.fillMaxWidth()) {
                             Text("我知道了，抬头看路")
                         }
                     }

@@ -11,6 +11,7 @@ import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -28,6 +29,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
@@ -60,6 +62,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge() // 沉浸式：系统栏透明，图标深浅随主题自动适配
         setContent { HeadsUpTheme { HomeScreen(resumeSeq) } }
     }
 }
@@ -301,25 +304,26 @@ private fun HomeScreen(resumeSeq: Int) {
         data = Uri.parse("package:${ctx.packageName}")
     }
 
+    // 沉浸滚动：Scaffold 不预留固定边框，系统边衬随内容一起滚，滚动时内容滑入透明系统栏之下
     Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text("看路提醒") },
-                navigationIcon = {
-                    FilledTonalIconButton(onClick = {}, modifier = Modifier.padding(start = 8.dp)) {
-                        Icon(Icons.AutoMirrored.Filled.DirectionsWalk, null)
-                    }
-                }
-            )
-        }
-    ) { pad ->
+        modifier = Modifier.fillMaxSize(),
+        containerColor = MaterialTheme.colorScheme.surface,
+        contentWindowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp),
+    ) { _ ->
         Column(
-            Modifier.padding(pad).padding(16.dp).verticalScroll(rememberScrollState()),
+            Modifier.fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .windowInsetsPadding(WindowInsets.safeDrawing)
+                .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             // 状态卡
             ElevatedCard(Modifier.fillMaxWidth()) {
                 Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                    FilledTonalIconButton(onClick = {}) {
+                        Icon(Icons.AutoMirrored.Filled.DirectionsWalk, null)
+                    }
+                    Spacer(Modifier.width(12.dp))
                     Column(Modifier.weight(1f)) {
                         Text(if (enabled) "守护中" else "已关闭", style = MaterialTheme.typography.titleLarge)
                         Text(
@@ -405,7 +409,10 @@ private fun HomeScreen(resumeSeq: Int) {
                             )
                         }
                         // 功能说明入口
-                        IconButton(onClick = { showIndoorHelp = true }) {
+                        IconButton(
+                            onClick = { showIndoorHelp = true },
+                            modifier = Modifier.padding(end = 8.dp),
+                        ) {
                             Icon(Icons.Filled.Info, contentDescription = "功能说明")
                         }
                     }
@@ -421,12 +428,18 @@ private fun HomeScreen(resumeSeq: Int) {
                     )
                     Spacer(Modifier.height(4.dp))
                     Text("灵敏度", style = MaterialTheme.typography.bodyMedium)
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {                        FilterChip(
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {                        // 选中态与测试按钮同色（primary 动态色）
+                        val chipColors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = MaterialTheme.colorScheme.primary,
+                            selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                        )
+                        FilterChip(
                             selected = sens == 0, onClick = {
                                 sens = 0; Prefs.setSensitivity(ctx, 0)
                                 if (enabled) HeadsUpService.start(ctx)
                             },
                             label = { Text("灵敏") },
+                            colors = chipColors,
                         )
                         FilterChip(
                             selected = sens == 1, onClick = {
@@ -434,6 +447,7 @@ private fun HomeScreen(resumeSeq: Int) {
                                 if (enabled) HeadsUpService.start(ctx)
                             },
                             label = { Text("标准") },
+                            colors = chipColors,
                         )
                         FilterChip(
                             selected = sens == 2, onClick = {
@@ -441,8 +455,10 @@ private fun HomeScreen(resumeSeq: Int) {
                                 if (enabled) HeadsUpService.start(ctx)
                             },
                             label = { Text("严格") },
+                            colors = chipColors,
                         )
                     }
+                    Spacer(Modifier.height(8.dp))
                     Button(onClick = { ReminderManager.test(ctx) }, modifier = Modifier.fillMaxWidth()) {
                         Icon(Icons.Default.Notifications, null)
                         Spacer(Modifier.width(8.dp))
@@ -639,7 +655,10 @@ private fun IndoorHelpDialog(
                     "“室内不提醒”功能受限于设备 GPS 硬件和所处环境差异，可能无法正确判断室内外，必要时可使用高级设置手动调整参数：",
                     style = MaterialTheme.typography.bodySmall,
                 )
-                TextButton(onClick = { expanded = !expanded }) {
+                TextButton(
+                    onClick = { expanded = !expanded },
+                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
+                ) {
                     Text(if (expanded) "高级设置 ▾" else "高级设置 ▸")
                 }
                 if (expanded) {
@@ -654,7 +673,10 @@ private fun IndoorHelpDialog(
                     if (err.isNotEmpty()) {
                         Text(err, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
                     }
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.padding(top = 8.dp),
+                    ) {
                         Button(onClick = ::save, modifier = Modifier.weight(1f)) { Text("保存") }
                         OutlinedButton(onClick = ::reset, modifier = Modifier.weight(1f)) { Text("恢复默认") }
                     }
@@ -775,6 +797,7 @@ private fun DetectStatusCard(enabled: Boolean) {
                     modifier = Modifier.fillMaxWidth(),
                 ) { Text("重启检测服务") }
             }
+            Spacer(Modifier.height(8.dp))
             OutlinedButton(
                 onClick = { HeadsUpService.simulate(ctx) },
                 modifier = Modifier.fillMaxWidth(),
@@ -796,8 +819,9 @@ private fun StateRow(label: String, value: String) {
         Text(
             label, style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.width(64.dp),
+            modifier = Modifier.width(80.dp),
         )
+        Spacer(Modifier.width(8.dp))
         Text(value, style = MaterialTheme.typography.bodyMedium)
     }
 }
@@ -838,9 +862,12 @@ private fun PermRow(title: String, desc: String, ok: Boolean, onFix: () -> Unit)
             )
         }
         if (!ok) TextButton(onClick = onFix) { Text("去开启") }
-        else Text(
-            "已允许", style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.primary
-        )
+        else TextButton(
+            onClick = {},
+            enabled = false,
+            colors = ButtonDefaults.textButtonColors(
+                disabledContentColor = MaterialTheme.colorScheme.primary,
+            ),
+        ) { Text("已允许", fontWeight = FontWeight.Normal) }
     }
 }
