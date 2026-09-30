@@ -35,7 +35,7 @@ object IndoorDetector {
     private const val GPS_GOOD_NEED = 2
 
     // 室内进入：总数 >= 8 用强星+占比双判；总数 < 8 只看强星+定位星（小样本占比无意义）
-    private const val VIS_INDOOR = 8
+    private const val VIS_INDOOR = 7
     private const val VIS_RATIO_INDOOR = 0.4f
     private const val BIG_TOTAL = 8
 

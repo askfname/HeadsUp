@@ -42,19 +42,31 @@ object ReminderManager {
         nm.createNotificationChannel(
             NotificationChannel(CH_ALERT, "看路提醒", NotificationManager.IMPORTANCE_HIGH).apply {
                 description = "看路提醒的浮动通知"
-                enableVibration(true)
+                // 关系统通知的震动
+                enableVibration(false)
+                vibrationPattern = null
             }
         )
+        // 存量渠道：同样关闭系统震动
+        try {
+            nm.getNotificationChannel(CH_ALERT)?.let {
+                if (it.shouldVibrate()) {
+                    it.enableVibration(false)
+                    it.vibrationPattern = null
+                    nm.createNotificationChannel(it)
+                }
+            }
+        } catch (_: Exception) { }
     }
 
     fun randomTitle() = TITLES.random()
 
     /** 统一入口：按用户选择的模式提醒，返回是否真正发出（冷却/灭屏/锁屏会被拦截） */
-    fun fire(ctx: Context): Boolean {
+    fun fire(ctx: Context, checkIndoor: Boolean = true): Boolean {
         if (!Prefs.canTrigger(ctx)) return false
         if (!isUsable(ctx)) return false // 灭屏/锁屏兜底：延迟回调到此时已无意义
         // 室内抑制：开关开且 GPS 判室内才拦截，开关关则不用 GPS
-        if (Prefs.isIndoorMute(ctx) && IndoorDetector.isIndoorNow()) return false
+        if (checkIndoor && Prefs.isIndoorMute(ctx) && IndoorDetector.isIndoorNow()) return false
         Prefs.markTriggered(ctx)
         ensureChannels(ctx)
         vibrate(ctx)
@@ -74,10 +86,10 @@ object ReminderManager {
         return true
     }
 
-    /** 供设置页测试：跳过冷却直接提醒 */
+    /** 供设置页测试：跳过冷却与室内判断，直接提醒 */
     fun test(ctx: Context) {
         Prefs.resetCooldown(ctx)
-        fire(ctx)
+        fire(ctx, checkIndoor = false)
     }
 
     // ---- 方式1：浮动通知（heads-up 横幅） ----
@@ -155,12 +167,14 @@ object ReminderManager {
         })
     }
 
+    // 软件内震动：短促两次
     private fun vibrate(ctx: Context) {
+        if (!Prefs.isVibrate(ctx)) return
         try {
             val vib = if (Build.VERSION.SDK_INT >= 31)
                 ctx.getSystemService(VibratorManager::class.java)?.defaultVibrator
             else @Suppress("DEPRECATION") ctx.getSystemService(Vibrator::class.java)
-            vib?.vibrate(VibrationEffect.createOneShot(400, VibrationEffect.DEFAULT_AMPLITUDE))
+            vib?.vibrate(VibrationEffect.createWaveform(longArrayOf(0, 350, 250, 350), -1))
         } catch (_: Exception) { }
     }
 }

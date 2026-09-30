@@ -33,9 +33,14 @@ object Prefs {
     fun setIndoorMute(ctx: Context, v: Boolean) =
         sp(ctx).edit().putBoolean("indoor_mute", v).apply()
 
+    /** 提醒时震动：默认开 */
+    fun isVibrate(ctx: Context) = sp(ctx).getBoolean("vibrate", true)
+    fun setVibrate(ctx: Context, v: Boolean) =
+        sp(ctx).edit().putBoolean("vibrate", v).apply()
+
     /** 室内判断参数：只判室内，达阈值即室内，其余按室外 */
     data class IndoorParams(
-        val visIndoor: Int = 8, // 室内强星数上限
+        val visIndoor: Int = 7, // 室内强星数上限
         val ratioIndoor: Float = 0.4f, // 室内占比上限
         val gpsAcc: Float = 10f, // 精度优于此值按室外（越小越易判室内）
     )

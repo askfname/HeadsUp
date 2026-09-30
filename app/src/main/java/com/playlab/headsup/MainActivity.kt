@@ -73,6 +73,7 @@ private fun HomeScreen(resumeSeq: Int) {
     var cooldown by remember { mutableStateOf(Prefs.getCooldown(ctx)) }
     var sens by remember { mutableStateOf(Prefs.getSensitivity(ctx)) }
     var indoorMute by remember { mutableStateOf(Prefs.isIndoorMute(ctx)) }
+    var vibrate by remember { mutableStateOf(Prefs.isVibrate(ctx)) }
     var pendingIndoor by remember { mutableStateOf(false) } // 权限不足，授权后自动补开
     var pendingEnable by remember { mutableStateOf(false) } // 开启守护但缺核心权限，等授权结果
     var pendingPopup by remember { mutableStateOf(false) } // 弹窗提醒缺悬浮窗权限，授权后才切换
@@ -129,6 +130,7 @@ private fun HomeScreen(resumeSeq: Int) {
         mode = Prefs.getMode(ctx)
         cooldown = Prefs.getCooldown(ctx)
         sens = Prefs.getSensitivity(ctx)
+        vibrate = Prefs.isVibrate(ctx)
         // 同步高级设置参数
         IndoorDetector.applyCustom(Prefs.getIndoorCustomOrNull(ctx))
         val enough = PermissionHelper.isLocationEnough(ctx)
@@ -353,6 +355,35 @@ private fun HomeScreen(resumeSeq: Int) {
                         mode = it; Prefs.setMode(ctx, it); tick++
                     }
                     Spacer(Modifier.height(4.dp))
+                    // 提醒时震动
+                    Row(
+                        Modifier.fillMaxWidth()
+                            .selectable(
+                                selected = vibrate,
+                                onClick = {
+                                    vibrate = !vibrate
+                                    Prefs.setVibrate(ctx, vibrate)
+                                }
+                            ),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Checkbox(
+                            checked = vibrate,
+                            onCheckedChange = {
+                                vibrate = it
+                                Prefs.setVibrate(ctx, it)
+                            }
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Column(Modifier.weight(1f)) {
+                            Text("提醒时震动", style = MaterialTheme.typography.bodyLarge)
+                            Text(
+                                "发出提醒的同时震动",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
                     // 室内不提醒：勾选态跟随位置权限
                     val indoorChecked = indoorMute && PermissionHelper.isLocationEnough(ctx)
                     Row(
