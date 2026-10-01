@@ -105,7 +105,7 @@ object ReminderManager {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         val n = NotificationCompat.Builder(ctx, CH_ALERT)
-            .setSmallIcon(R.drawable.ic_walk)
+            .setSmallIcon(R.drawable.ic_notify)
             .setContentTitle(randomTitle())
             .setContentText(CONTENT)
             .setSubText("看路提醒")
@@ -186,7 +186,7 @@ object ReminderManager {
                 }
             }
             val icon = android.widget.ImageView(ctx).apply {
-                setImageResource(R.drawable.ic_walk)
+                setImageResource(R.drawable.ic_notify)
                 imageTintList = android.content.res.ColorStateList.valueOf(onPrimaryContainer)
                 layoutParams = android.widget.FrameLayout.LayoutParams(dp(28), dp(28), Gravity.CENTER)
             }

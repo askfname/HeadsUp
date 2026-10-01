@@ -278,7 +278,7 @@ class HeadsUpService : Service() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
         return NotificationCompat.Builder(this, ReminderManager.CH_GUARD)
-            .setSmallIcon(R.drawable.ic_walk)
+            .setSmallIcon(com.playlab.headsup.R.drawable.ic_notify)
             .setContentTitle("看路提醒运行中")
             .setContentText(text)
             .setOngoing(true)
