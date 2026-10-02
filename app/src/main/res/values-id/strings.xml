@@ -94,9 +94,9 @@
     <string name="perm_granted">Diizinkan</string>
 
     <string name="keepalive_title">Mulai otomatis dan persistensi</string>
-    <string name="autostart_settings">Setelan mulai otomatis</string>
+    <string name="autostart_settings">Mulai otomatis</string>
     <string name="battery_whitelist">Daftar putih baterai</string>
-    <string name="battery_ignored">Optimasi baterai diabaikan</string>
+    <string name="battery_ignored">Diabaikan</string>
     <string name="device_hint_xiaomi">Xiaomi: Setelan → Setelan aplikasi → Manajemen otorisasi → Mulai otomatis</string>
     <string name="device_hint_huawei">Huawei: Manajer Telepon → Manajemen peluncuran → Izinkan mulai otomatis</string>
     <string name="device_hint_oppo">OPPO / OnePlus: Manajer Telepon → Privasi → Manajemen mulai otomatis</string>

@@ -94,9 +94,9 @@
     <string name="perm_granted">Gewährt</string>
 
     <string name="keepalive_title">Autostart und Schutz</string>
-    <string name="autostart_settings">Autostart-Einstellungen</string>
+    <string name="autostart_settings">Autostart</string>
     <string name="battery_whitelist">Akku-Whitelist</string>
-    <string name="battery_ignored">Akkuoptimierung wird ignoriert</string>
+    <string name="battery_ignored">Ignoriert</string>
     <string name="device_hint_xiaomi">Xiaomi: Einstellungen → App-Einstellungen → Berechtigungsverwaltung → Autostart</string>
     <string name="device_hint_huawei">Huawei: Telefonmanager → App-Startverwaltung → Autostart zulassen</string>
     <string name="device_hint_oppo">OPPO / OnePlus: Telefonmanager → Datenschutz → Autostart-Verwaltung</string>

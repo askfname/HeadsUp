@@ -94,9 +94,9 @@
     <string name="perm_granted">Concedida</string>
 
     <string name="keepalive_title">Arranque automático e persistência</string>
-    <string name="autostart_settings">Definições de arranque automático</string>
+    <string name="autostart_settings">Arranque auto</string>
     <string name="battery_whitelist">Lista branca de bateria</string>
-    <string name="battery_ignored">Otimização de bateria ignorada</string>
+    <string name="battery_ignored">Ignorada</string>
     <string name="device_hint_xiaomi">Xiaomi: Definições → Definições de apps → Gestão de autorizações → Arranque automático</string>
     <string name="device_hint_huawei">Huawei: Gestor do telefone → Gestão de arranque → Permitir arranque automático</string>
     <string name="device_hint_oppo">OPPO / OnePlus: Gestor do telefone → Privacidade → Gestão de arranque automático</string>

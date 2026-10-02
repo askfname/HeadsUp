@@ -94,9 +94,9 @@
     <string name="perm_granted">Разрешено</string>
 
     <string name="keepalive_title">Автозапуск и удержание</string>
-    <string name="autostart_settings">Настройки автозапуска</string>
+    <string name="autostart_settings">Автозапуск</string>
     <string name="battery_whitelist">Белый список батареи</string>
-    <string name="battery_ignored">Оптимизация батареи игнорируется</string>
+    <string name="battery_ignored">Отключена</string>
     <string name="device_hint_xiaomi">Xiaomi: Настройки → Настройки приложений → Управление разрешениями → Автозапуск</string>
     <string name="device_hint_huawei">Huawei: Диспетчер телефона → Управление запуском → Разрешить автозапуск</string>
     <string name="device_hint_oppo">OPPO / OnePlus: Диспетчер телефона → Конфиденциальность → Управление автозапуском</string>

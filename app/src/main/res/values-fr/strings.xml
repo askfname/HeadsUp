@@ -94,9 +94,9 @@
     <string name="perm_granted">Accordée</string>
 
     <string name="keepalive_title">Démarrage auto et maintien actif</string>
-    <string name="autostart_settings">Paramètres de démarrage automatique</string>
+    <string name="autostart_settings">Démarrage auto</string>
     <string name="battery_whitelist">Liste blanche de batterie</string>
-    <string name="battery_ignored">Optimisation de batterie ignorée</string>
+    <string name="battery_ignored">Non optimisée</string>
     <string name="device_hint_xiaomi">Xiaomi : Paramètres → Paramètres des applis → Gestion des autorisations → Démarrage auto</string>
     <string name="device_hint_huawei">Huawei : Gestionnaire du téléphone → Gestion du lancement des applis → Autoriser le démarrage auto</string>
     <string name="device_hint_oppo">OPPO / OnePlus : Gestionnaire du téléphone → Confidentialité → Gestion du démarrage auto</string>

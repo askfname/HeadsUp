@@ -94,9 +94,9 @@
     <string name="perm_granted">अनुमत</string>
 
     <string name="keepalive_title">स्वतः-प्रारंभ व सक्रियता</string>
-    <string name="autostart_settings">स्वतः-प्रारंभ सेटिंग</string>
+    <string name="autostart_settings">स्वतः-प्रारंभ</string>
     <string name="battery_whitelist">बैटरी श्वेतसूची</string>
-    <string name="battery_ignored">बैटरी अनुकूलन उपेक्षित</string>
+    <string name="battery_ignored">अनुकूलन बंद</string>
     <string name="device_hint_xiaomi">Xiaomi: सेटिंग → ऐप सेटिंग → प्राधिकरण प्रबंधन → स्वतः-प्रारंभ</string>
     <string name="device_hint_huawei">Huawei: फ़ोन प्रबंधक → ऐप प्रारंभ प्रबंधन → स्वतः-प्रारंभ अनुमति दें</string>
     <string name="device_hint_oppo">OPPO / OnePlus: फ़ोन प्रबंधक → गोपनीयता → स्वतः-प्रारंभ प्रबंधन</string>

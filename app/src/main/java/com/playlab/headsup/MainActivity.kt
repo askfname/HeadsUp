@@ -441,7 +441,7 @@ private fun HomeScreen(resumeSeq: Int) {
                         // 功能说明入口
                         IconButton(
                             onClick = { showIndoorHelp = true },
-                            modifier = Modifier.padding(end = 8.dp),
+                            modifier = Modifier.padding(end = 5.dp),
                         ) {
                             Icon(Icons.Filled.Info, contentDescription = stringResource(R.string.indoor_help_title))
                         }
@@ -1022,6 +1022,7 @@ private fun AboutCard() {
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
+            Spacer(Modifier.height(2.dp))
             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Text(
                     stringResource(R.string.developer_title),

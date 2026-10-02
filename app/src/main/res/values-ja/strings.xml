@@ -94,9 +94,9 @@
     <string name="perm_granted">許可済み</string>
 
     <string name="keepalive_title">自動起動と常駐</string>
-    <string name="autostart_settings">自動起動設定</string>
+    <string name="autostart_settings">自動起動</string>
     <string name="battery_whitelist">電池ホワイトリスト</string>
-    <string name="battery_ignored">電池の最適化を無視済み</string>
+    <string name="battery_ignored">最適化オフ</string>
     <string name="device_hint_xiaomi">Xiaomi：設定 → アプリ設定 → 許可管理 → 自動起動</string>
     <string name="device_hint_huawei">Huawei：端末管理 → アプリ起動管理 → 自動起動を許可</string>
     <string name="device_hint_oppo">OPPO / OnePlus：端末管理 → プライバシー権限 → 自動起動管理</string>

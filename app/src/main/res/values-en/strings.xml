@@ -100,9 +100,9 @@
 
     <!-- Keep-alive -->
     <string name="keepalive_title">Auto-start and keep-alive</string>
-    <string name="autostart_settings">Auto-start settings</string>
+    <string name="autostart_settings">Auto-start</string>
     <string name="battery_whitelist">Battery whitelist</string>
-    <string name="battery_ignored">Battery optimization ignored</string>
+    <string name="battery_ignored">Unrestricted</string>
     <string name="device_hint_xiaomi">Xiaomi: Settings → App settings → Authorization management → Auto-start</string>
     <string name="device_hint_huawei">Huawei: Phone Manager → App launch management → Allow auto-start</string>
     <string name="device_hint_oppo">OPPO / OnePlus: Phone Manager → Privacy permissions → Auto-start management</string>

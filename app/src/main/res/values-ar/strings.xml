@@ -94,9 +94,9 @@
     <string name="perm_granted">ممنوح</string>
 
     <string name="keepalive_title">التشغيل التلقائي والاستمرارية</string>
-    <string name="autostart_settings">إعدادات التشغيل التلقائي</string>
+    <string name="autostart_settings">بدء تلقائي</string>
     <string name="battery_whitelist">القائمة البيضاء للبطارية</string>
-    <string name="battery_ignored">تم تجاهل تحسين البطارية</string>
+    <string name="battery_ignored">بدون تحسين</string>
     <string name="device_hint_xiaomi">Xiaomi: الإعدادات ← إعدادات التطبيقات ← إدارة التفويض ← التشغيل التلقائي</string>
     <string name="device_hint_huawei">Huawei: مدير الهاتف ← إدارة بدء التطبيقات ← السماح بالتشغيل التلقائي</string>
     <string name="device_hint_oppo">OPPO / OnePlus: مدير الهاتف ← الخصوصية ← إدارة التشغيل التلقائي</string>

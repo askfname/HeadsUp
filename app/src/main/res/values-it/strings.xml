@@ -94,9 +94,9 @@
     <string name="perm_granted">Concessa</string>
 
     <string name="keepalive_title">Avvio automatico e persistenza</string>
-    <string name="autostart_settings">Impostazioni di avvio automatico</string>
+    <string name="autostart_settings">Avvio auto</string>
     <string name="battery_whitelist">Whitelist della batteria</string>
-    <string name="battery_ignored">Ottimizzazione della batteria ignorata</string>
+    <string name="battery_ignored">Ignorata</string>
     <string name="device_hint_xiaomi">Xiaomi: Impostazioni → Impostazioni app → Gestione autorizzazioni → Avvio automatico</string>
     <string name="device_hint_huawei">Huawei: Gestione telefono → Gestione avvio app → Consenti avvio automatico</string>
     <string name="device_hint_oppo">OPPO / OnePlus: Gestione telefono → Privacy → Gestione avvio automatico</string>

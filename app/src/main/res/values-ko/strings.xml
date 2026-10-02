@@ -94,9 +94,9 @@
     <string name="perm_granted">허용됨</string>
 
     <string name="keepalive_title">자동 시작 및 유지</string>
-    <string name="autostart_settings">자동 시작 설정</string>
+    <string name="autostart_settings">자동 시작</string>
     <string name="battery_whitelist">배터리 화이트리스트</string>
-    <string name="battery_ignored">배터리 최적화 무시됨</string>
+    <string name="battery_ignored">최적화 무시</string>
     <string name="device_hint_xiaomi">Xiaomi: 설정 → 앱 설정 → 권한 관리 → 자동 시작</string>
     <string name="device_hint_huawei">Huawei: 휴대폰 관리 → 앱 실행 관리 → 자동 시작 허용</string>
     <string name="device_hint_oppo">OPPO / OnePlus: 휴대폰 관리 → 개인정보 보호 → 자동 시작 관리</string>
