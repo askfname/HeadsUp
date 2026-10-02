@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">HeadsUp</string>
+    <string name="desc">Pengingat tepat waktu saat menggunakan ponsel sambil berjalan — lihat jalan</string>
+    <string name="disclaimer">Pengingat tidak menggantikan perhatian. Minimalkan penggunaan ponsel saat berjalan.</string>
+
+    <string name="home_status_on">Perlindungan aktif</string>
+    <string name="home_status_off">Nonaktif</string>
+    <string name="home_status_on_desc">Anda akan diingatkan saat menggunakan ponsel sambil berjalan</string>
+    <string name="home_status_off_desc">Aktifkan perlindungan untuk memantau pejalan</string>
+
+    <string name="section_reminder_method">Metode pengingat</string>
+    <string name="mode_float_title">Pengingat mengambang</string>
+    <string name="mode_float_desc">Kartu mengambang; memerlukan izin tampil di atas aplikasi</string>
+    <string name="mode_popup_title">Notifikasi pop-up</string>
+    <string name="mode_popup_desc">Spanduk atas; memerlukan izin notifikasi pop-up</string>
+    <string name="mode_full_title">Pengingat layar penuh</string>
+    <string name="mode_full_desc">Gangguan layar penuh paksa dengan efek terkuat</string>
+    <string name="vibrate_title">Bergetar saat pengingat</string>
+    <string name="vibrate_desc">Bergetar saat pengingat dikeluarkan</string>
+    <string name="indoor_mute_title">Bisukan di dalam ruangan</string>
+    <string name="indoor_mute_desc">Di dalam ruangan pun waspadai bahaya tersandung furnitur</string>
+    <string name="cooldown_format">Interval pengingat: %1$d detik</string>
+    <string name="sensitivity_title">Sensitivitas</string>
+    <string name="sens_low">Sensitif</string>
+    <string name="sens_mid">Standar</string>
+    <string name="sens_high">Ketat</string>
+    <string name="test_reminder">Uji pengingat</string>
+
+    <string name="detect_status_title">Status deteksi</string>
+    <string name="sens_desc_sensitive">Sensitif (8 langkah · ≤2 dtk/langkah)</string>
+    <string name="sens_desc_standard">Standar (12 langkah · ≤1,7 dtk/langkah)</string>
+    <string name="sens_desc_strict">Ketat (16 langkah · ≤1,5 dtk/langkah)</string>
+    <string name="state_service">Layanan</string>
+    <string name="state_off">Nonaktif</string>
+    <string name="state_standby_screen_off">Siaga (layar mati, hemat daya)</string>
+    <string name="state_standby_locked">Siaga (terkunci)</string>
+    <string name="state_standby_pocket">Siaga (di saku)</string>
+    <string name="state_running">Berjalan</string>
+    <string name="state_dormant_unknown">Diam / tidak diketahui</string>
+    <string name="state_gait">Gaya berjalan</string>
+    <string name="gait_walking_format">Diduga berjalan · %1$d dtk berlangsung</string>
+    <string name="gait_reminded_format">Sudah diingatkan · %1$d dtk lalu</string>
+    <string name="gait_still">Diam</string>
+    <string name="state_run_steps">Langkah berurutan</string>
+    <string name="run_steps_format">%1$d/%2$d</string>
+    <string name="gait_batched">(pengiriman batch)</string>
+    <string name="gait_rhythmic">(akumulasi ritme)</string>
+    <string name="state_window_steps">Langkah jendela</string>
+    <string name="window_steps_format">%1$d (jendela 10 dtk)</string>
+    <string name="state_screen">Layar</string>
+    <string name="screen_off">Mati</string>
+    <string name="screen_on_locked">Nyala · Terkunci</string>
+    <string name="screen_on_unlocked">Nyala · Terbuka</string>
+    <string name="state_proximity">Halangan</string>
+    <string name="proximity_yes">Ya (saku)</string>
+    <string name="proximity_no">Tidak</string>
+    <string name="state_sensor">Sensor</string>
+    <string name="sensor_step">Detektor langkah</string>
+    <string name="sensor_none">Tanpa sensor langkah (deteksi tidak didukung di perangkat ini)</string>
+    <string name="state_indoor">Dalam ruangan</string>
+    <string name="indoor_unknown_always">Tidak diketahui (perlu lokasi “Selalu izinkan”)</string>
+    <string name="indoor_unknown_need_perm">Tidak diketahui (perlu izin lokasi)</string>
+    <string name="indoor_unknown_disabled">Tidak diketahui (belum diaktifkan)</string>
+    <string name="indoor_unknown_loc_off">Tidak diketahui (lokasi mati)</string>
+    <string name="indoor_confirming">Mengonfirmasi…</string>
+    <string name="indoor_yes">Ya (pengingat ditahan)</string>
+    <string name="indoor_no">Tidak</string>
+    <string name="state_satellite">Satelit</string>
+    <string name="sat_not_tracking">Tidak melacak</string>
+    <string name="sat_waiting">Menunggu sinyal…</string>
+    <string name="sat_value_format">%1$s (fix/kuat/total)</string>
+    <string name="state_gms">Akselerasi GMS</string>
+    <string name="generic_unknown">Tidak diketahui</string>
+    <string name="gms_available">Tersedia</string>
+    <string name="gms_unavailable">Tidak tersedia</string>
+    <string name="gms_no_perm">Tanpa izin</string>
+    <string name="restart_service">Mulai ulang layanan deteksi</string>
+    <string name="simulate_need_enable">Aktifkan sakelar utama terlebih dahulu untuk simulasi</string>
+    <string name="simulating">Mensimulasikan jalan…</string>
+    <string name="simulate_walk">Simulasikan jalan</string>
+
+    <string name="perm_title">Izin</string>
+    <string name="perm_activity_title">Aktivitas fisik</string>
+    <string name="perm_activity_desc">Mendeteksi berjalan dan tangga</string>
+    <string name="perm_notif_title">Notifikasi</string>
+    <string name="perm_notif_desc">Wajib untuk pengingat</string>
+    <string name="perm_location_title">Lokasi (opsional)</string>
+    <string name="perm_location_desc_always">Bisukan di dalam ruangan memerlukan “Selalu izinkan”</string>
+    <string name="perm_location_desc_fg">Bisukan di dalam ruangan memerlukan izin lokasi</string>
+    <string name="perm_overlay_title">Tampil di atas aplikasi lain</string>
+    <string name="perm_overlay_desc">Wajib untuk pengingat pop-up</string>
+    <string name="perm_open">Aktifkan</string>
+    <string name="perm_granted">Diizinkan</string>
+
+    <string name="keepalive_title">Mulai otomatis dan persistensi</string>
+    <string name="autostart_settings">Setelan mulai otomatis</string>
+    <string name="battery_whitelist">Daftar putih baterai</string>
+    <string name="battery_ignored">Optimasi baterai diabaikan</string>
+    <string name="device_hint_xiaomi">Xiaomi: Setelan → Setelan aplikasi → Manajemen otorisasi → Mulai otomatis</string>
+    <string name="device_hint_huawei">Huawei: Manajer Telepon → Manajemen peluncuran → Izinkan mulai otomatis</string>
+    <string name="device_hint_oppo">OPPO / OnePlus: Manajer Telepon → Privasi → Manajemen mulai otomatis</string>
+    <string name="device_hint_vivo">vivo: Setelan → Aplikasi → Mulai otomatis</string>
+    <string name="device_hint_default">Izinkan mulai otomatis dan berjalan di latar di setelan sistem</string>
+
+    <string name="about_title">Tentang</string>
+    <string name="donate_title">Dukung</string>
+    <string name="donate_desc">Suka aplikasi ini? Traktir pengembang secangkir kopi</string>
+    <string name="version_format">Versi: %1$s</string>
+    <string name="copyright_format">Copyright © %1$d PlayLab</string>
+    <string name="developer_title">Pengembang</string>
+    <string name="developer_name">PlayLab</string>
+    <string name="about_website">Situs resmi</string>
+    <string name="about_github">GitHub</string>
+    <string name="about_github_desc">Lihat repositori GitHub</string>
+    <string name="about_license">Lisensi sumber terbuka</string>
+    <string name="about_license_desc">Lihat lisensi sumber terbuka</string>
+    <string name="about_terms">Ketentuan penggunaan</string>
+    <string name="about_terms_desc">Lihat ketentuan penggunaan</string>
+    <string name="about_view">Lihat</string>
+    <string name="donate_choose">Pilih kanal donasi:</string>
+    <string name="donate_afdian">Afdian</string>
+    <string name="donate_afdian_desc">Disarankan untuk pengguna di Tiongkok daratan</string>
+    <string name="donate_afdian_btn">Buka Afdian</string>
+    <string name="donate_kofi">Ko-fi</string>
+    <string name="donate_kofi_desc">Disarankan untuk pengguna di luar Tiongkok daratan</string>
+    <string name="donate_kofi_btn">Buka Ko-fi</string>
+    <string name="dialog_close">Tutup</string>
+    <string name="dialog_know">Mengerti</string>
+    <string name="dialog_cancel">Batal</string>
+    <string name="dialog_go_settings">Buka setelan</string>
+    <string name="license_title">Lisensi sumber terbuka</string>
+    <string name="terms_title">Ketentuan penggunaan</string>
+    <string name="terms_content">1. Aplikasi ini hanya menyediakan pengingat tambahan untuk penggunaan ponsel sambil berjalan dan tidak menggantikan perhatian. Patuhi aturan lalu lintas dan minimalkan penggunaan ponsel sambil berjalan;\n2. Fitur “Bisukan di dalam ruangan” dipengaruhi perangkat keras GPS dan lingkungan; hasilnya hanya sebagai referensi;\n3. Perangkat lunak ini disediakan “sebagaimana adanya”, tanpa jaminan tersurat maupun tersirat, termasuk jaminan kelayakan dagang dan kesesuaian;\n4. Dalam keadaan apa pun, baik kontrak, perbuatan melawan hukum, maupun lainnya, penulis tidak bertanggung jawab atas klaim, kerusakan, atau tanggung jawab lain akibat penggunaan perangkat lunak ini.</string>
+    <string name="footer_disclaimer"># Pengingat tidak menggantikan perhatian. Minimalkan penggunaan ponsel saat berjalan</string>
+
+    <string name="loc_dialog_need_always_title">Lokasi harus disetel ke “Selalu izinkan”</string>
+    <string name="loc_dialog_need_perm_title">Izin lokasi diperlukan</string>
+    <string name="loc_dialog_need_always_msg">Bisukan di dalam ruangan memerlukan lokasi latar. Di Info aplikasi → Izin → Lokasi, pilih “Selalu izinkan”.</string>
+    <string name="loc_dialog_need_perm_msg">Bisukan di dalam ruangan memerlukan izin lokasi. Izinkan akses lokasi di Info aplikasi → Izin.</string>
+    <string name="core_dialog_title">Izin diperlukan</string>
+    <string name="core_dialog_msg">Deteksi berjalan memerlukan izin aktivitas fisik dan notifikasi. Aktifkan di Info aplikasi → Izin / Notifikasi.</string>
+
+    <string name="indoor_help_title">Tentang fitur ini</string>
+    <string name="indoor_help_desc">Fitur “Bisukan di dalam ruangan” terbatas oleh perangkat keras GPS dan lingkungan, sehingga mungkin tidak menentukan dalam/luar ruangan dengan benar. Jika perlu, sesuaikan parameter secara manual di Setelan lanjutan:</string>
+    <string name="indoor_advanced_show">Setelan lanjutan ▸</string>
+    <string name="indoor_advanced_hide">Setelan lanjutan ▾</string>
+    <string name="tune_strong_count">Satelit kuat</string>
+    <string name="tune_strong_ratio">Rasio sinyal kuat</string>
+    <string name="tune_gps_acc">Akurasi GPS (m)</string>
+    <string name="tune_default_format">Bawaan %1$s (%2$s)</string>
+    <string name="tune_range_int">0–30</string>
+    <string name="tune_range_ratio">0–1</string>
+    <string name="tune_range_acc">5–50</string>
+    <string name="tune_hint">Jumlah atau rasio satelit kuat yang lebih besar membuat bisukan dalam ruangan lebih sensitif; akurasi GPS yang lebih kecil juga membuatnya lebih sensitif.</string>
+    <string name="tune_error">Parameter di luar rentang atau tidak valid; perubahan tidak disimpan</string>
+    <string name="tune_save">Simpan</string>
+    <string name="tune_reset">Kembalikan</string>
+
+    <string name="reminder_content">Kurangi penggunaan ponsel sambil berjalan dan perhatikan sekitar</string>
+    <string name="reminder_confirm">Mengerti, saya lihat jalan</string>
+    <string name="channel_guard">Perlindungan berjalan</string>
+    <string name="channel_alert">Pengingat HeadsUp</string>
+    <string name="channel_alert_desc">Notifikasi mengambang pengingat HeadsUp</string>
+    <string name="notif_action_ack">Mengerti</string>
+
+    <string-array name="reminder_titles">
+        <item>Lihat depan</item>
+        <item>Perhatikan langkah</item>
+        <item>Hati-hati</item>
+        <item>Lihat sekitar</item>
+        <item>Jangan hanya lihat ponsel</item>
+        <item>Awas tangga</item>
+        <item>Utamakan keselamatan</item>
+    </string-array>
+
+    <string name="guard_screen_off">Siaga (layar mati, hemat daya)</string>
+    <string name="guard_locked">Siaga terkunci (pengingat setelah buka)</string>
+    <string name="guard_pocket">Diduga di saku (pengingat setelah dikeluarkan)</string>
+    <string name="guard_indoor">Di dalam ruangan (pengingat ditahan)</string>
+    <string name="guard_loc_confirming">Mengonfirmasi lokasi…</string>
+    <string name="guard_monitoring">Memantau penggunaan ponsel sambil berjalan…</string>
+    <string name="guard_walking_format">Diduga berjalan · langkah %1$d/%2$d (%3$d dtk berlangsung)</string>
+    <string name="guard_still_format">Diam · langkah %1$d/%2$d</string>
+    <string name="guard_running_title">HeadsUp berjalan</string>
+</resources>

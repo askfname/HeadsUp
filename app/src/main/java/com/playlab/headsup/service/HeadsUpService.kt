@@ -143,11 +143,11 @@ class HeadsUpService : Service() {
 
     /** 守卫文本：室内抑制优先，其次挂起确认中，其余显示行走/静止 */
     private fun renderGuard(s: DetectSnapshot, indoorNow: Boolean) {
-        if (!s.screenOn) notifyGuard("灭屏待机（省电中）")
-        else if (!s.unlocked) notifyGuard("锁屏待机（解锁后提醒）")
-        else if (s.pocketed) notifyGuard("疑似在口袋（拿出后提醒）")
-        else if (indoorNow && Prefs.isIndoorMute(this)) notifyGuard("室内（抑制提醒）")
-        else if (s.indoorPending && Prefs.isIndoorMute(this)) notifyGuard("位置确认中…")
+        if (!s.screenOn) notifyGuard(getString(R.string.guard_screen_off))
+        else if (!s.unlocked) notifyGuard(getString(R.string.guard_locked))
+        else if (s.pocketed) notifyGuard(getString(R.string.guard_pocket))
+        else if (indoorNow && Prefs.isIndoorMute(this)) notifyGuard(getString(R.string.guard_indoor))
+        else if (s.indoorPending && Prefs.isIndoorMute(this)) notifyGuard(getString(R.string.guard_loc_confirming))
         else refreshGuard(s.walking, s.runLen, s.runNeed, s.walkElapsedSec)
     }
     /** 灵敏度变化才应用：GMS 回调每次都走 start，直接重置会把刚攒的步数清掉 */
@@ -253,13 +253,13 @@ class HeadsUpService : Service() {
 
     /** 常驻通知：附带实时检测状态 */
     private fun startForegroundGuard() {
-        startForeground(ReminderManager.GUARD_ID, buildGuard("正在监测行走中的用机行为…"))
+        startForeground(ReminderManager.GUARD_ID, buildGuard(getString(R.string.guard_monitoring)))
     }
 
     private fun refreshGuard(walking: Boolean, run: Int, need: Int, elapsed: Int) {
         if (!Prefs.isEnabled(this)) return
-        val text = if (walking) "疑似行走 · 连贯步数 $run/$need（已持续 ${elapsed}s）"
-        else "静止 · 连贯步数 $run/$need"
+        val text = if (walking) getString(R.string.guard_walking_format, run, need, elapsed)
+        else getString(R.string.guard_still_format, run, need)
         notifyGuard(text)
     }
 
@@ -279,7 +279,7 @@ class HeadsUpService : Service() {
         )
         return NotificationCompat.Builder(this, ReminderManager.CH_GUARD)
             .setSmallIcon(com.playlab.headsup.R.drawable.ic_notify)
-            .setContentTitle("看路提醒运行中")
+            .setContentTitle(getString(R.string.guard_running_title))
             .setContentText(text)
             .setOngoing(true)
             .setContentIntent(open)
@@ -291,7 +291,7 @@ class HeadsUpService : Service() {
         if (checkSelfPermission(android.Manifest.permission.ACTIVITY_RECOGNITION) !=
             PackageManager.PERMISSION_GRANTED
         ) {
-            detector.gmsStatus = "无权限"
+            detector.gmsStatus = WalkDetector.GmsStatus.NO_PERM
             return
         }
         try {
@@ -312,13 +312,13 @@ class HeadsUpService : Service() {
             )
             ActivityRecognition.getClient(this)
                 .requestActivityTransitionUpdates(ActivityTransitionRequest(transitions), pi)
-                .addOnSuccessListener { detector.gmsStatus = "可用" }
+                .addOnSuccessListener { detector.gmsStatus = WalkDetector.GmsStatus.AVAILABLE }
                 .addOnFailureListener { e ->
-                    detector.gmsStatus = "不可用"
+                    detector.gmsStatus = WalkDetector.GmsStatus.UNAVAILABLE
                     Log.w(TAG, "GMS ActivityRecognition 不可用，本机检测继续工作: $e")
                 }
         } catch (e: Exception) {
-            detector.gmsStatus = "不可用"
+            detector.gmsStatus = WalkDetector.GmsStatus.UNAVAILABLE
             Log.w(TAG, "GMS 订阅异常，本机检测继续工作: $e")
         }
     }

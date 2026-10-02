@@ -29,19 +29,28 @@ object ReminderManager {
     const val NOTIFY_ID = 1001
     const val GUARD_ID = 2001
 
-    // 随机标题
-    private val TITLES = listOf("抬头看看", "注意脚下", "小心一点", "环顾四周", "别只看手机", "小心台阶", "注意安全")
-    private const val CONTENT = "走路时请少看手机，注意周围环境"
+    // Localized titles follow the system language via string-array resources.
+    fun randomTitle(ctx: Context): String {
+        val arr = try {
+            ctx.resources.getStringArray(R.array.reminder_titles)
+        } catch (_: Exception) {
+            null
+        }
+        if (arr.isNullOrEmpty()) return ctx.getString(R.string.guard_running_title)
+        return arr.random()
+    }
+
+    private fun content(ctx: Context): String = ctx.getString(R.string.reminder_content)
 
     fun ensureChannels(ctx: Context) {
         if (Build.VERSION.SDK_INT < 26) return
         val nm = ctx.getSystemService(NotificationManager::class.java) ?: return
         nm.createNotificationChannel(
-            NotificationChannel(CH_GUARD, "步行守护", NotificationManager.IMPORTANCE_LOW)
+            NotificationChannel(CH_GUARD, ctx.getString(R.string.channel_guard), NotificationManager.IMPORTANCE_LOW)
         )
         nm.createNotificationChannel(
-            NotificationChannel(CH_ALERT, "看路提醒", NotificationManager.IMPORTANCE_HIGH).apply {
-                description = "看路提醒的浮动通知"
+            NotificationChannel(CH_ALERT, ctx.getString(R.string.channel_alert), NotificationManager.IMPORTANCE_HIGH).apply {
+                description = ctx.getString(R.string.channel_alert_desc)
                 // 关系统通知的震动
                 enableVibration(false)
                 vibrationPattern = null
@@ -59,7 +68,9 @@ object ReminderManager {
         } catch (_: Exception) { }
     }
 
-    fun randomTitle() = TITLES.random()
+    // No-arg overload kept only for compat; callers should prefer randomTitle(ctx) so the
+    // title follows the system language. Falls back to the English name for safety.
+    fun randomTitle(): String = "HeadsUp"
 
     /** 统一入口：按用户选择的模式提醒，返回是否真正发出（冷却/灭屏/锁屏会被拦截） */
     fun fire(ctx: Context, checkIndoor: Boolean = true): Boolean {
@@ -102,14 +113,14 @@ object ReminderManager {
         )
         val n = NotificationCompat.Builder(ctx, CH_ALERT)
             .setSmallIcon(R.drawable.ic_notify)
-            .setContentTitle(randomTitle())
-            .setContentText(CONTENT)
-            .setSubText("看路提醒")
+            .setContentTitle(randomTitle(ctx))
+            .setContentText(content(ctx))
+            .setSubText(ctx.getString(R.string.app_name))
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setAutoCancel(true)
             .setContentIntent(open)
-            .addAction(0, "知道了", dismissPI(ctx))
+            .addAction(0, ctx.getString(R.string.notif_action_ack), dismissPI(ctx))
             .build()
         nm.notify(NOTIFY_ID, n)
     }
@@ -197,13 +208,13 @@ object ReminderManager {
                 ).apply { leftMargin = dp(16) }
             }
             val title = android.widget.TextView(ctx).apply {
-                text = randomTitle()
+                text = randomTitle(ctx)
                 textSize = 17f
                 setTypeface(typeface, android.graphics.Typeface.BOLD)
                 setTextColor(onSurface)
             }
             val content = android.widget.TextView(ctx).apply {
-                text = CONTENT
+                text = content(ctx)
                 textSize = 14f
                 setTextColor(onSurfaceVariant)
                 setPadding(0, dp(4), 0, 0)
@@ -218,7 +229,7 @@ object ReminderManager {
                 setPadding(dp(64), dp(16), 0, 0)
             }
             val btn = android.widget.TextView(ctx).apply {
-                text = "知道了"
+                text = ctx.getString(R.string.notif_action_ack)
                 textSize = 14f
                 setTypeface(typeface, android.graphics.Typeface.BOLD)
                 setTextColor(onPrimary)

@@ -12,6 +12,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.playlab.headsup.R
 import com.playlab.headsup.ui.theme.HeadsUpTheme
 
 /** 全屏提醒页（强制打断） */
@@ -33,17 +35,17 @@ class ReminderActivity : ComponentActivity() {
                             Icon(Icons.AutoMirrored.Filled.DirectionsWalk, null, Modifier.size(56.dp))
                         }
                         Spacer(Modifier.height(24.dp))
-                        Text(ReminderManager.randomTitle(), style = MaterialTheme.typography.headlineMedium)
+                        Text(ReminderManager.randomTitle(this@ReminderActivity), style = MaterialTheme.typography.headlineMedium)
                         Spacer(Modifier.height(8.dp))
                         Text(
-                            "走路时请少看手机，注意周围环境",
+                            stringResource(R.string.reminder_content),
                             style = MaterialTheme.typography.bodyLarge,
                             textAlign = TextAlign.Center,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Spacer(Modifier.height(32.dp))
                         Button(onClick = { finishAndRemoveTask() }, modifier = Modifier.fillMaxWidth()) {
-                            Text("我知道了，抬头看路")
+                            Text(stringResource(R.string.reminder_confirm))
                         }
                     }
                 }

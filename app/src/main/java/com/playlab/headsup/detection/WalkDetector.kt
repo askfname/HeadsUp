@@ -23,12 +23,12 @@ data class DetectSnapshot(
     val pocketed: Boolean = false, // 距离感应器被遮挡（口袋里不提醒）
     val hasStepDetector: Boolean = false,
     val batched: Boolean = false, // 是否观察到批量投递（投递延迟 >1.5s）
-    val gms: String = "未知",
+    val gms: String = WalkDetector.GmsStatus.UNKNOWN,
     val lastTriggerAt: Long = 0L, // 上次真实提醒时刻（elapsedRealtime，批量投递下UI同步用）
     val simulating: Boolean = false, // 模拟步行状态
     val indoor: Boolean = false, // GPS 判室内（仅“室内不提醒”开时更新）
     val indoorPending: Boolean = false, // 位置未决、提醒挂起中
-    val sats: String = "未知", // 强星/总数（跨机型对比信号用）
+    val sats: String = "", // 强星/总数（跨机型对比信号用）
 )
 
 object DetectState {
@@ -50,7 +50,17 @@ class WalkDetector(
     var unlocked = true // 锁屏不提醒
     var pocketed = false // 口袋不提醒
     var requiredSteps = 12 // 默认标准档，服务启动时按灵敏度覆盖
-    var gmsStatus = "未知"
+    // Language-independent status code; UI resolves it to localized text on every
+    // recomposition, so it always follows the current system language.
+    var gmsStatus = GmsStatus.UNKNOWN
+
+    /** GMS status codes */
+    object GmsStatus {
+        const val UNKNOWN = "unknown"
+        const val AVAILABLE = "available"
+        const val UNAVAILABLE = "unavailable"
+        const val NO_PERM = "no_perm"
+    }
 
     // 灵敏度联动：步数越多、节律容差越小、动作门限越严、显示门限越高
     var minInterval = 350L

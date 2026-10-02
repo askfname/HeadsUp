@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">HeadsUp</string>
+    <string name="desc">चलते समय फ़ोन देखने पर समय पर याद दिलाए — सिर उठाकर रास्ता देखें</string>
+    <string name="disclaimer">याद दिलाना ध्यान का विकल्प नहीं है। कृपया चलते समय फ़ोन का उपयोग कम करें।</string>
+
+    <string name="home_status_on">सुरक्षा चालू</string>
+    <string name="home_status_off">बंद</string>
+    <string name="home_status_on_desc">चलते समय फ़ोन देखने पर आपको याद दिलाया जाएगा</string>
+    <string name="home_status_off_desc">चलने की निगरानी हेतु सुरक्षा चालू करें</string>
+
+    <string name="section_reminder_method">याद दिलाने का तरीका</string>
+    <string name="mode_float_title">फ़्लोटिंग याद</string>
+    <string name="mode_float_desc">फ़्लोटिंग कार्ड; अन्य ऐप्स पर दिखाने की अनुमति आवश्यक</string>
+    <string name="mode_popup_title">पॉप-अप सूचना</string>
+    <string name="mode_popup_desc">शीर्ष बैनर; पॉप-अप सूचना अनुमति आवश्यक</string>
+    <string name="mode_full_title">पूर्ण-स्क्रीन याद</string>
+    <string name="mode_full_desc">ज़बरदस्त पूर्ण-स्क्रीन व्यवधान, सबसे प्रभावी</string>
+    <string name="vibrate_title">याद पर कंपन</string>
+    <string name="vibrate_desc">याद जारी होने पर कंपन करें</string>
+    <string name="indoor_mute_title">घर के अंदर याद न दिलाएं</string>
+    <string name="indoor_mute_desc">घर के अंदर भी फ़र्नीचर आदि से ठोकर का ध्यान रखें</string>
+    <string name="cooldown_format">याद अंतराल: %1$d सेकंड</string>
+    <string name="sensitivity_title">संवेदनशीलता</string>
+    <string name="sens_low">संवेदनशील</string>
+    <string name="sens_mid">मानक</string>
+    <string name="sens_high">कठोर</string>
+    <string name="test_reminder">याद का परीक्षण</string>
+
+    <string name="detect_status_title">पहचान स्थिति</string>
+    <string name="sens_desc_sensitive">संवेदनशील (8 कदम · ≤2 से/कदम)</string>
+    <string name="sens_desc_standard">मानक (12 कदम · ≤1.7 से/कदम)</string>
+    <string name="sens_desc_strict">कठोर (16 कदम · ≤1.5 से/कदम)</string>
+    <string name="state_service">सेवा</string>
+    <string name="state_off">बंद</string>
+    <string name="state_standby_screen_off">स्टैंडबाय (स्क्रीन बंद, बिजली बचत)</string>
+    <string name="state_standby_locked">स्टैंडबाय (लॉक)</string>
+    <string name="state_standby_pocket">स्टैंडबाय (जेब में)</string>
+    <string name="state_running">चल रही है</string>
+    <string name="state_dormant_unknown">निष्क्रिय / अज्ञात</string>
+    <string name="state_gait">चाल</string>
+    <string name="gait_walking_format">संभावित चलना · %1$d से जारी</string>
+    <string name="gait_reminded_format">याद दिलाई · %1$d से पहले</string>
+    <string name="gait_still">स्थिर</string>
+    <string name="state_run_steps">लगातार कदम</string>
+    <string name="run_steps_format">%1$d/%2$d</string>
+    <string name="gait_batched">(बैच वितरण)</string>
+    <string name="gait_rhythmic">(लय संचय)</string>
+    <string name="state_window_steps">विंडो कदम</string>
+    <string name="window_steps_format">%1$d (10 से विंडो)</string>
+    <string name="state_screen">स्क्रीन</string>
+    <string name="screen_off">बंद</string>
+    <string name="screen_on_locked">चालू · लॉक</string>
+    <string name="screen_on_unlocked">चालू · अनलॉक</string>
+    <string name="state_proximity">रुकावट</string>
+    <string name="proximity_yes">हाँ (जेब)</string>
+    <string name="proximity_no">नहीं</string>
+    <string name="state_sensor">सेंसर</string>
+    <string name="sensor_step">कदम संसूचक</string>
+    <string name="sensor_none">कदम सेंसर नहीं (इस डिवाइस पर पहचान समर्थित नहीं)</string>
+    <string name="state_indoor">घर के अंदर</string>
+    <string name="indoor_unknown_always">अज्ञात (“हमेशा अनुमति दें” स्थान आवश्यक)</string>
+    <string name="indoor_unknown_need_perm">अज्ञात (स्थान अनुमति आवश्यक)</string>
+    <string name="indoor_unknown_disabled">अज्ञात (चालू नहीं)</string>
+    <string name="indoor_unknown_loc_off">अज्ञात (स्थान बंद)</string>
+    <string name="indoor_confirming">पुष्टि हो रही है…</string>
+    <string name="indoor_yes">हाँ (याद दबाई गई)</string>
+    <string name="indoor_no">नहीं</string>
+    <string name="state_satellite">उपग्रह</string>
+    <string name="sat_not_tracking">ट्रैकिंग नहीं</string>
+    <string name="sat_waiting">संकेत की प्रतीक्षा…</string>
+    <string name="sat_value_format">%1$s (फ़िक्स/मज़बूत/कुल)</string>
+    <string name="state_gms">GMS त्वरण</string>
+    <string name="generic_unknown">अज्ञात</string>
+    <string name="gms_available">उपलब्ध</string>
+    <string name="gms_unavailable">अनुपलब्ध</string>
+    <string name="gms_no_perm">अनुमति नहीं</string>
+    <string name="restart_service">पहचान सेवा पुनः प्रारंभ करें</string>
+    <string name="simulate_need_enable">सिमुलेशन हेतु पहले मुख्य स्विच चालू करें</string>
+    <string name="simulating">चलना सिमुलेट हो रहा है…</string>
+    <string name="simulate_walk">चलना सिमुलेट करें</string>
+
+    <string name="perm_title">अनुमतियाँ</string>
+    <string name="perm_activity_title">शारीरिक गतिविधि</string>
+    <string name="perm_activity_desc">चलना / सीढ़ी चढ़ना पहचानें</string>
+    <string name="perm_notif_title">सूचनाएँ</string>
+    <string name="perm_notif_desc">याद हेतु आवश्यक</string>
+    <string name="perm_location_title">स्थान (वैकल्पिक)</string>
+    <string name="perm_location_desc_always">घर के अंदर मौन हेतु “हमेशा अनुमति दें” आवश्यक</string>
+    <string name="perm_location_desc_fg">घर के अंदर मौन हेतु स्थान अनुमति आवश्यक</string>
+    <string name="perm_overlay_title">अन्य ऐप्स पर दिखाएँ</string>
+    <string name="perm_overlay_desc">पॉप-अप याद हेतु आवश्यक</string>
+    <string name="perm_open">चालू करें</string>
+    <string name="perm_granted">अनुमत</string>
+
+    <string name="keepalive_title">स्वतः-प्रारंभ व सक्रियता</string>
+    <string name="autostart_settings">स्वतः-प्रारंभ सेटिंग</string>
+    <string name="battery_whitelist">बैटरी श्वेतसूची</string>
+    <string name="battery_ignored">बैटरी अनुकूलन उपेक्षित</string>
+    <string name="device_hint_xiaomi">Xiaomi: सेटिंग → ऐप सेटिंग → प्राधिकरण प्रबंधन → स्वतः-प्रारंभ</string>
+    <string name="device_hint_huawei">Huawei: फ़ोन प्रबंधक → ऐप प्रारंभ प्रबंधन → स्वतः-प्रारंभ अनुमति दें</string>
+    <string name="device_hint_oppo">OPPO / OnePlus: फ़ोन प्रबंधक → गोपनीयता → स्वतः-प्रारंभ प्रबंधन</string>
+    <string name="device_hint_vivo">vivo: सेटिंग → ऐप्स → स्वतः-प्रारंभ</string>
+    <string name="device_hint_default">कृपया सिस्टम सेटिंग में स्वतः-प्रारंभ व पृष्ठभूमि संचालन अनुमति दें</string>
+
+    <string name="about_title">परिचय</string>
+    <string name="donate_title">समर्थन करें</string>
+    <string name="donate_desc">यह ऐप पसंद है? विकासक को कॉफ़ी पिलाएँ</string>
+    <string name="version_format">संस्करण: %1$s</string>
+    <string name="copyright_format">Copyright © %1$d PlayLab</string>
+    <string name="developer_title">विकासक</string>
+    <string name="developer_name">PlayLab</string>
+    <string name="about_website">आधिकारिक वेबसाइट</string>
+    <string name="about_github">GitHub</string>
+    <string name="about_github_desc">GitHub भंडार देखें</string>
+    <string name="about_license">ओपन-सोर्स लाइसेंस</string>
+    <string name="about_license_desc">ओपन-सोर्स लाइसेंस देखें</string>
+    <string name="about_terms">उपयोग शर्तें</string>
+    <string name="about_terms_desc">उपयोग शर्तें देखें</string>
+    <string name="about_view">देखें</string>
+    <string name="donate_choose">दान माध्यम चुनें:</string>
+    <string name="donate_afdian">Afdian</string>
+    <string name="donate_afdian_desc">मुख्यभूमि चीन के उपयोगकर्ताओं हेतु अनुशंसित</string>
+    <string name="donate_afdian_btn">Afdian खोलें</string>
+    <string name="donate_kofi">Ko-fi</string>
+    <string name="donate_kofi_desc">मुख्यभूमि चीन के बाहर हेतु अनुशंसित</string>
+    <string name="donate_kofi_btn">Ko-fi खोलें</string>
+    <string name="dialog_close">बंद करें</string>
+    <string name="dialog_know">समझ गया</string>
+    <string name="dialog_cancel">रद्द करें</string>
+    <string name="dialog_go_settings">सेटिंग खोलें</string>
+    <string name="license_title">ओपन-सोर्स लाइसेंस</string>
+    <string name="terms_title">उपयोग शर्तें</string>
+    <string name="terms_content">1. यह ऐप चलते समय फ़ोन देखने हेतु केवल सहायक याद है, ध्यान का विकल्प नहीं है। कृपया यातायात नियमों का पालन करें और चलते समय फ़ोन कम देखें;\n2. “घर के अंदर याद न दिलाएं” सुविधा डिवाइस GPS हार्डवेयर व वातावरण पर निर्भर है, परिणाम केवल संदर्भ हेतु हैं;\n3. यह सॉफ़्टवेयर “जैसा है” प्रदान किया जाता है, व्यापारिकता व उपयुक्तता सहित किसी व्यक्त या निहित गारंटी के बिना;\n4. किसी भी स्थिति में, अनुबंध, अपकृत्य या अन्यथा, लेखक इस सॉफ़्टवेयर के उपयोग से उत्पन्न दावों, क्षतियों या दायित्वों हेतु उत्तरदायी नहीं हैं।</string>
+    <string name="footer_disclaimer"># याद दिलाना ध्यान का विकल्प नहीं है। कृपया चलते समय फ़ोन कम देखें</string>
+
+    <string name="loc_dialog_need_always_title">स्थान “हमेशा अनुमति दें” होना चाहिए</string>
+    <string name="loc_dialog_need_perm_title">स्थान अनुमति आवश्यक</string>
+    <string name="loc_dialog_need_always_msg">घर के अंदर मौन हेतु पृष्ठभूमि स्थान आवश्यक है। ऐप जानकारी → अनुमतियाँ → स्थान में “हमेशा अनुमति दें” चुनें।</string>
+    <string name="loc_dialog_need_perm_msg">घर के अंदर मौन हेतु स्थान अनुमति आवश्यक है। कृपया ऐप जानकारी → अनुमतियाँ में स्थान पहुँच अनुमति दें।</string>
+    <string name="core_dialog_title">अनुमतियाँ आवश्यक</string>
+    <string name="core_dialog_msg">चलने की पहचान हेतु शारीरिक गतिविधि व सूचना अनुमतियाँ आवश्यक हैं। कृपया ऐप जानकारी → अनुमतियाँ / सूचनाएँ में चालू करें।</string>
+
+    <string name="indoor_help_title">सुविधा विवरण</string>
+    <string name="indoor_help_desc">“घर के अंदर याद न दिलाएं” सुविधा डिवाइस GPS हार्डवेयर व वातावरण की सीमा से घर-बाहर सही नहीं पहचान सकती। आवश्यक हो तो उन्नत सेटिंग में पैरामीटर स्वयं समायोजित करें:</string>
+    <string name="indoor_advanced_show">उन्नत सेटिंग ▸</string>
+    <string name="indoor_advanced_hide">उन्नत सेटिंग ▾</string>
+    <string name="tune_strong_count">मज़बूत उपग्रह</string>
+    <string name="tune_strong_ratio">मज़बूत संकेत अनुपात</string>
+    <string name="tune_gps_acc">GPS सटीकता (मी)</string>
+    <string name="tune_default_format">डिफ़ॉल्ट %1$s (%2$s)</string>
+    <string name="tune_range_int">0–30</string>
+    <string name="tune_range_ratio">0–1</string>
+    <string name="tune_range_acc">5–50</string>
+    <string name="tune_hint">मज़बूत उपग्रह संख्या/अनुपात अधिक होने पर घर के अंदर मौन अधिक संवेदनशील, GPS सटीकता छोटी होने पर अधिक संवेदनशील।</string>
+    <string name="tune_error">पैरामीटर सीमा से बाहर या अमान्य; सहेजा नहीं गया</string>
+    <string name="tune_save">सहेजें</string>
+    <string name="tune_reset">पुनर्स्थापित करें</string>
+
+    <string name="reminder_content">कृपया चलते समय फ़ोन कम देखें और आसपास ध्यान दें</string>
+    <string name="reminder_confirm">समझ गया, सिर उठाकर देखता हूँ</string>
+    <string name="channel_guard">चल सुरक्षा</string>
+    <string name="channel_alert">HeadsUp याद</string>
+    <string name="channel_alert_desc">HeadsUp याद की फ़्लोटिंग सूचनाएँ</string>
+    <string name="notif_action_ack">समझ गया</string>
+
+    <string-array name="reminder_titles">
+        <item>सिर उठाकर देखें</item>
+        <item>कदमों पर ध्यान दें</item>
+        <item>सावधान रहें</item>
+        <item>चारों ओर देखें</item>
+        <item>केवल फ़ोन न देखें</item>
+        <item>सीढ़ियों पर ध्यान दें</item>
+        <item>सुरक्षित रहें</item>
+    </string-array>
+
+    <string name="guard_screen_off">स्क्रीन-बंद स्टैंडबाय (बिजली बचत)</string>
+    <string name="guard_locked">लॉक स्टैंडबाय (अनलॉक पर याद)</string>
+    <string name="guard_pocket">संभावित जेब (निकालने पर याद)</string>
+    <string name="guard_indoor">घर के अंदर (याद दबाई गई)</string>
+    <string name="guard_loc_confirming">स्थान पुष्टि हो रही है…</string>
+    <string name="guard_monitoring">चलते समय उपयोग की निगरानी हो रही है…</string>
+    <string name="guard_walking_format">संभावित चलना · लगातार कदम %1$d/%2$d (%3$d से जारी)</string>
+    <string name="guard_still_format">स्थिर · लगातार कदम %1$d/%2$d</string>
+    <string name="guard_running_title">HeadsUp चल रहा है</string>
+</resources>

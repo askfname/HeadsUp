@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">HeadsUp</string>
+    <string name="desc">Своевременные напоминания при использовании телефона на ходу — поднимите взгляд</string>
+    <string name="disclaimer">Напоминания не заменяют внимательность. По возможности не пользуйтесь телефоном на ходу.</string>
+
+    <string name="home_status_on">Защита включена</string>
+    <string name="home_status_off">Выключено</string>
+    <string name="home_status_on_desc">Вы получите напоминание при использовании телефона на ходу</string>
+    <string name="home_status_off_desc">Включите защиту для контроля ходьбы</string>
+
+    <string name="section_reminder_method">Способ напоминания</string>
+    <string name="mode_float_title">Плавающее напоминание</string>
+    <string name="mode_float_desc">Плавающая карточка; требуется разрешение на отображение поверх приложений</string>
+    <string name="mode_popup_title">Всплывающее уведомление</string>
+    <string name="mode_popup_desc">Верхний баннер; требуется разрешение на всплывающие уведомления</string>
+    <string name="mode_full_title">Полноэкранное напоминание</string>
+    <string name="mode_full_desc">Принудительное полноэкранное прерывание с максимальным эффектом</string>
+    <string name="vibrate_title">Вибрация при напоминании</string>
+    <string name="vibrate_desc">Вибрация при выдаче напоминания</string>
+    <string name="indoor_mute_title">Не напоминать в помещении</string>
+    <string name="indoor_mute_desc">В помещении сохраняется риск споткнуться, например о мебель</string>
+    <string name="cooldown_format">Интервал напоминаний: %1$d с</string>
+    <string name="sensitivity_title">Чувствительность</string>
+    <string name="sens_low">Высокая</string>
+    <string name="sens_mid">Стандартная</string>
+    <string name="sens_high">Строгая</string>
+    <string name="test_reminder">Проверить напоминание</string>
+
+    <string name="detect_status_title">Состояние обнаружения</string>
+    <string name="sens_desc_sensitive">Высокая (8 шагов · ≤2 с/шаг)</string>
+    <string name="sens_desc_standard">Стандартная (12 шагов · ≤1,7 с/шаг)</string>
+    <string name="sens_desc_strict">Строгая (16 шагов · ≤1,5 с/шаг)</string>
+    <string name="state_service">Служба</string>
+    <string name="state_off">Выключена</string>
+    <string name="state_standby_screen_off">Ожидание (экран выключен, энергосбережение)</string>
+    <string name="state_standby_locked">Ожидание (заблокировано)</string>
+    <string name="state_standby_pocket">Ожидание (в кармане)</string>
+    <string name="state_running">Работает</string>
+    <string name="state_dormant_unknown">Сон / неизвестно</string>
+    <string name="state_gait">Походка</string>
+    <string name="gait_walking_format">Вероятно ходьба · уже %1$d с</string>
+    <string name="gait_reminded_format">Напомнено · %1$d с назад</string>
+    <string name="gait_still">Неподвижно</string>
+    <string name="state_run_steps">Подряд шагов</string>
+    <string name="run_steps_format">%1$d/%2$d</string>
+    <string name="gait_batched">(пакетная доставка)</string>
+    <string name="gait_rhythmic">(накопление по ритму)</string>
+    <string name="state_window_steps">Шагов в окне</string>
+    <string name="window_steps_format">%1$d (окно 10 с)</string>
+    <string name="state_screen">Экран</string>
+    <string name="screen_off">Выкл.</string>
+    <string name="screen_on_locked">Вкл. · Заблокирован</string>
+    <string name="screen_on_unlocked">Вкл. · Разблокирован</string>
+    <string name="state_proximity">Перекрытие</string>
+    <string name="proximity_yes">Да (карман)</string>
+    <string name="proximity_no">Нет</string>
+    <string name="state_sensor">Датчик</string>
+    <string name="sensor_step">Детектор шагов</string>
+    <string name="sensor_none">Нет датчика шагов (обнаружение не поддерживается на этом устройстве)</string>
+    <string name="state_indoor">Помещение</string>
+    <string name="indoor_unknown_always">Неизвестно (требуется местоположение «Разрешить всегда»)</string>
+    <string name="indoor_unknown_need_perm">Неизвестно (требуется разрешение на местоположение)</string>
+    <string name="indoor_unknown_disabled">Неизвестно (не включено)</string>
+    <string name="indoor_unknown_loc_off">Неизвестно (местоположение выключено)</string>
+    <string name="indoor_confirming">Подтверждение…</string>
+    <string name="indoor_yes">Да (напоминания подавлены)</string>
+    <string name="indoor_no">Нет</string>
+    <string name="state_satellite">Спутники</string>
+    <string name="sat_not_tracking">Нет отслеживания</string>
+    <string name="sat_waiting">Ожидание сигнала…</string>
+    <string name="sat_value_format">%1$s (фикс/сильные/всего)</string>
+    <string name="state_gms">Ускорение GMS</string>
+    <string name="generic_unknown">Неизвестно</string>
+    <string name="gms_available">Доступно</string>
+    <string name="gms_unavailable">Недоступно</string>
+    <string name="gms_no_perm">Нет разрешения</string>
+    <string name="restart_service">Перезапустить службу обнаружения</string>
+    <string name="simulate_need_enable">Сначала включите главный переключатель для симуляции</string>
+    <string name="simulating">Симуляция ходьбы…</string>
+    <string name="simulate_walk">Симулировать ходьбу</string>
+
+    <string name="perm_title">Разрешения</string>
+    <string name="perm_activity_title">Физическая активность</string>
+    <string name="perm_activity_desc">Обнаружение ходьбы и лестниц</string>
+    <string name="perm_notif_title">Уведомления</string>
+    <string name="perm_notif_desc">Обязательны для напоминаний</string>
+    <string name="perm_location_title">Местоположение (необязательно)</string>
+    <string name="perm_location_desc_always">Для отключения в помещении требуется «Разрешить всегда»</string>
+    <string name="perm_location_desc_fg">Для отключения в помещении требуется разрешение на местоположение</string>
+    <string name="perm_overlay_title">Отображение поверх других приложений</string>
+    <string name="perm_overlay_desc">Обязательно для всплывающих напоминаний</string>
+    <string name="perm_open">Включить</string>
+    <string name="perm_granted">Разрешено</string>
+
+    <string name="keepalive_title">Автозапуск и удержание</string>
+    <string name="autostart_settings">Настройки автозапуска</string>
+    <string name="battery_whitelist">Белый список батареи</string>
+    <string name="battery_ignored">Оптимизация батареи игнорируется</string>
+    <string name="device_hint_xiaomi">Xiaomi: Настройки → Настройки приложений → Управление разрешениями → Автозапуск</string>
+    <string name="device_hint_huawei">Huawei: Диспетчер телефона → Управление запуском → Разрешить автозапуск</string>
+    <string name="device_hint_oppo">OPPO / OnePlus: Диспетчер телефона → Конфиденциальность → Управление автозапуском</string>
+    <string name="device_hint_vivo">vivo: Настройки → Приложения → Автозапуск</string>
+    <string name="device_hint_default">Разрешите автозапуск и работу в фоне в системных настройках</string>
+
+    <string name="about_title">О приложении</string>
+    <string name="donate_title">Поддержать</string>
+    <string name="donate_desc">Нравится это приложение? Угостите разработчика чашкой кофе</string>
+    <string name="version_format">Версия: %1$s</string>
+    <string name="copyright_format">Copyright © %1$d PlayLab</string>
+    <string name="developer_title">Разработчик</string>
+    <string name="developer_name">PlayLab</string>
+    <string name="about_website">Официальный сайт</string>
+    <string name="about_github">GitHub</string>
+    <string name="about_github_desc">Открыть репозиторий GitHub</string>
+    <string name="about_license">Лицензии открытого кода</string>
+    <string name="about_license_desc">Просмотреть лицензии открытого кода</string>
+    <string name="about_terms">Условия использования</string>
+    <string name="about_terms_desc">Просмотреть условия использования</string>
+    <string name="about_view">Открыть</string>
+    <string name="donate_choose">Выберите канал поддержки:</string>
+    <string name="donate_afdian">Afdian</string>
+    <string name="donate_afdian_desc">Рекомендуется пользователям в материковом Китае</string>
+    <string name="donate_afdian_btn">Открыть Afdian</string>
+    <string name="donate_kofi">Ko-fi</string>
+    <string name="donate_kofi_desc">Рекомендуется пользователям за пределами материкового Китая</string>
+    <string name="donate_kofi_btn">Открыть Ko-fi</string>
+    <string name="dialog_close">Закрыть</string>
+    <string name="dialog_know">Понятно</string>
+    <string name="dialog_cancel">Отмена</string>
+    <string name="dialog_go_settings">Открыть настройки</string>
+    <string name="license_title">Лицензии открытого кода</string>
+    <string name="terms_title">Условия использования</string>
+    <string name="terms_content">1. Это приложение предоставляет только вспомогательные напоминания при использовании телефона на ходу и не заменяет внимательность. Соблюдайте правила дорожного движения и минимизируйте использование телефона на ходу;\n2. Функция «Не напоминать в помещении» зависит от GPS-оборудования устройства и окружающей среды; результаты носят справочный характер;\n3. Данное программное обеспечение предоставляется «как есть», без каких-либо явных или подразумеваемых гарантий, включая гарантии товарного состояния и пригодности;\n4. Ни в каком случае, будь то договор, деликт или иное основание, авторы не несут ответственности за претензии, ущерб или иную ответственность, возникшие вследствие использования данного программного обеспечения.</string>
+    <string name="footer_disclaimer"># Напоминания не заменяют внимательность. По возможности не пользуйтесь телефоном на ходу</string>
+
+    <string name="loc_dialog_need_always_title">Для местоположения требуется «Разрешить всегда»</string>
+    <string name="loc_dialog_need_perm_title">Требуется разрешение на местоположение</string>
+    <string name="loc_dialog_need_always_msg">Для отключения в помещении требуется фоновое местоположение. В разделе Сведения о приложении → Разрешения → Местоположение выберите «Разрешить всегда».</string>
+    <string name="loc_dialog_need_perm_msg">Для отключения в помещении требуется разрешение на местоположение. Разрешите доступ к местоположению в разделе Сведения о приложении → Разрешения.</string>
+    <string name="core_dialog_title">Требуются разрешения</string>
+    <string name="core_dialog_msg">Для обнаружения ходьбы требуются разрешения на физическую активность и уведомления. Включите их в разделе Сведения о приложении → Разрешения / Уведомления.</string>
+
+    <string name="indoor_help_title">Об этой функции</string>
+    <string name="indoor_help_desc">Функция «Не напоминать в помещении» ограничена аппаратными возможностями GPS и окружающей средой и может неверно определять нахождение в помещении. При необходимости настройте параметры вручную в расширенных настройках:</string>
+    <string name="indoor_advanced_show">Расширенные настройки ▸</string>
+    <string name="indoor_advanced_hide">Расширенные настройки ▾</string>
+    <string name="tune_strong_count">Сильные спутники</string>
+    <string name="tune_strong_ratio">Доля сильного сигнала</string>
+    <string name="tune_gps_acc">Точность GPS (м)</string>
+    <string name="tune_default_format">По умолчанию %1$s (%2$s)</string>
+    <string name="tune_range_int">0–30</string>
+    <string name="tune_range_ratio">0–1</string>
+    <string name="tune_range_acc">5–50</string>
+    <string name="tune_hint">Чем больше число и доля сильных спутников, тем чувствительнее отключение в помещении; чем меньше точность GPS, тем оно чувствительнее.</string>
+    <string name="tune_error">Параметры вне диапазона или неверны; изменения не сохранены</string>
+    <string name="tune_save">Сохранить</string>
+    <string name="tune_reset">Сбросить</string>
+
+    <string name="reminder_content">По возможности не пользуйтесь телефоном на ходу и следите за окружающей обстановкой</string>
+    <string name="reminder_confirm">Понятно, смотрю на дорогу</string>
+    <string name="channel_guard">Защита при ходьбе</string>
+    <string name="channel_alert">Напоминания HeadsUp</string>
+    <string name="channel_alert_desc">Плавающие уведомления напоминаний HeadsUp</string>
+    <string name="notif_action_ack">Понятно</string>
+
+    <string-array name="reminder_titles">
+        <item>Поднимите взгляд</item>
+        <item>Смотрите под ноги</item>
+        <item>Будьте осторожны</item>
+        <item>Осмотритесь</item>
+        <item>Не смотрите только в телефон</item>
+        <item>Осторожно, ступени</item>
+        <item>Берегите себя</item>
+    </string-array>
+
+    <string name="guard_screen_off">Ожидание (экран выключен, энергосбережение)</string>
+    <string name="guard_locked">Ожидание с блокировкой (напоминания после разблокировки)</string>
+    <string name="guard_pocket">Возможно в кармане (напоминания после извлечения)</string>
+    <string name="guard_indoor">В помещении (напоминания подавлены)</string>
+    <string name="guard_loc_confirming">Подтверждение местоположения…</string>
+    <string name="guard_monitoring">Контроль использования телефона на ходу…</string>
+    <string name="guard_walking_format">Вероятно ходьба · шагов подряд %1$d/%2$d (уже %3$d с)</string>
+    <string name="guard_still_format">Неподвижно · шагов подряд %1$d/%2$d</string>
+    <string name="guard_running_title">HeadsUp работает</string>
+</resources>

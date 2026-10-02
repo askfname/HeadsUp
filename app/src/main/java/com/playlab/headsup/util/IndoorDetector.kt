@@ -76,7 +76,7 @@ object IndoorDetector {
         private set
 
     @Volatile
-    var satInfo = "未知"
+    var satInfo = ""
         private set
 
     @Volatile
@@ -1135,7 +1135,7 @@ object IndoorDetector {
 
         lastGnssAt = 0L
 
-        satInfo = "未知"
+        satInfo = ""
 
         satSamples = 0
 

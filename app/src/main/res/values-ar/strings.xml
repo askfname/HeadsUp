@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">HeadsUp</string>
+    <string name="desc">تذكيرات في الوقت المناسب عند استخدام الهاتف أثناء المشي — انظر إلى الطريق</string>
+    <string name="disclaimer">التذكيرات لا تغني عن الانتباه. يرجى تقليل استخدام الهاتف أثناء المشي.</string>
+
+    <string name="home_status_on">الحماية نشطة</string>
+    <string name="home_status_off">متوقفة</string>
+    <string name="home_status_on_desc">سيتم تذكيرك عند استخدام الهاتف أثناء المشي</string>
+    <string name="home_status_off_desc">فعّل الحماية لمراقبة المشي</string>
+
+    <string name="section_reminder_method">طريقة التذكير</string>
+    <string name="mode_float_title">تذكير عائم</string>
+    <string name="mode_float_desc">بطاقة عائمة؛ يتطلب إذن العرض فوق التطبيقات</string>
+    <string name="mode_popup_title">إشعار منبثق</string>
+    <string name="mode_popup_desc">شريط علوي؛ يتطلب إذن الإشعارات المنبثقة</string>
+    <string name="mode_full_title">تذكير بملء الشاشة</string>
+    <string name="mode_full_desc">مقاطعة إجبارية بملء الشاشة بأقصى تأثير</string>
+    <string name="vibrate_title">الاهتزاز عند التذكير</string>
+    <string name="vibrate_desc">الاهتزاز عند إصدار التذكير</string>
+    <string name="indoor_mute_title">كتم الصوت في الأماكن المغلقة</string>
+    <string name="indoor_mute_desc">تبقى مخاطر التعثر في الأماكن المغلقة، مثل الأثاث</string>
+    <string name="cooldown_format">الفاصل بين التذكيرات: %1$d ثانية</string>
+    <string name="sensitivity_title">الحساسية</string>
+    <string name="sens_low">حساسة</string>
+    <string name="sens_mid">قياسية</string>
+    <string name="sens_high">صارمة</string>
+    <string name="test_reminder">اختبار التذكير</string>
+
+    <string name="detect_status_title">حالة الكشف</string>
+    <string name="sens_desc_sensitive">حساسة (8 خطوات · ≤2 ث/خطوة)</string>
+    <string name="sens_desc_standard">قياسية (12 خطوة · ≤1.7 ث/خطوة)</string>
+    <string name="sens_desc_strict">صارمة (16 خطوة · ≤1.5 ث/خطوة)</string>
+    <string name="state_service">الخدمة</string>
+    <string name="state_off">متوقفة</string>
+    <string name="state_standby_screen_off">استعداد (الشاشة مطفأة، توفير الطاقة)</string>
+    <string name="state_standby_locked">استعداد (مقفل)</string>
+    <string name="state_standby_pocket">استعداد (في الجيب)</string>
+    <string name="state_running">قيد التشغيل</string>
+    <string name="state_dormant_unknown">خامل / غير معروف</string>
+    <string name="state_gait">المشية</string>
+    <string name="gait_walking_format">احتمال المشي · مستمر منذ %1$d ث</string>
+    <string name="gait_reminded_format">تم التذكير · قبل %1$d ث</string>
+    <string name="gait_still">ثابت</string>
+    <string name="state_run_steps">خطوات متتالية</string>
+    <string name="run_steps_format">%1$d/%2$d</string>
+    <string name="gait_batched">(تسليم مجمّع)</string>
+    <string name="gait_rhythmic">(تراكم إيقاعي)</string>
+    <string name="state_window_steps">خطوات النافذة</string>
+    <string name="window_steps_format">%1$d (نافذة 10 ثوانٍ)</string>
+    <string name="state_screen">الشاشة</string>
+    <string name="screen_off">مطفأة</string>
+    <string name="screen_on_locked">مضاءة · مقفلة</string>
+    <string name="screen_on_unlocked">مضاءة · غير مقفلة</string>
+    <string name="state_proximity">الحجب</string>
+    <string name="proximity_yes">نعم (الجيب)</string>
+    <string name="proximity_no">لا</string>
+    <string name="state_sensor">المستشعر</string>
+    <string name="sensor_step">كاشف الخطوات</string>
+    <string name="sensor_none">لا يوجد مستشعر خطوات (الكشف غير مدعوم على هذا الجهاز)</string>
+    <string name="state_indoor">داخل المبنى</string>
+    <string name="indoor_unknown_always">غير معروف (يتطلب الموقع “السماح طوال الوقت”)</string>
+    <string name="indoor_unknown_need_perm">غير معروف (يتطلب إذن الموقع)</string>
+    <string name="indoor_unknown_disabled">غير معروف (غير مفعّل)</string>
+    <string name="indoor_unknown_loc_off">غير معروف (الموقع متوقف)</string>
+    <string name="indoor_confirming">جارٍ التأكيد…</string>
+    <string name="indoor_yes">نعم (تم كبح التذكيرات)</string>
+    <string name="indoor_no">لا</string>
+    <string name="state_satellite">الأقمار الصناعية</string>
+    <string name="sat_not_tracking">لا يوجد تتبع</string>
+    <string name="sat_waiting">بانتظار الإشارة…</string>
+    <string name="sat_value_format">%1$s (مثبتة/قوية/الإجمالي)</string>
+    <string name="state_gms">تسريع GMS</string>
+    <string name="generic_unknown">غير معروف</string>
+    <string name="gms_available">متاح</string>
+    <string name="gms_unavailable">غير متاح</string>
+    <string name="gms_no_perm">لا يوجد إذن</string>
+    <string name="restart_service">إعادة تشغيل خدمة الكشف</string>
+    <string name="simulate_need_enable">فعّل المفتاح الرئيسي أولاً للمحاكاة</string>
+    <string name="simulating">جارٍ محاكاة المشي…</string>
+    <string name="simulate_walk">محاكاة المشي</string>
+
+    <string name="perm_title">الأذونات</string>
+    <string name="perm_activity_title">النشاط البدني</string>
+    <string name="perm_activity_desc">كشف المشي وصعود الدرج</string>
+    <string name="perm_notif_title">الإشعارات</string>
+    <string name="perm_notif_desc">ضرورية للتذكيرات</string>
+    <string name="perm_location_title">الموقع (اختياري)</string>
+    <string name="perm_location_desc_always">يتطلب كتم الأماكن المغلقة “السماح طوال الوقت”</string>
+    <string name="perm_location_desc_fg">يتطلب كتم الأماكن المغلقة إذن الموقع</string>
+    <string name="perm_overlay_title">العرض فوق التطبيقات الأخرى</string>
+    <string name="perm_overlay_desc">ضروري للتذكيرات المنبثقة</string>
+    <string name="perm_open">تفعيل</string>
+    <string name="perm_granted">ممنوح</string>
+
+    <string name="keepalive_title">التشغيل التلقائي والاستمرارية</string>
+    <string name="autostart_settings">إعدادات التشغيل التلقائي</string>
+    <string name="battery_whitelist">القائمة البيضاء للبطارية</string>
+    <string name="battery_ignored">تم تجاهل تحسين البطارية</string>
+    <string name="device_hint_xiaomi">Xiaomi: الإعدادات ← إعدادات التطبيقات ← إدارة التفويض ← التشغيل التلقائي</string>
+    <string name="device_hint_huawei">Huawei: مدير الهاتف ← إدارة بدء التطبيقات ← السماح بالتشغيل التلقائي</string>
+    <string name="device_hint_oppo">OPPO / OnePlus: مدير الهاتف ← الخصوصية ← إدارة التشغيل التلقائي</string>
+    <string name="device_hint_vivo">vivo: الإعدادات ← التطبيقات ← التشغيل التلقائي</string>
+    <string name="device_hint_default">يرجى السماح بالتشغيل التلقائي والعمل في الخلفية في إعدادات النظام</string>
+
+    <string name="about_title">حول</string>
+    <string name="donate_title">الدعم</string>
+    <string name="donate_desc">هل يعجبك هذا التطبيق؟ ادعُ المطوّر إلى فنجان قهوة</string>
+    <string name="version_format">الإصدار: %1$s</string>
+    <string name="copyright_format">Copyright © %1$d PlayLab</string>
+    <string name="developer_title">المطوّر</string>
+    <string name="developer_name">PlayLab</string>
+    <string name="about_website">الموقع الرسمي</string>
+    <string name="about_github">GitHub</string>
+    <string name="about_github_desc">عرض مستودع GitHub</string>
+    <string name="about_license">تراخيص المصدر المفتوح</string>
+    <string name="about_license_desc">عرض تراخيص المصدر المفتوح</string>
+    <string name="about_terms">شروط الاستخدام</string>
+    <string name="about_terms_desc">عرض شروط الاستخدام</string>
+    <string name="about_view">عرض</string>
+    <string name="donate_choose">اختر قناة التبرع:</string>
+    <string name="donate_afdian">Afdian</string>
+    <string name="donate_afdian_desc">موصى به للمستخدمين في بر الصين الرئيسي</string>
+    <string name="donate_afdian_btn">فتح Afdian</string>
+    <string name="donate_kofi">Ko-fi</string>
+    <string name="donate_kofi_desc">موصى به للمستخدمين خارج بر الصين الرئيسي</string>
+    <string name="donate_kofi_btn">فتح Ko-fi</string>
+    <string name="dialog_close">إغلاق</string>
+    <string name="dialog_know">فهمت</string>
+    <string name="dialog_cancel">إلغاء</string>
+    <string name="dialog_go_settings">فتح الإعدادات</string>
+    <string name="license_title">تراخيص المصدر المفتوح</string>
+    <string name="terms_title">شروط الاستخدام</string>
+    <string name="terms_content">1. يقدم هذا التطبيق تذكيرات مساعدة فقط لاستخدام الهاتف أثناء المشي ولا يغني عن الانتباه. يرجى الالتزام بقواعد المرور وتقليل استخدام الهاتف أثناء المشي؛\n2. تتأثر وظيفة “كتم الصوت في الأماكن المغلقة” بعتاد GPS في الجهاز والبيئة المحيطة، ونتائجها استرشادية فقط؛\n3. يُقدَّم هذا البرنامج “كما هو” دون أي ضمانات صريحة أو ضمنية، بما في ذلك ضمانات القابلية للتسويق والملاءمة؛\n4. لا يتحمل المؤلفون في أي حال، سواء كان ذلك بموجب عقد أو تقصير أو غيره، أي مسؤولية عن المطالبات أو الأضرار أو الالتزامات الأخرى الناشئة عن استخدام هذا البرنامج.</string>
+    <string name="footer_disclaimer"># التذكيرات لا تغني عن الانتباه. يرجى تقليل استخدام الهاتف أثناء المشي</string>
+
+    <string name="loc_dialog_need_always_title">يجب ضبط الموقع على “السماح طوال الوقت”</string>
+    <string name="loc_dialog_need_perm_title">يلزم إذن الموقع</string>
+    <string name="loc_dialog_need_always_msg">يتطلب كتم الأماكن المغلقة الموقع في الخلفية. في معلومات التطبيق ← الأذونات ← الموقع، اختر “السماح طوال الوقت”.</string>
+    <string name="loc_dialog_need_perm_msg">يتطلب كتم الأماكن المغلقة إذن الموقع. يرجى السماح بالوصول إلى الموقع في معلومات التطبيق ← الأذونات.</string>
+    <string name="core_dialog_title">الأذونات مطلوبة</string>
+    <string name="core_dialog_msg">يتطلب كشف المشي إذني النشاط البدني والإشعارات. يرجى تفعيلهما في معلومات التطبيق ← الأذونات / الإشعارات.</string>
+
+    <string name="indoor_help_title">حول هذه الميزة</string>
+    <string name="indoor_help_desc">تقتصر وظيفة “كتم الصوت في الأماكن المغلقة” بعتاد GPS في الجهاز والبيئة، وقد لا تحدد بدقة الوضع الداخلي أو الخارجي. عند الحاجة، اضبط المعلمات يدوياً في الإعدادات المتقدمة:</string>
+    <string name="indoor_advanced_show">الإعدادات المتقدمة ▸</string>
+    <string name="indoor_advanced_hide">الإعدادات المتقدمة ▾</string>
+    <string name="tune_strong_count">الأقمار القوية</string>
+    <string name="tune_strong_ratio">نسبة الإشارة القوية</string>
+    <string name="tune_gps_acc">دقة GPS (م)</string>
+    <string name="tune_default_format">الافتراضي %1$s (%2$s)</string>
+    <string name="tune_range_int">0–30</string>
+    <string name="tune_range_ratio">0–1</string>
+    <string name="tune_range_acc">5–50</string>
+    <string name="tune_hint">كلما زاد عدد الأقمار القوية أو نسبتها زادت حساسية الكتم في الأماكن المغلقة، وكلما قلت دقة GPS زادت حساسيتها.</string>
+    <string name="tune_error">المعلمات خارج النطاق أو غير صالحة؛ لم يتم الحفظ</string>
+    <string name="tune_save">حفظ</string>
+    <string name="tune_reset">استعادة</string>
+
+    <string name="reminder_content">يرجى تقليل استخدام الهاتف أثناء المشي والانتباه إلى المحيط</string>
+    <string name="reminder_confirm">فهمت، سأنظر إلى الطريق</string>
+    <string name="channel_guard">حماية المشي</string>
+    <string name="channel_alert">تذكيرات HeadsUp</string>
+    <string name="channel_alert_desc">إشعارات عائمة لتذكيرات HeadsUp</string>
+    <string name="notif_action_ack">فهمت</string>
+
+    <string-array name="reminder_titles">
+        <item>انظر إلى الأمام</item>
+        <item>انتبه لخطواتك</item>
+        <item>كن حذراً</item>
+        <item>انظر حولك</item>
+        <item>لا تحدق في الهاتف فقط</item>
+        <item>انتبه للدرجات</item>
+        <item>حافظ على سلامتك</item>
+    </string-array>
+
+    <string name="guard_screen_off">استعداد (الشاشة مطفأة، توفير الطاقة)</string>
+    <string name="guard_locked">استعداد مقفل (التذكير بعد إلغاء القفل)</string>
+    <string name="guard_pocket">احتمال الجيب (التذكير بعد الإخراج)</string>
+    <string name="guard_indoor">في الأماكن المغلقة (تم كبح التذكيرات)</string>
+    <string name="guard_loc_confirming">جارٍ تأكيد الموقع…</string>
+    <string name="guard_monitoring">جارٍ مراقبة استخدام الهاتف أثناء المشي…</string>
+    <string name="guard_walking_format">احتمال المشي · خطوات %1$d/%2$d (مستمر منذ %3$d ث)</string>
+    <string name="guard_still_format">ثابت · خطوات %1$d/%2$d</string>
+    <string name="guard_running_title">HeadsUp قيد التشغيل</string>
+</resources>

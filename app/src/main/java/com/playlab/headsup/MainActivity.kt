@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalViewConfiguration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -44,7 +45,9 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.playlab.headsup.data.Prefs
+import com.playlab.headsup.R
 import com.playlab.headsup.detection.DetectState
+import com.playlab.headsup.detection.WalkDetector
 import com.playlab.headsup.reminder.ReminderManager
 import com.playlab.headsup.service.HeadsUpService
 import kotlinx.coroutines.delay
@@ -337,9 +340,12 @@ private fun HomeScreen(resumeSeq: Int) {
                     }
                     Spacer(Modifier.width(12.dp))
                     Column(Modifier.weight(1f)) {
-                        Text(if (enabled) "守护中" else "已关闭", style = MaterialTheme.typography.titleLarge)
                         Text(
-                            if (enabled) "走路时看手机会提醒你" else "开启守护监测行走状态",
+                            if (enabled) stringResource(R.string.home_status_on) else stringResource(R.string.home_status_off),
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                        Text(
+                            if (enabled) stringResource(R.string.home_status_on_desc) else stringResource(R.string.home_status_off_desc),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -351,11 +357,19 @@ private fun HomeScreen(resumeSeq: Int) {
             // 提醒方式
             Card(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text("提醒方式", style = MaterialTheme.typography.titleMedium)
-                    ModeRow("浮动通知", "顶部横幅，需悬浮通知权限", Prefs.MODE_FLOAT, mode) {
+                    Text(stringResource(R.string.section_reminder_method), style = MaterialTheme.typography.titleMedium)
+                    ModeRow(
+                        stringResource(R.string.mode_popup_title),
+                        stringResource(R.string.mode_popup_desc),
+                        Prefs.MODE_FLOAT, mode
+                    ) {
                         mode = it; Prefs.setMode(ctx, it); tick++
                     }
-                    ModeRow("弹窗提醒", "悬浮窗卡片，需悬浮窗权限", Prefs.MODE_POPUP, mode) {
+                    ModeRow(
+                        stringResource(R.string.mode_float_title),
+                        stringResource(R.string.mode_float_desc),
+                        Prefs.MODE_POPUP, mode
+                    ) {
                         if (PermissionHelper.hasOverlay(ctx)) {
                             mode = it; Prefs.setMode(ctx, it)
                         } else {
@@ -367,7 +381,11 @@ private fun HomeScreen(resumeSeq: Int) {
                         }
                         tick++
                     }
-                    ModeRow("全屏提醒", "强制全屏打断，效果最强", Prefs.MODE_FULL, mode) {
+                    ModeRow(
+                        stringResource(R.string.mode_full_title),
+                        stringResource(R.string.mode_full_desc),
+                        Prefs.MODE_FULL, mode
+                    ) {
                         mode = it; Prefs.setMode(ctx, it); tick++
                     }
                     Spacer(Modifier.height(4.dp))
@@ -392,9 +410,9 @@ private fun HomeScreen(resumeSeq: Int) {
                         )
                         Spacer(Modifier.width(8.dp))
                         Column(Modifier.weight(1f)) {
-                            Text("提醒时震动", style = MaterialTheme.typography.bodyLarge)
+                            Text(stringResource(R.string.vibrate_title), style = MaterialTheme.typography.bodyLarge)
                             Text(
-                                "发出提醒的同时震动",
+                                stringResource(R.string.vibrate_desc),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -413,9 +431,9 @@ private fun HomeScreen(resumeSeq: Int) {
                         )
                         Spacer(Modifier.width(8.dp))
                         Column(Modifier.weight(1f)) {
-                            Text("室内不提醒", style = MaterialTheme.typography.bodyLarge)
+                            Text(stringResource(R.string.indoor_mute_title), style = MaterialTheme.typography.bodyLarge)
                             Text(
-                                "即使在室内也要当心被家具等物品绊倒",
+                                stringResource(R.string.indoor_mute_desc),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -425,11 +443,11 @@ private fun HomeScreen(resumeSeq: Int) {
                             onClick = { showIndoorHelp = true },
                             modifier = Modifier.padding(end = 8.dp),
                         ) {
-                            Icon(Icons.Filled.Info, contentDescription = "功能说明")
+                            Icon(Icons.Filled.Info, contentDescription = stringResource(R.string.indoor_help_title))
                         }
                     }
                     Spacer(Modifier.height(4.dp))
-                    Text("提醒间隔：${cooldown}秒", style = MaterialTheme.typography.bodyMedium)
+                    Text(stringResource(R.string.cooldown_format, cooldown), style = MaterialTheme.typography.bodyMedium)
                     // 方向锁：竖滑接管并转交父滚动，避免误拖滑块
                     Box(
                         Modifier.pointerInput(scrollState, viewConfig) {
@@ -471,7 +489,7 @@ private fun HomeScreen(resumeSeq: Int) {
                         )
                     }
                     Spacer(Modifier.height(4.dp))
-                    Text("灵敏度", style = MaterialTheme.typography.bodyMedium)
+                    Text(stringResource(R.string.sensitivity_title), style = MaterialTheme.typography.bodyMedium)
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         val chipColors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = MaterialTheme.colorScheme.primary,
@@ -482,7 +500,7 @@ private fun HomeScreen(resumeSeq: Int) {
                                 sens = 0; Prefs.setSensitivity(ctx, 0)
                                 if (enabled) HeadsUpService.start(ctx)
                             },
-                            label = { Text("灵敏") },
+                            label = { Text(stringResource(R.string.sens_low)) },
                             colors = chipColors,
                         )
                         FilterChip(
@@ -490,7 +508,7 @@ private fun HomeScreen(resumeSeq: Int) {
                                 sens = 1; Prefs.setSensitivity(ctx, 1)
                                 if (enabled) HeadsUpService.start(ctx)
                             },
-                            label = { Text("标准") },
+                            label = { Text(stringResource(R.string.sens_mid)) },
                             colors = chipColors,
                         )
                         FilterChip(
@@ -498,7 +516,7 @@ private fun HomeScreen(resumeSeq: Int) {
                                 sens = 2; Prefs.setSensitivity(ctx, 2)
                                 if (enabled) HeadsUpService.start(ctx)
                             },
-                            label = { Text("严格") },
+                            label = { Text(stringResource(R.string.sens_high)) },
                             colors = chipColors,
                         )
                     }
@@ -506,7 +524,7 @@ private fun HomeScreen(resumeSeq: Int) {
                     Button(onClick = { ReminderManager.test(ctx) }, modifier = Modifier.fillMaxWidth()) {
                         Icon(Icons.Default.Notifications, null)
                         Spacer(Modifier.width(8.dp))
-                        Text("测试提醒")
+                        Text(stringResource(R.string.test_reminder))
                     }
                 }
             }
@@ -517,9 +535,17 @@ private fun HomeScreen(resumeSeq: Int) {
             // 权限
             Card(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("权限", style = MaterialTheme.typography.titleMedium)
-                    PermRow("身体活动", "检测步行/上下楼", PermissionHelper.hasActivity(ctx)) { requestCore() }
-                    PermRow("通知", "发送提醒必备", PermissionHelper.hasNotification(ctx)) {
+                    Text(stringResource(R.string.perm_title), style = MaterialTheme.typography.titleMedium)
+                    PermRow(
+                        stringResource(R.string.perm_activity_title),
+                        stringResource(R.string.perm_activity_desc),
+                        PermissionHelper.hasActivity(ctx)
+                    ) { requestCore() }
+                    PermRow(
+                        stringResource(R.string.perm_notif_title),
+                        stringResource(R.string.perm_notif_desc),
+                        PermissionHelper.hasNotification(ctx)
+                    ) {
                         if (Build.VERSION.SDK_INT >= 33) requestRuntime(
                             arrayOf(Manifest.permission.POST_NOTIFICATIONS),
                             onDead = { showCoreDialog = true }
@@ -530,16 +556,20 @@ private fun HomeScreen(resumeSeq: Int) {
                         } catch (_: Exception) { }
                     }
                     PermRow(
-                        "位置（可选）",
+                        stringResource(R.string.perm_location_title),
                         if (PermissionHelper.requiresAlwaysLocation(ctx) &&
                             !Prefs.isLocationCompat(ctx)
-                        ) "室内不提醒需始终允许" else "室内不提醒需要位置权限",
+                        ) stringResource(R.string.perm_location_desc_always) else stringResource(R.string.perm_location_desc_fg),
                         PermissionHelper.isLocationEnough(ctx)
                     ) {
                         requestLocation()
                     }
                     if (mode == Prefs.MODE_POPUP)
-                        PermRow("悬浮窗", "弹窗提醒必须", PermissionHelper.hasOverlay(ctx)) {
+                        PermRow(
+                            stringResource(R.string.perm_overlay_title),
+                            stringResource(R.string.perm_overlay_desc),
+                            PermissionHelper.hasOverlay(ctx)
+                        ) {
                             try { settingsLauncher.launch(overlayIntent()) } catch (_: Exception) { }
                         }
                     @Suppress("unused") val _tick = tick // 订阅刷新
@@ -549,9 +579,9 @@ private fun HomeScreen(resumeSeq: Int) {
             // 保活
             Card(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("自启与保活", style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(R.string.keepalive_title), style = MaterialTheme.typography.titleMedium)
                     Text(
-                        KeepAliveHelper.deviceHint(),
+                        KeepAliveHelper.deviceHint(ctx),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -559,7 +589,7 @@ private fun HomeScreen(resumeSeq: Int) {
                         OutlinedButton(
                             onClick = { KeepAliveHelper.openAutoStart(ctx) },
                             modifier = Modifier.weight(1f)
-                        ) { Text("自启动设置") }
+                        ) { Text(stringResource(R.string.autostart_settings)) }
                         OutlinedButton(
                             onClick = {
                                 try {
@@ -570,7 +600,12 @@ private fun HomeScreen(resumeSeq: Int) {
                             },
                             modifier = Modifier.weight(1f),
                             enabled = !KeepAliveHelper.ignoringBattery(ctx)
-                        ) { Text(if (KeepAliveHelper.ignoringBattery(ctx)) "已忽略电池优化" else "电池白名单") }
+                        ) {
+                            Text(
+                                if (KeepAliveHelper.ignoringBattery(ctx)) stringResource(R.string.battery_ignored)
+                                else stringResource(R.string.battery_whitelist)
+                            )
+                        }
                     }
                 }
             }
@@ -579,7 +614,7 @@ private fun HomeScreen(resumeSeq: Int) {
             AboutCard()
 
             Text(
-                "# 提醒不能替代注意力，走路时请尽量少看手机",
+                stringResource(R.string.footer_disclaimer),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
@@ -600,11 +635,16 @@ private fun HomeScreen(resumeSeq: Int) {
             val needAlways = PermissionHelper.requiresAlwaysLocation(ctx)
             AlertDialog(
                 onDismissRequest = { showLocDialog = false; pendingIndoor = false },
-                title = { Text(if (needAlways) "需要始终允许位置" else "需要位置权限") },
+                title = {
+                    Text(
+                        if (needAlways) stringResource(R.string.loc_dialog_need_always_title)
+                        else stringResource(R.string.loc_dialog_need_perm_title)
+                    )
+                },
                 text = {
                     Text(
-                        if (needAlways) "室内不提醒需在后台获取位置，请在应用信息 → 权限 → 位置中选择“始终允许”。"
-                        else "室内不提醒需要位置权限，请在应用信息 → 权限中允许位置访问。"
+                        if (needAlways) stringResource(R.string.loc_dialog_need_always_msg)
+                        else stringResource(R.string.loc_dialog_need_perm_msg)
                     )
                 },
                 confirmButton = {
@@ -613,10 +653,12 @@ private fun HomeScreen(resumeSeq: Int) {
                         try {
                             settingsLauncher.launch(KeepAliveHelper.appDetailsIntent(ctx))
                         } catch (_: Exception) { pendingIndoor = false }
-                    }) { Text("去设置") }
+                    }) { Text(stringResource(R.string.dialog_go_settings)) }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showLocDialog = false; pendingIndoor = false }) { Text("取消") }
+                    TextButton(onClick = { showLocDialog = false; pendingIndoor = false }) {
+                        Text(stringResource(R.string.dialog_cancel))
+                    }
                 }
             )
         }
@@ -625,18 +667,20 @@ private fun HomeScreen(resumeSeq: Int) {
         if (showCoreDialog) {
             AlertDialog(
                 onDismissRequest = { showCoreDialog = false; pendingEnable = false },
-                title = { Text("需要权限") },
-                text = { Text("看路检测需要身体活动与通知权限，请在应用信息 → 权限/通知中开启。") },
+                title = { Text(stringResource(R.string.core_dialog_title)) },
+                text = { Text(stringResource(R.string.core_dialog_msg)) },
                 confirmButton = {
                     TextButton(onClick = {
                         showCoreDialog = false
                         try {
                             settingsLauncher.launch(KeepAliveHelper.appDetailsIntent(ctx))
                         } catch (_: Exception) { pendingEnable = false }
-                    }) { Text("去设置") }
+                    }) { Text(stringResource(R.string.dialog_go_settings)) }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showCoreDialog = false; pendingEnable = false }) { Text("取消") }
+                    TextButton(onClick = { showCoreDialog = false; pendingEnable = false }) {
+                        Text(stringResource(R.string.dialog_cancel))
+                    }
                 }
             )
         }
@@ -675,7 +719,7 @@ private fun IndoorHelpDialog(
             (fRatioIn.trim().isNotEmpty() && ratioIn == null) ||
             (fGpsAcc.trim().isNotEmpty() && gpsAcc == null)
         ) {
-            err = "参数超范围或格式错误，已取消保存"
+            err = ctx.getString(R.string.tune_error)
             return
         }
         Prefs.saveIndoorCustom(ctx, visIn, ratioIn, gpsAcc)
@@ -697,25 +741,55 @@ private fun IndoorHelpDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("功能说明") },
+        title = { Text(stringResource(R.string.indoor_help_title)) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState())) {
                 Text(
-                    "“室内不提醒”功能受限于设备 GPS 硬件和所处环境差异，可能无法正确判断室内外，必要时可使用高级设置手动调整参数：",
+                    stringResource(R.string.indoor_help_desc),
                     style = MaterialTheme.typography.bodySmall,
                 )
                 TextButton(
                     onClick = { expanded = !expanded },
                     contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
                 ) {
-                    Text(if (expanded) "高级设置 ▾" else "高级设置 ▸")
+                    Text(
+                        if (expanded) stringResource(R.string.indoor_advanced_hide)
+                        else stringResource(R.string.indoor_advanced_show)
+                    )
                 }
                 if (expanded) {
-                    TuneField("强星数", fVisIn, "默认 ${d.visIndoor}（0~30）", KeyboardType.Number) { fVisIn = it }
-                    TuneField("强星占比", fRatioIn, "默认 ${d.ratioIndoor}（0~1）", KeyboardType.Decimal) { fRatioIn = it }
-                    TuneField("GPS 精度（米）", fGpsAcc, "默认 ${d.gpsAcc}（5~50）", KeyboardType.Decimal) { fGpsAcc = it }
+                    TuneField(
+                        stringResource(R.string.tune_strong_count),
+                        fVisIn,
+                        stringResource(
+                            R.string.tune_default_format,
+                            d.visIndoor.toString(),
+                            stringResource(R.string.tune_range_int)
+                        ),
+                        KeyboardType.Number
+                    ) { fVisIn = it }
+                    TuneField(
+                        stringResource(R.string.tune_strong_ratio),
+                        fRatioIn,
+                        stringResource(
+                            R.string.tune_default_format,
+                            d.ratioIndoor.toString(),
+                            stringResource(R.string.tune_range_ratio)
+                        ),
+                        KeyboardType.Decimal
+                    ) { fRatioIn = it }
+                    TuneField(
+                        stringResource(R.string.tune_gps_acc),
+                        fGpsAcc,
+                        stringResource(
+                            R.string.tune_default_format,
+                            d.gpsAcc.toString(),
+                            stringResource(R.string.tune_range_acc)
+                        ),
+                        KeyboardType.Decimal
+                    ) { fGpsAcc = it }
                     Text(
-                        "参数说明：强星数/强星占比越大室内不提醒越灵敏，GPS 精度越小室内不提醒越灵敏。",
+                        stringResource(R.string.tune_hint),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -726,14 +800,18 @@ private fun IndoorHelpDialog(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         modifier = Modifier.padding(top = 8.dp),
                     ) {
-                        Button(onClick = ::save, modifier = Modifier.weight(1f)) { Text("保存") }
-                        OutlinedButton(onClick = ::reset, modifier = Modifier.weight(1f)) { Text("恢复默认") }
+                        Button(onClick = ::save, modifier = Modifier.weight(1f)) {
+                            Text(stringResource(R.string.tune_save))
+                        }
+                        OutlinedButton(onClick = ::reset, modifier = Modifier.weight(1f)) {
+                            Text(stringResource(R.string.tune_reset))
+                        }
                     }
                 }
             }
         },
         confirmButton = {
-            TextButton(onClick = onDismiss) { Text("关闭") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.dialog_close)) }
         },
     )
 }
@@ -771,49 +849,60 @@ private fun DetectStatusCard(enabled: Boolean) {
     }
     // 灵敏度只读显示，每秒随快照同步刷新
     val sensDesc = when (Prefs.getSensitivity(ctx)) {
-        0 -> "灵敏（8步·≤2s/步）"
-        2 -> "严格（16步·≤1.5s/步）"
-        else -> "标准（12步·≤1.7s/步）"
+        0 -> stringResource(R.string.sens_desc_sensitive)
+        2 -> stringResource(R.string.sens_desc_strict)
+        else -> stringResource(R.string.sens_desc_standard)
     }
     // heartbeat 与 elapsedRealtime 同基准（心跳已降频至 10s，Doze 下更稀）
     val alive = snap.heartbeat > 0 &&
         android.os.SystemClock.elapsedRealtime() - snap.heartbeat < 45_000
     Card(Modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            Text("检测状态", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.detect_status_title), style = MaterialTheme.typography.titleMedium)
             StateRow(
-                "服务",
-                if (!enabled) "未开启"
-                else if (!snap.screenOn) "待机（灭屏省电中）"
-                else if (!snap.unlocked) "待机（锁屏中）"
-                else if (snap.pocketed) "待机（口袋中）"
-                else if (alive) "运行中"
-                else "休眠中/未知",
+                stringResource(R.string.state_service),
+                if (!enabled) stringResource(R.string.state_off)
+                else if (!snap.screenOn) stringResource(R.string.state_standby_screen_off)
+                else if (!snap.unlocked) stringResource(R.string.state_standby_locked)
+                else if (snap.pocketed) stringResource(R.string.state_standby_pocket)
+                else if (alive) stringResource(R.string.state_running)
+                else stringResource(R.string.state_dormant_unknown),
             )
             // 真实提醒后 8s 内显示“已提醒”，与批量投递下整串步伐一次处理完保持同步
             val firedAgoSec = if (snap.lastTriggerAt > 0)
                 (android.os.SystemClock.elapsedRealtime() - snap.lastTriggerAt) / 1000
             else Long.MAX_VALUE
             StateRow(
-                "步态",
-                if (snap.walking && snap.runLen >= 3) "疑似行走 · 已持续 ${snap.walkElapsedSec}s"
-                else if (firedAgoSec < 8) "已提醒 · ${firedAgoSec}s前"
-                else "静止",
+                stringResource(R.string.state_gait),
+                if (snap.walking && snap.runLen >= 3) stringResource(R.string.gait_walking_format, snap.walkElapsedSec)
+                else if (firedAgoSec < 8) stringResource(R.string.gait_reminded_format, firedAgoSec.toInt())
+                else stringResource(R.string.gait_still),
             )
             StateRow(
-                "连贯步数",
-                "${snap.runLen}/${snap.runNeed}" +
-                    if (snap.batched) "（批量投递）" else "（节律累计）",
+                stringResource(R.string.state_run_steps),
+                stringResource(R.string.run_steps_format, snap.runLen, snap.runNeed) +
+                    if (snap.batched) stringResource(R.string.gait_batched) else stringResource(R.string.gait_rhythmic),
             )
-            StateRow("窗口步数", "${snap.stepsInWindow}（10s 窗口）")
-            StateRow("屏幕", if (!snap.screenOn) "灭" else if (!snap.unlocked) "亮·锁屏" else "亮·已解锁")
-            StateRow("遮挡", if (snap.pocketed) "是（口袋）" else "否")
             StateRow(
-                "传感器",
-                if (snap.hasStepDetector) "步伐"
-                else "无步伐传感器（本机不支持检测）",
+                stringResource(R.string.state_window_steps),
+                stringResource(R.string.window_steps_format, snap.stepsInWindow)
             )
-            StateRow("灵敏度", sensDesc)
+            StateRow(
+                stringResource(R.string.state_screen),
+                if (!snap.screenOn) stringResource(R.string.screen_off)
+                else if (!snap.unlocked) stringResource(R.string.screen_on_locked)
+                else stringResource(R.string.screen_on_unlocked)
+            )
+            StateRow(
+                stringResource(R.string.state_proximity),
+                if (snap.pocketed) stringResource(R.string.proximity_yes) else stringResource(R.string.proximity_no)
+            )
+            StateRow(
+                stringResource(R.string.state_sensor),
+                if (snap.hasStepDetector) stringResource(R.string.sensor_step)
+                else stringResource(R.string.sensor_none),
+            )
+            StateRow(stringResource(R.string.sensitivity_title), sensDesc)
             // 室内态跟随位置权限
             val locEnough = PermissionHelper.isLocationEnough(ctx)
             val needAlways = PermissionHelper.requiresAlwaysLocation(ctx) &&
@@ -824,27 +913,35 @@ private fun DetectStatusCard(enabled: Boolean) {
             val satsFresh = tracking && IndoorDetector.isGnssFresh()
             val liveIndoor = if (tracking) IndoorDetector.isIndoorNow() else snap.indoor
             StateRow(
-                "室内",
-                if (!locEnough && needAlways) "未知（需始终允许位置）"
-                else if (!locEnough) "未知（需位置权限）"
-                else if (!Prefs.isIndoorMute(ctx)) "未知（未启用）"
-                else if (!IndoorDetector.isLocationOn(ctx)) "未知（定位已关闭）"
-                else if (snap.indoorPending) "确认中…"
-                else if (liveIndoor) "是（抑制提醒）" else "否",
+                stringResource(R.string.state_indoor),
+                if (!locEnough && needAlways) stringResource(R.string.indoor_unknown_always)
+                else if (!locEnough) stringResource(R.string.indoor_unknown_need_perm)
+                else if (!Prefs.isIndoorMute(ctx)) stringResource(R.string.indoor_unknown_disabled)
+                else if (!IndoorDetector.isLocationOn(ctx)) stringResource(R.string.indoor_unknown_loc_off)
+                else if (snap.indoorPending) stringResource(R.string.indoor_confirming)
+                else if (liveIndoor) stringResource(R.string.indoor_yes) else stringResource(R.string.indoor_no),
             )
             StateRow(
-                "卫星",
-                if (!tracking) "未追踪"
-                else if (!satsFresh) "等待信号…"
-                else "$liveSats（定位/强星/总数）"
+                stringResource(R.string.state_satellite),
+                if (!tracking) stringResource(R.string.sat_not_tracking)
+                else if (!satsFresh) stringResource(R.string.sat_waiting)
+                else if (liveSats.isBlank()) stringResource(R.string.sat_waiting)
+                else stringResource(R.string.sat_value_format, liveSats)
             )
-            StateRow("GMS 加速", snap.gms)
+            // GMS 状态以语言无关的状态码存储，每次重组时映射到语言 XML 中的对应字段，
+            val gmsText = when (snap.gms) {
+                WalkDetector.GmsStatus.AVAILABLE -> stringResource(R.string.gms_available)
+                WalkDetector.GmsStatus.UNAVAILABLE -> stringResource(R.string.gms_unavailable)
+                WalkDetector.GmsStatus.NO_PERM -> stringResource(R.string.gms_no_perm)
+                else -> stringResource(R.string.generic_unknown)
+            }
+            StateRow(stringResource(R.string.state_gms), gmsText)
             // 一键拉起（正常不用点，打开页面会自动拉起）
             if (enabled && !alive) {
                 OutlinedButton(
                     onClick = { HeadsUpService.start(ctx) },
                     modifier = Modifier.fillMaxWidth(),
-                ) { Text("重启检测服务") }
+                ) { Text(stringResource(R.string.restart_service)) }
             }
             Spacer(Modifier.height(8.dp))
             OutlinedButton(
@@ -853,9 +950,9 @@ private fun DetectStatusCard(enabled: Boolean) {
                 enabled = enabled && !snap.simulating,
             ) {
                 Text(
-                    if (!enabled) "请先打开总开关再模拟"
-                    else if (snap.simulating) "模拟步行中…"
-                    else "模拟步行"
+                    if (!enabled) stringResource(R.string.simulate_need_enable)
+                    else if (snap.simulating) stringResource(R.string.simulating)
+                    else stringResource(R.string.simulate_walk)
                 )
             }
         }
@@ -881,7 +978,7 @@ private fun AboutCard() {
 
     Card(Modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("关于", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.about_title), style = MaterialTheme.typography.titleMedium)
             Surface(
                 onClick = { showDonate = true },
                 shape = RoundedCornerShape(24.dp),
@@ -897,10 +994,10 @@ private fun AboutCard() {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Filled.Favorite, null)
                         Spacer(Modifier.width(8.dp))
-                        Text("赞助支持", style = MaterialTheme.typography.titleMedium)
+                        Text(stringResource(R.string.donate_title), style = MaterialTheme.typography.titleMedium)
                     }
                     Text(
-                        "喜欢这个应用？请开发者喝杯咖啡吧",
+                        stringResource(R.string.donate_desc),
                         style = MaterialTheme.typography.bodySmall,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth()
@@ -909,30 +1006,50 @@ private fun AboutCard() {
             }
             // 应用名 + 版本 + 版权
             Column(verticalArrangement = Arrangement.spacedBy(1.8.dp)) {
-                Text("看路提醒", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
                 Text(
-                    "Version: $version",
+                    stringResource(R.string.app_name),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    stringResource(R.string.version_format, version),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    "Copyright © $year PlayLab",
+                    stringResource(R.string.copyright_format, year),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text("开发者", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
                 Text(
-                    "Play 实验室",
+                    stringResource(R.string.developer_title),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    stringResource(R.string.developer_name),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            AboutRow("官方网站", "https://playlab.eu.org") { openUrl(ctx, "https://playlab.eu.org") }
-            AboutRow("GitHub", "查看 Github 仓库") { openUrl(ctx, "https://github.com/askfname/HeadsUp") }
-            AboutRow("开源许可协议", "查看开源许可") { showLicense = true }
-            AboutRow("使用条款", "查看使用条款") { showTerms = true }
+            AboutRow(
+                stringResource(R.string.about_website),
+                "https://playlab.eu.org"
+            ) { openUrl(ctx, "https://playlab.eu.org") }
+            AboutRow(
+                stringResource(R.string.about_github),
+                stringResource(R.string.about_github_desc)
+            ) { openUrl(ctx, "https://github.com/askfname/HeadsUp") }
+            AboutRow(
+                stringResource(R.string.about_license),
+                stringResource(R.string.about_license_desc)
+            ) { showLicense = true }
+            AboutRow(
+                stringResource(R.string.about_terms),
+                stringResource(R.string.about_terms_desc)
+            ) { showTerms = true }
         }
     }
 
@@ -940,28 +1057,28 @@ private fun AboutCard() {
     if (showDonate) {
         AlertDialog(
             onDismissRequest = { showDonate = false },
-            title = { Text("赞助支持") },
+            title = { Text(stringResource(R.string.donate_title)) },
             text = {
                 Column(
                     Modifier.verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Text("选择适合你的赞助渠道：")
+                    Text(stringResource(R.string.donate_choose))
                     DonateChannel(
-                        "爱发电",
-                        "国内用户推荐",
+                        stringResource(R.string.donate_afdian),
+                        stringResource(R.string.donate_afdian_desc),
                         "https://afdian.com/a/playlab",
-                        "前往爱发电"
+                        stringResource(R.string.donate_afdian_btn)
                     )
                     DonateChannel(
-                        "Ko-fi",
-                        "海外用户推荐",
+                        stringResource(R.string.donate_kofi),
+                        stringResource(R.string.donate_kofi_desc),
                         "https://ko-fi.com/playlaboratory",
-                        "前往 Ko-fi"
+                        stringResource(R.string.donate_kofi_btn)
                     )
                 }
             },
-            confirmButton = { TextButton(onClick = { showDonate = false }) { Text("关闭") } }
+            confirmButton = { TextButton(onClick = { showDonate = false }) { Text(stringResource(R.string.dialog_close)) } }
         )
     }
 
@@ -969,7 +1086,7 @@ private fun AboutCard() {
     if (showLicense) {
         AlertDialog(
             onDismissRequest = { showLicense = false },
-            title = { Text("开源许可协议") },
+            title = { Text(stringResource(R.string.license_title)) },
             text = {
                 Column(
                     Modifier.verticalScroll(rememberScrollState()),
@@ -978,32 +1095,27 @@ private fun AboutCard() {
                     LicenseEntry("Kotlin / Android Gradle Plugin", "Apache License 2.0")
                     LicenseEntry("AndroidX Core / Activity Compose", "Apache License 2.0")
                     LicenseEntry(
-                        "Jetpack Compose（UI / Material3 / Icons / BOM 2024.06.00）",
+                        "Jetpack Compose (UI / Material3 / Icons / BOM 2024.06.00)",
                         "Apache License 2.0"
                     )
                     LicenseEntry("WorkManager 2.9.0", "Apache License 2.0")
                     LicenseEntry("Play Services Location 21.3.0", "Apache License 2.0")
                 }
             },
-            confirmButton = { TextButton(onClick = { showLicense = false }) { Text("关闭") } }
+            confirmButton = { TextButton(onClick = { showLicense = false }) { Text(stringResource(R.string.dialog_close)) } }
         )
     }
     // 使用条款弹窗
     if (showTerms) {
         AlertDialog(
             onDismissRequest = { showTerms = false },
-            title = { Text("使用条款") },
+            title = { Text(stringResource(R.string.terms_title)) },
             text = {
                 Column(Modifier.verticalScroll(rememberScrollState())) {
-                    Text(
-                        "1. 本应用仅为行走看手机的辅助提醒，不能替代注意力，行走时请遵守交通规则，尽量少看手机；\n" +
-                            "2. “室内不提醒”功能受设备 GPS 硬件与所处环境影响，室内外判断结果仅供参考；\n" +
-                            "3. 本软件按“原样”提供，不作任何明示或暗示保证，包括但不限于适销性与适用性保证；\n" +
-                            "4. 在任何情况下，无论是合同、侵权或其他情形，作者均不对因使用本软件而产生的任何索赔、损害或其他责任承担责任。"
-                    )
+                    Text(stringResource(R.string.terms_content))
                 }
             },
-            confirmButton = { TextButton(onClick = { showTerms = false }) { Text("知道了") } }
+            confirmButton = { TextButton(onClick = { showTerms = false }) { Text(stringResource(R.string.dialog_know)) } }
         )
     }
 }
@@ -1019,7 +1131,7 @@ private fun AboutRow(title: String, desc: String, onClick: () -> Unit) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-        TextButton(onClick = onClick) { Text("查看") }
+        TextButton(onClick = onClick) { Text(stringResource(R.string.about_view)) }
     }
 }
 
@@ -1108,13 +1220,13 @@ private fun PermRow(title: String, desc: String, ok: Boolean, onFix: () -> Unit)
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-        if (!ok) TextButton(onClick = onFix) { Text("去开启") }
+        if (!ok) TextButton(onClick = onFix) { Text(stringResource(R.string.perm_open)) }
         else TextButton(
             onClick = {},
             enabled = false,
             colors = ButtonDefaults.textButtonColors(
                 disabledContentColor = MaterialTheme.colorScheme.primary,
             ),
-        ) { Text("已允许", fontWeight = FontWeight.Normal) }
+        ) { Text(stringResource(R.string.perm_granted), fontWeight = FontWeight.Normal) }
     }
 }

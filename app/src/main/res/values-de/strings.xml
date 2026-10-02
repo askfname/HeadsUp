@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">HeadsUp</string>
+    <string name="desc">Rechtzeitige Erinnerungen bei der Handynutzung im Gehen — blicken Sie auf</string>
+    <string name="disclaimer">Erinnerungen ersetzen keine Aufmerksamkeit. Bitte minimieren Sie die Handynutzung im Gehen.</string>
+
+    <string name="home_status_on">Schutz aktiv</string>
+    <string name="home_status_off">Deaktiviert</string>
+    <string name="home_status_on_desc">Sie werden erinnert, wenn Sie im Gehen das Handy nutzen</string>
+    <string name="home_status_off_desc">Aktivieren Sie den Schutz zur Gehüberwachung</string>
+
+    <string name="section_reminder_method">Erinnerungsmethode</string>
+    <string name="mode_float_title">Schwebende Erinnerung</string>
+    <string name="mode_float_desc">Schwebende Karte; Berechtigung zur Anzeige über Apps erforderlich</string>
+    <string name="mode_popup_title">Pop-up-Benachrichtigung</string>
+    <string name="mode_popup_desc">Banner oben; Berechtigung für Pop-up-Benachrichtigung erforderlich</string>
+    <string name="mode_full_title">Vollbilderinnerung</string>
+    <string name="mode_full_desc">Erzwungene Vollbildunterbrechung mit stärkster Wirkung</string>
+    <string name="vibrate_title">Bei Erinnerung vibrieren</string>
+    <string name="vibrate_desc">Beim Ausgeben einer Erinnerung vibrieren</string>
+    <string name="indoor_mute_title">In Innenräumen stumm</string>
+    <string name="indoor_mute_desc">Auch in Innenräumen besteht Stolpergefahr, z. B. durch Möbel</string>
+    <string name="cooldown_format">Erinnerungsintervall: %1$d Sekunden</string>
+    <string name="sensitivity_title">Empfindlichkeit</string>
+    <string name="sens_low">Sensibel</string>
+    <string name="sens_mid">Standard</string>
+    <string name="sens_high">Streng</string>
+    <string name="test_reminder">Erinnerung testen</string>
+
+    <string name="detect_status_title">Erkennungsstatus</string>
+    <string name="sens_desc_sensitive">Sensibel (8 Schritte · ≤2 s/Schritt)</string>
+    <string name="sens_desc_standard">Standard (12 Schritte · ≤1,7 s/Schritt)</string>
+    <string name="sens_desc_strict">Streng (16 Schritte · ≤1,5 s/Schritt)</string>
+    <string name="state_service">Dienst</string>
+    <string name="state_off">Deaktiviert</string>
+    <string name="state_standby_screen_off">Bereitschaft (Bildschirm aus, Energiesparen)</string>
+    <string name="state_standby_locked">Bereitschaft (gesperrt)</string>
+    <string name="state_standby_pocket">Bereitschaft (in der Tasche)</string>
+    <string name="state_running">Wird ausgeführt</string>
+    <string name="state_dormant_unknown">Ruhend / unbekannt</string>
+    <string name="state_gait">Gang</string>
+    <string name="gait_walking_format">Vermutlich Gehen · seit %1$d s</string>
+    <string name="gait_reminded_format">Erinnert · vor %1$d s</string>
+    <string name="gait_still">Stillstand</string>
+    <string name="state_run_steps">Aufeinanderfolgende Schritte</string>
+    <string name="run_steps_format">%1$d/%2$d</string>
+    <string name="gait_batched">(gebündelte Zustellung)</string>
+    <string name="gait_rhythmic">(rhythmische Kumulation)</string>
+    <string name="state_window_steps">Schritte im Fenster</string>
+    <string name="window_steps_format">%1$d (10-s-Fenster)</string>
+    <string name="state_screen">Bildschirm</string>
+    <string name="screen_off">Aus</string>
+    <string name="screen_on_locked">An · Gesperrt</string>
+    <string name="screen_on_unlocked">An · Entsperrt</string>
+    <string name="state_proximity">Verdeckung</string>
+    <string name="proximity_yes">Ja (Tasche)</string>
+    <string name="proximity_no">Nein</string>
+    <string name="state_sensor">Sensor</string>
+    <string name="sensor_step">Schritterkennung</string>
+    <string name="sensor_none">Kein Schrittsensor (Erkennung auf diesem Gerät nicht unterstützt)</string>
+    <string name="state_indoor">Innenraum</string>
+    <string name="indoor_unknown_always">Unbekannt (Standort „Immer zulassen“ erforderlich)</string>
+    <string name="indoor_unknown_need_perm">Unbekannt (Standortberechtigung erforderlich)</string>
+    <string name="indoor_unknown_disabled">Unbekannt (nicht aktiviert)</string>
+    <string name="indoor_unknown_loc_off">Unbekannt (Standort deaktiviert)</string>
+    <string name="indoor_confirming">Wird bestätigt…</string>
+    <string name="indoor_yes">Ja (Erinnerungen unterdrückt)</string>
+    <string name="indoor_no">Nein</string>
+    <string name="state_satellite">Satelliten</string>
+    <string name="sat_not_tracking">Kein Tracking</string>
+    <string name="sat_waiting">Warte auf Signal…</string>
+    <string name="sat_value_format">%1$s (Fix/stark/gesamt)</string>
+    <string name="state_gms">GMS-Beschleunigung</string>
+    <string name="generic_unknown">Unbekannt</string>
+    <string name="gms_available">Verfügbar</string>
+    <string name="gms_unavailable">Nicht verfügbar</string>
+    <string name="gms_no_perm">Keine Berechtigung</string>
+    <string name="restart_service">Erkennungsdienst neu starten</string>
+    <string name="simulate_need_enable">Bitte zuerst den Hauptschalter aktivieren, dann simulieren</string>
+    <string name="simulating">Gehen wird simuliert…</string>
+    <string name="simulate_walk">Gehen simulieren</string>
+
+    <string name="perm_title">Berechtigungen</string>
+    <string name="perm_activity_title">Körperliche Aktivität</string>
+    <string name="perm_activity_desc">Gehen und Treppensteigen erkennen</string>
+    <string name="perm_notif_title">Benachrichtigungen</string>
+    <string name="perm_notif_desc">Für Erinnerungen erforderlich</string>
+    <string name="perm_location_title">Standort (optional)</string>
+    <string name="perm_location_desc_always">Stummschaltung in Innenräumen erfordert „Immer zulassen“</string>
+    <string name="perm_location_desc_fg">Stummschaltung in Innenräumen erfordert Standortberechtigung</string>
+    <string name="perm_overlay_title">Über anderen Apps anzeigen</string>
+    <string name="perm_overlay_desc">Für Pop-up-Erinnerungen erforderlich</string>
+    <string name="perm_open">Aktivieren</string>
+    <string name="perm_granted">Gewährt</string>
+
+    <string name="keepalive_title">Autostart und Schutz</string>
+    <string name="autostart_settings">Autostart-Einstellungen</string>
+    <string name="battery_whitelist">Akku-Whitelist</string>
+    <string name="battery_ignored">Akkuoptimierung wird ignoriert</string>
+    <string name="device_hint_xiaomi">Xiaomi: Einstellungen → App-Einstellungen → Berechtigungsverwaltung → Autostart</string>
+    <string name="device_hint_huawei">Huawei: Telefonmanager → App-Startverwaltung → Autostart zulassen</string>
+    <string name="device_hint_oppo">OPPO / OnePlus: Telefonmanager → Datenschutz → Autostart-Verwaltung</string>
+    <string name="device_hint_vivo">vivo: Einstellungen → Apps → Autostart</string>
+    <string name="device_hint_default">Bitte Autostart und Hintergrundbetrieb in den Systemeinstellungen zulassen</string>
+
+    <string name="about_title">Über</string>
+    <string name="donate_title">Unterstützen</string>
+    <string name="donate_desc">Gefällt Ihnen diese App? Geben Sie dem Entwickler einen Kaffee aus</string>
+    <string name="version_format">Version: %1$s</string>
+    <string name="copyright_format">Copyright © %1$d PlayLab</string>
+    <string name="developer_title">Entwickler</string>
+    <string name="developer_name">PlayLab</string>
+    <string name="about_website">Offizielle Website</string>
+    <string name="about_github">GitHub</string>
+    <string name="about_github_desc">GitHub-Repository ansehen</string>
+    <string name="about_license">Open-Source-Lizenzen</string>
+    <string name="about_license_desc">Open-Source-Lizenzen ansehen</string>
+    <string name="about_terms">Nutzungsbedingungen</string>
+    <string name="about_terms_desc">Nutzungsbedingungen ansehen</string>
+    <string name="about_view">Ansehen</string>
+    <string name="donate_choose">Wählen Sie einen Spendenkanal:</string>
+    <string name="donate_afdian">Afdian</string>
+    <string name="donate_afdian_desc">Empfohlen für Nutzer in Festlandchina</string>
+    <string name="donate_afdian_btn">Afdian öffnen</string>
+    <string name="donate_kofi">Ko-fi</string>
+    <string name="donate_kofi_desc">Empfohlen für Nutzer außerhalb Festlandchinas</string>
+    <string name="donate_kofi_btn">Ko-fi öffnen</string>
+    <string name="dialog_close">Schließen</string>
+    <string name="dialog_know">Verstanden</string>
+    <string name="dialog_cancel">Abbrechen</string>
+    <string name="dialog_go_settings">Einstellungen öffnen</string>
+    <string name="license_title">Open-Source-Lizenzen</string>
+    <string name="terms_title">Nutzungsbedingungen</string>
+    <string name="terms_content">1. Diese App bietet nur unterstützende Erinnerungen für die Handynutzung im Gehen und ersetzt keine Aufmerksamkeit. Bitte beachten Sie die Verkehrsregeln und minimieren Sie die Handynutzung im Gehen;\n2. Die Funktion „In Innenräumen stumm“ hängt von der GPS-Hardware des Geräts und der Umgebung ab; Ergebnisse dienen nur als Referenz;\n3. Diese Software wird „wie besehen“ bereitgestellt, ohne ausdrückliche oder stillschweigende Gewährleistung, einschließlich der Marktgängigkeit und Eignung;\n4. In keinem Fall, weder vertraglich noch deliktisch, haften die Autoren für Ansprüche, Schäden oder sonstige Haftung aus der Nutzung dieser Software.</string>
+    <string name="footer_disclaimer"># Erinnerungen ersetzen keine Aufmerksamkeit. Bitte minimieren Sie die Handynutzung im Gehen</string>
+
+    <string name="loc_dialog_need_always_title">Standort muss auf „Immer zulassen“ stehen</string>
+    <string name="loc_dialog_need_perm_title">Standortberechtigung erforderlich</string>
+    <string name="loc_dialog_need_always_msg">Stummschaltung in Innenräumen erfordert Hintergrundstandort. Wählen Sie unter App-Info → Berechtigungen → Standort die Option „Immer zulassen“.</string>
+    <string name="loc_dialog_need_perm_msg">Stummschaltung in Innenräumen erfordert die Standortberechtigung. Bitte gewähren Sie den Standortzugriff unter App-Info → Berechtigungen.</string>
+    <string name="core_dialog_title">Berechtigungen erforderlich</string>
+    <string name="core_dialog_msg">Die Geherkennung erfordert Berechtigungen für körperliche Aktivität und Benachrichtigungen. Bitte aktivieren Sie sie unter App-Info → Berechtigungen / Benachrichtigungen.</string>
+
+    <string name="indoor_help_title">Zu dieser Funktion</string>
+    <string name="indoor_help_desc">Die Funktion „In Innenräumen stumm“ ist durch GPS-Hardware und Umgebung begrenzt und erkennt Innen- oder Außenbereiche ggf. nicht korrekt. Passen Sie die Parameter bei Bedarf manuell in den erweiterten Einstellungen an:</string>
+    <string name="indoor_advanced_show">Erweiterte Einstellungen ▸</string>
+    <string name="indoor_advanced_hide">Erweiterte Einstellungen ▾</string>
+    <string name="tune_strong_count">Starke Satelliten</string>
+    <string name="tune_strong_ratio">Starksignalanteil</string>
+    <string name="tune_gps_acc">GPS-Genauigkeit (m)</string>
+    <string name="tune_default_format">Standard %1$s (%2$s)</string>
+    <string name="tune_range_int">0–30</string>
+    <string name="tune_range_ratio">0–1</string>
+    <string name="tune_range_acc">5–50</string>
+    <string name="tune_hint">Höhere Anzahl bzw. höherer Anteil starker Satelliten erhöht die Empfindlichkeit der Innenraum-Stummschaltung; kleinere GPS-Genauigkeit erhöht sie ebenfalls.</string>
+    <string name="tune_error">Parameter außerhalb des Bereichs oder ungültig; Änderungen wurden nicht gespeichert</string>
+    <string name="tune_save">Speichern</string>
+    <string name="tune_reset">Zurücksetzen</string>
+
+    <string name="reminder_content">Bitte schauen Sie im Gehen seltener aufs Handy und achten Sie auf die Umgebung</string>
+    <string name="reminder_confirm">Verstanden, ich blicke auf</string>
+    <string name="channel_guard">Gehschutz</string>
+    <string name="channel_alert">HeadsUp-Erinnerungen</string>
+    <string name="channel_alert_desc">Schwebende Benachrichtigungen für HeadsUp-Erinnerungen</string>
+    <string name="notif_action_ack">Verstanden</string>
+
+    <string-array name="reminder_titles">
+        <item>Blick auf</item>
+        <item>Achte auf den Weg</item>
+        <item>Sei vorsichtig</item>
+        <item>Sieh dich um</item>
+        <item>Starre nicht nur aufs Handy</item>
+        <item>Achte auf Stufen</item>
+        <item>Bleib sicher</item>
+    </string-array>
+
+    <string name="guard_screen_off">Bildschirm-aus-Bereitschaft (Energiesparen)</string>
+    <string name="guard_locked">Gesperrte Bereitschaft (Erinnerungen nach Entsperren)</string>
+    <string name="guard_pocket">Vermutlich in der Tasche (Erinnerungen nach Entnahme)</string>
+    <string name="guard_indoor">Innenraum (Erinnerungen unterdrückt)</string>
+    <string name="guard_loc_confirming">Standort wird bestätigt…</string>
+    <string name="guard_monitoring">Handynutzung im Gehen wird überwacht…</string>
+    <string name="guard_walking_format">Vermutlich Gehen · Schritte %1$d/%2$d (seit %3$d s)</string>
+    <string name="guard_still_format">Stillstand · Schritte %1$d/%2$d</string>
+    <string name="guard_running_title">HeadsUp wird ausgeführt</string>
+</resources>

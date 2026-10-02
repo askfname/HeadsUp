@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">HeadsUp</string>
+    <string name="desc">Rappels opportuns lors de l\'utilisation du téléphone en marchant — levez les yeux</string>
+    <string name="disclaimer">Les rappels ne remplacent pas l\'attention. Limitez l\'usage du téléphone en marchant.</string>
+
+    <string name="home_status_on">Protection active</string>
+    <string name="home_status_off">Désactivé</string>
+    <string name="home_status_on_desc">Vous serez alerté en cas d\'utilisation du téléphone en marchant</string>
+    <string name="home_status_off_desc">Activez la protection pour surveiller la marche</string>
+
+    <string name="section_reminder_method">Méthode de rappel</string>
+    <string name="mode_popup_title">Notification pop-up</string>
+    <string name="mode_popup_desc">Bannière supérieure ; autorisation de notification pop-up requise</string>
+    <string name="mode_float_title">Rappel flottant</string>
+    <string name="mode_float_desc">Carte flottante ; autorisation de surimpression requise</string>
+    <string name="mode_full_title">Rappel en plein écran</string>
+    <string name="mode_full_desc">Interruption forcée en plein écran, effet maximal</string>
+    <string name="vibrate_title">Vibrer lors du rappel</string>
+    <string name="vibrate_desc">Vibrer lors de l\'émission d\'un rappel</string>
+    <string name="indoor_mute_title">Silence à l\'intérieur</string>
+    <string name="indoor_mute_desc">À l\'intérieur, des risques de trébuchement subsistent (meubles, objets)</string>
+    <string name="cooldown_format">Intervalle de rappel : %1$d secondes</string>
+    <string name="sensitivity_title">Sensibilité</string>
+    <string name="sens_low">Sensible</string>
+    <string name="sens_mid">Standard</string>
+    <string name="sens_high">Stricte</string>
+    <string name="test_reminder">Tester le rappel</string>
+
+    <string name="detect_status_title">État de détection</string>
+    <string name="sens_desc_sensitive">Sensible (8 pas · ≤2 s/pas)</string>
+    <string name="sens_desc_standard">Standard (12 pas · ≤1,7 s/pas)</string>
+    <string name="sens_desc_strict">Stricte (16 pas · ≤1,5 s/pas)</string>
+    <string name="state_service">Service</string>
+    <string name="state_off">Désactivé</string>
+    <string name="state_standby_screen_off">En veille (écran éteint, économie d\'énergie)</string>
+    <string name="state_standby_locked">En veille (verrouillé)</string>
+    <string name="state_standby_pocket">En veille (dans la poche)</string>
+    <string name="state_running">En cours d\'exécution</string>
+    <string name="state_dormant_unknown">Inactif / inconnu</string>
+    <string name="state_gait">Démarche</string>
+    <string name="gait_walking_format">Marche probable · %1$d s en cours</string>
+    <string name="gait_reminded_format">Rappel émis · il y a %1$d s</string>
+    <string name="gait_still">Immobile</string>
+    <string name="state_run_steps">Pas consécutifs</string>
+    <string name="run_steps_format">%1$d/%2$d</string>
+    <string name="gait_batched">(envoi groupé)</string>
+    <string name="gait_rhythmic">(cumul rythmique)</string>
+    <string name="state_window_steps">Pas dans la fenêtre</string>
+    <string name="window_steps_format">%1$d (fenêtre de 10 s)</string>
+    <string name="state_screen">Écran</string>
+    <string name="screen_off">Éteint</string>
+    <string name="screen_on_locked">Allumé · Verrouillé</string>
+    <string name="screen_on_unlocked">Allumé · Déverrouillé</string>
+    <string name="state_proximity">Obstruction</string>
+    <string name="proximity_yes">Oui (poche)</string>
+    <string name="proximity_no">Non</string>
+    <string name="state_sensor">Capteur</string>
+    <string name="sensor_step">Détecteur de pas</string>
+    <string name="sensor_none">Aucun capteur de pas (détection non prise en charge sur cet appareil)</string>
+    <string name="state_indoor">Intérieur</string>
+    <string name="indoor_unknown_always">Inconnu (localisation « Toujours autoriser » requise)</string>
+    <string name="indoor_unknown_need_perm">Inconnu (autorisation de localisation requise)</string>
+    <string name="indoor_unknown_disabled">Inconnu (non activé)</string>
+    <string name="indoor_unknown_loc_off">Inconnu (localisation désactivée)</string>
+    <string name="indoor_confirming">Confirmation…</string>
+    <string name="indoor_yes">Oui (rappels supprimés)</string>
+    <string name="indoor_no">Non</string>
+    <string name="state_satellite">Satellites</string>
+    <string name="sat_not_tracking">Suivi arrêté</string>
+    <string name="sat_waiting">Attente du signal…</string>
+    <string name="sat_value_format">%1$s (fixes/forts/total)</string>
+    <string name="state_gms">Accélération GMS</string>
+    <string name="generic_unknown">Inconnu</string>
+    <string name="gms_available">Disponible</string>
+    <string name="gms_unavailable">Indisponible</string>
+    <string name="gms_no_perm">Sans autorisation</string>
+    <string name="restart_service">Redémarrer le service de détection</string>
+    <string name="simulate_need_enable">Activez d\'abord l\'interrupteur général pour simuler</string>
+    <string name="simulating">Simulation de marche…</string>
+    <string name="simulate_walk">Simuler la marche</string>
+
+    <string name="perm_title">Autorisations</string>
+    <string name="perm_activity_title">Activité physique</string>
+    <string name="perm_activity_desc">Détecter la marche et les escaliers</string>
+    <string name="perm_notif_title">Notifications</string>
+    <string name="perm_notif_desc">Indispensable pour les rappels</string>
+    <string name="perm_location_title">Localisation (facultatif)</string>
+    <string name="perm_location_desc_always">Le silence à l\'intérieur exige « Toujours autoriser »</string>
+    <string name="perm_location_desc_fg">Le silence à l\'intérieur exige l\'autorisation de localisation</string>
+    <string name="perm_overlay_title">Afficher par-dessus les autres applications</string>
+    <string name="perm_overlay_desc">Indispensable pour les rappels contextuels</string>
+    <string name="perm_open">Activer</string>
+    <string name="perm_granted">Accordée</string>
+
+    <string name="keepalive_title">Démarrage auto et maintien actif</string>
+    <string name="autostart_settings">Paramètres de démarrage automatique</string>
+    <string name="battery_whitelist">Liste blanche de batterie</string>
+    <string name="battery_ignored">Optimisation de batterie ignorée</string>
+    <string name="device_hint_xiaomi">Xiaomi : Paramètres → Paramètres des applis → Gestion des autorisations → Démarrage auto</string>
+    <string name="device_hint_huawei">Huawei : Gestionnaire du téléphone → Gestion du lancement des applis → Autoriser le démarrage auto</string>
+    <string name="device_hint_oppo">OPPO / OnePlus : Gestionnaire du téléphone → Confidentialité → Gestion du démarrage auto</string>
+    <string name="device_hint_vivo">vivo : Paramètres → Applications → Démarrage auto</string>
+    <string name="device_hint_default">Veuillez autoriser le démarrage auto et l\'exécution en arrière-plan dans les paramètres système</string>
+
+    <string name="about_title">À propos</string>
+    <string name="donate_title">Soutenir</string>
+    <string name="donate_desc">Vous aimez cette application ? Offrez un café au développeur</string>
+    <string name="version_format">Version : %1$s</string>
+    <string name="copyright_format">Copyright © %1$d PlayLab</string>
+    <string name="developer_title">Développeur</string>
+    <string name="developer_name">PlayLab</string>
+    <string name="about_website">Site officiel</string>
+    <string name="about_github">GitHub</string>
+    <string name="about_github_desc">Voir le dépôt GitHub</string>
+    <string name="about_license">Licences open source</string>
+    <string name="about_license_desc">Voir les licences open source</string>
+    <string name="about_terms">Conditions d\'utilisation</string>
+    <string name="about_terms_desc">Voir les conditions d\'utilisation</string>
+    <string name="about_view">Voir</string>
+    <string name="donate_choose">Choisissez un canal de don :</string>
+    <string name="donate_afdian">Afdian</string>
+    <string name="donate_afdian_desc">Recommandé pour les utilisateurs en Chine continentale</string>
+    <string name="donate_afdian_btn">Ouvrir Afdian</string>
+    <string name="donate_kofi">Ko-fi</string>
+    <string name="donate_kofi_desc">Recommandé pour les utilisateurs hors de Chine continentale</string>
+    <string name="donate_kofi_btn">Ouvrir Ko-fi</string>
+    <string name="dialog_close">Fermer</string>
+    <string name="dialog_know">Compris</string>
+    <string name="dialog_cancel">Annuler</string>
+    <string name="dialog_go_settings">Ouvrir les paramètres</string>
+    <string name="license_title">Licences open source</string>
+    <string name="terms_title">Conditions d\'utilisation</string>
+    <string name="terms_content">1. Cette application fournit uniquement des rappels auxiliaires lors de l\'utilisation du téléphone en marchant et ne remplace pas l\'attention. Respectez le code de la route et limitez l\'usage du téléphone en marchant ;\n2. La fonction « Silence à l\'intérieur » dépend du matériel GPS de l\'appareil et de l\'environnement ; les résultats sont fournis à titre indicatif ;\n3. Ce logiciel est fourni « en l\'état », sans aucune garantie expresse ou implicite, y compris les garanties de qualité marchande et d\'adéquation ;\n4. En aucun cas, contractuel, délictuel ou autre, les auteurs ne sauraient être tenus responsables des réclamations, dommages ou autres responsabilités découlant de l\'utilisation de ce logiciel.</string>
+    <string name="footer_disclaimer"># Les rappels ne remplacent pas l\'attention. Limitez l\'usage du téléphone en marchant</string>
+
+    <string name="loc_dialog_need_always_title">La localisation doit être réglée sur « Toujours autoriser »</string>
+    <string name="loc_dialog_need_perm_title">Autorisation de localisation requise</string>
+    <string name="loc_dialog_need_always_msg">Le silence à l\'intérieur exige la localisation en arrière-plan. Dans Infos sur l\'appli → Autorisations → Localisation, sélectionnez « Toujours autoriser ».</string>
+    <string name="loc_dialog_need_perm_msg">Le silence à l\'intérieur exige l\'autorisation de localisation. Veuillez autoriser l\'accès à la localisation dans Infos sur l\'appli → Autorisations.</string>
+    <string name="core_dialog_title">Autorisations requises</string>
+    <string name="core_dialog_msg">La détection de marche exige les autorisations d\'activité physique et de notification. Veuillez les activer dans Infos sur l\'appli → Autorisations / Notifications.</string>
+
+    <string name="indoor_help_title">À propos de cette fonction</string>
+    <string name="indoor_help_desc">La fonction « Silence à l\'intérieur » est limitée par le matériel GPS de l\'appareil et l\'environnement, et peut ne pas déterminer correctement la situation intérieure ou extérieure. Si nécessaire, ajustez manuellement les paramètres dans les réglages avancés :</string>
+    <string name="indoor_advanced_show">Réglages avancés ▸</string>
+    <string name="indoor_advanced_hide">Réglages avancés ▾</string>
+    <string name="tune_strong_count">Satellites forts</string>
+    <string name="tune_strong_ratio">Proportion de signal fort</string>
+    <string name="tune_gps_acc">Précision GPS (m)</string>
+    <string name="tune_default_format">Par défaut %1$s (%2$s)</string>
+    <string name="tune_range_int">0–30</string>
+    <string name="tune_range_ratio">0–1</string>
+    <string name="tune_range_acc">5–50</string>
+    <string name="tune_hint">Un nombre ou une proportion plus élevés de satellites forts rendent le silence à l\'intérieur plus sensible ; une précision GPS plus faible le rend également plus sensible.</string>
+    <string name="tune_error">Paramètres hors limites ou non valides ; modifications non enregistrées</string>
+    <string name="tune_save">Enregistrer</string>
+    <string name="tune_reset">Restaurer</string>
+
+    <string name="reminder_content">Réduisez l\'usage du téléphone en marchant et restez attentif à l\'environnement</string>
+    <string name="reminder_confirm">Compris, je lève les yeux</string>
+    <string name="channel_guard">Protection de la marche</string>
+    <string name="channel_alert">Rappels HeadsUp</string>
+    <string name="channel_alert_desc">Notifications flottantes des rappels HeadsUp</string>
+    <string name="notif_action_ack">Compris</string>
+
+    <string-array name="reminder_titles">
+        <item>Levez les yeux</item>
+        <item>Regardez où vous marchez</item>
+        <item>Soyez prudent</item>
+        <item>Regardez autour de vous</item>
+        <item>Ne fixez pas votre téléphone</item>
+        <item>Attention aux marches</item>
+        <item>Restez prudent</item>
+    </string-array>
+
+    <string name="guard_screen_off">En veille (écran éteint, économie d\'énergie)</string>
+    <string name="guard_locked">En veille verrouillé (rappels après déverrouillage)</string>
+    <string name="guard_pocket">Probablement dans la poche (rappels après retrait)</string>
+    <string name="guard_indoor">À l\'intérieur (rappels supprimés)</string>
+    <string name="guard_loc_confirming">Confirmation de la localisation…</string>
+    <string name="guard_monitoring">Surveillance de l\'usage du téléphone en marchant…</string>
+    <string name="guard_walking_format">Marche probable · pas consécutifs %1$d/%2$d (%3$d s en cours)</string>
+    <string name="guard_still_format">Immobile · pas consécutifs %1$d/%2$d</string>
+    <string name="guard_running_title">HeadsUp en cours d\'exécution</string>
+</resources>

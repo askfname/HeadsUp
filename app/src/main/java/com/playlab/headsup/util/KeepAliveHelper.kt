@@ -11,6 +11,7 @@ import android.provider.Settings
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import com.playlab.headsup.R
 import com.playlab.headsup.worker.KeepAliveWorker
 import java.util.concurrent.TimeUnit
 
@@ -83,11 +84,12 @@ object KeepAliveHelper {
             data = Uri.parse("package:${ctx.packageName}")
         }
 
-    fun deviceHint(): String = when (Build.MANUFACTURER.lowercase()) {
-        "xiaomi", "redmi" -> "小米：设置 → 应用设置 → 授权管理 → 自启动"
-        "huawei", "honor" -> "华为：手机管家 → 应用启动管理 → 允许自启动"
-        "oppo", "realme", "oneplus" -> "OPPO/一加：手机管家 → 权限隐私 → 自启动管理"
-        "vivo", "iqoo" -> "vivo：设置 → 应用 → 自启动"
-        else -> "请在系统设置中允许自启动 + 后台运行"
+    /** Follow system language: device hints are localized. Keep the no-arg overload out; callers pass Context. */
+    fun deviceHint(ctx: Context): String = when (Build.MANUFACTURER.lowercase()) {
+        "xiaomi", "redmi" -> ctx.getString(R.string.device_hint_xiaomi)
+        "huawei", "honor" -> ctx.getString(R.string.device_hint_huawei)
+        "oppo", "realme", "oneplus" -> ctx.getString(R.string.device_hint_oppo)
+        "vivo", "iqoo" -> ctx.getString(R.string.device_hint_vivo)
+        else -> ctx.getString(R.string.device_hint_default)
     }
 }

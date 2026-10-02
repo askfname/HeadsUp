@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 中文环境使用中文应用名称与开发者名称 -->
+    <string name="app_name">看路提醒</string>
+    <string name="desc">走路玩手机时及时提醒，抬头看看路</string>
+    <string name="disclaimer">提醒不能替代注意力，走路时请尽量少看手机。</string>
+
+    <string name="home_status_on">守护中</string>
+    <string name="home_status_off">已关闭</string>
+    <string name="home_status_on_desc">走路时看手机会提醒你</string>
+    <string name="home_status_off_desc">开启守护监测行走状态</string>
+
+    <string name="section_reminder_method">提醒方式</string>
+    <string name="mode_float_title">弹窗提醒</string>
+    <string name="mode_float_desc">悬浮窗卡片，需悬浮窗权限</string>
+    <string name="mode_popup_title">浮动通知</string>
+    <string name="mode_popup_desc">顶部横幅，需悬浮通知权限</string>
+    <string name="mode_full_title">全屏提醒</string>
+    <string name="mode_full_desc">强制全屏打断，效果最强</string>
+    <string name="vibrate_title">提醒时震动</string>
+    <string name="vibrate_desc">发出提醒的同时震动</string>
+    <string name="indoor_mute_title">室内不提醒</string>
+    <string name="indoor_mute_desc">即使在室内也要当心被家具等物品绊倒</string>
+    <string name="cooldown_format">提醒间隔：%1$d秒</string>
+    <string name="sensitivity_title">灵敏度</string>
+    <string name="sens_low">灵敏</string>
+    <string name="sens_mid">标准</string>
+    <string name="sens_high">严格</string>
+    <string name="test_reminder">测试提醒</string>
+
+    <string name="detect_status_title">检测状态</string>
+    <string name="sens_desc_sensitive">灵敏（8步·≤2秒/步）</string>
+    <string name="sens_desc_standard">标准（12步·≤1.7秒/步）</string>
+    <string name="sens_desc_strict">严格（16步·≤1.5秒/步）</string>
+    <string name="state_service">服务</string>
+    <string name="state_off">未开启</string>
+    <string name="state_standby_screen_off">待机（灭屏省电中）</string>
+    <string name="state_standby_locked">待机（锁屏中）</string>
+    <string name="state_standby_pocket">待机（口袋中）</string>
+    <string name="state_running">运行中</string>
+    <string name="state_dormant_unknown">休眠中/未知</string>
+    <string name="state_gait">步态</string>
+    <string name="gait_walking_format">疑似行走 · 已持续 %1$d秒</string>
+    <string name="gait_reminded_format">已提醒 · %1$d秒前</string>
+    <string name="gait_still">静止</string>
+    <string name="state_run_steps">连贯步数</string>
+    <string name="run_steps_format">%1$d/%2$d</string>
+    <string name="gait_batched">（批量投递）</string>
+    <string name="gait_rhythmic">（节律累计）</string>
+    <string name="state_window_steps">窗口步数</string>
+    <string name="window_steps_format">%1$d（10秒窗口）</string>
+    <string name="state_screen">屏幕</string>
+    <string name="screen_off">灭</string>
+    <string name="screen_on_locked">亮·锁屏</string>
+    <string name="screen_on_unlocked">亮·已解锁</string>
+    <string name="state_proximity">遮挡</string>
+    <string name="proximity_yes">是（口袋）</string>
+    <string name="proximity_no">否</string>
+    <string name="state_sensor">传感器</string>
+    <string name="sensor_step">步伐</string>
+    <string name="sensor_none">无步伐传感器（本机不支持检测）</string>
+    <string name="state_indoor">室内</string>
+    <string name="indoor_unknown_always">未知（需始终允许位置）</string>
+    <string name="indoor_unknown_need_perm">未知（需位置权限）</string>
+    <string name="indoor_unknown_disabled">未知（未启用）</string>
+    <string name="indoor_unknown_loc_off">未知（定位已关闭）</string>
+    <string name="indoor_confirming">确认中…</string>
+    <string name="indoor_yes">是（抑制提醒）</string>
+    <string name="indoor_no">否</string>
+    <string name="state_satellite">卫星</string>
+    <string name="sat_not_tracking">未追踪</string>
+    <string name="sat_waiting">等待信号…</string>
+    <string name="sat_value_format">%1$s（定位/强星/总数）</string>
+    <string name="state_gms">GMS 加速</string>
+    <string name="generic_unknown">未知</string>
+    <string name="gms_available">可用</string>
+    <string name="gms_unavailable">不可用</string>
+    <string name="gms_no_perm">无权限</string>
+    <string name="restart_service">重启检测服务</string>
+    <string name="simulate_need_enable">请先打开总开关再模拟</string>
+    <string name="simulating">模拟步行中…</string>
+    <string name="simulate_walk">模拟步行</string>
+
+    <string name="perm_title">权限</string>
+    <string name="perm_activity_title">身体活动</string>
+    <string name="perm_activity_desc">检测步行/上下楼</string>
+    <string name="perm_notif_title">通知</string>
+    <string name="perm_notif_desc">发送提醒必备</string>
+    <string name="perm_location_title">位置（可选）</string>
+    <string name="perm_location_desc_always">室内不提醒需始终允许</string>
+    <string name="perm_location_desc_fg">室内不提醒需要位置权限</string>
+    <string name="perm_overlay_title">悬浮窗</string>
+    <string name="perm_overlay_desc">弹窗提醒必须</string>
+    <string name="perm_open">去开启</string>
+    <string name="perm_granted">已允许</string>
+
+    <string name="keepalive_title">自启与保活</string>
+    <string name="autostart_settings">自启动设置</string>
+    <string name="battery_whitelist">电池白名单</string>
+    <string name="battery_ignored">已忽略电池优化</string>
+    <string name="device_hint_xiaomi">小米：设置 → 应用设置 → 授权管理 → 自启动</string>
+    <string name="device_hint_huawei">华为：手机管家 → 应用启动管理 → 允许自启动</string>
+    <string name="device_hint_oppo">OPPO/一加：手机管家 → 权限隐私 → 自启动管理</string>
+    <string name="device_hint_vivo">vivo：设置 → 应用 → 自启动</string>
+    <string name="device_hint_default">请在系统设置中允许自启动 + 后台运行</string>
+
+    <string name="about_title">关于</string>
+    <string name="donate_title">赞助支持</string>
+    <string name="donate_desc">喜欢这个应用？请开发者喝杯咖啡吧</string>
+    <string name="version_format">Version: %1$s</string>
+    <string name="copyright_format">Copyright © %1$d PlayLab</string>
+    <string name="developer_title">开发者</string>
+    <string name="developer_name">Play 实验室</string>
+    <string name="about_website">官方网站</string>
+    <string name="about_github">GitHub</string>
+    <string name="about_github_desc">查看 Github 仓库</string>
+    <string name="about_license">开源许可协议</string>
+    <string name="about_license_desc">查看开源许可</string>
+    <string name="about_terms">使用条款</string>
+    <string name="about_terms_desc">查看使用条款</string>
+    <string name="about_view">查看</string>
+    <string name="donate_choose">选择适合你的赞助渠道：</string>
+    <string name="donate_afdian">爱发电</string>
+    <string name="donate_afdian_desc">国内用户推荐</string>
+    <string name="donate_afdian_btn">前往爱发电</string>
+    <string name="donate_kofi">Ko-fi</string>
+    <string name="donate_kofi_desc">海外用户推荐</string>
+    <string name="donate_kofi_btn">前往 Ko-fi</string>
+    <string name="dialog_close">关闭</string>
+    <string name="dialog_know">知道了</string>
+    <string name="dialog_cancel">取消</string>
+    <string name="dialog_go_settings">去设置</string>
+    <string name="license_title">开源许可协议</string>
+    <string name="terms_title">使用条款</string>
+    <string name="terms_content">1. 本应用仅为行走看手机的辅助提醒，不能替代注意力，行走时请遵守交通规则，尽量少看手机；\n2. “室内不提醒”功能受设备 GPS 硬件与所处环境影响，室内外判断结果仅供参考；\n3. 本软件按“原样”提供，不作任何明示或暗示保证，包括但不限于适销性与适用性保证；\n4. 在任何情况下，无论是合同、侵权或其他情形，作者均不对因使用本软件而产生的任何索赔、损害或其他责任承担责任。</string>
+    <string name="footer_disclaimer"># 提醒不能替代注意力，走路时请尽量少看手机</string>
+
+    <string name="loc_dialog_need_always_title">需要始终允许位置</string>
+    <string name="loc_dialog_need_perm_title">需要位置权限</string>
+    <string name="loc_dialog_need_always_msg">室内不提醒需在后台获取位置，请在应用信息 → 权限 → 位置中选择“始终允许”。</string>
+    <string name="loc_dialog_need_perm_msg">室内不提醒需要位置权限，请在应用信息 → 权限中允许位置访问。</string>
+    <string name="core_dialog_title">需要权限</string>
+    <string name="core_dialog_msg">看路检测需要身体活动与通知权限，请在应用信息 → 权限/通知中开启。</string>
+
+    <string name="indoor_help_title">功能说明</string>
+    <string name="indoor_help_desc">“室内不提醒”功能受限于设备 GPS 硬件和所处环境差异，可能无法正确判断室内外，必要时可使用高级设置手动调整参数：</string>
+    <string name="indoor_advanced_show">高级设置 ▸</string>
+    <string name="indoor_advanced_hide">高级设置 ▾</string>
+    <string name="tune_strong_count">强星数</string>
+    <string name="tune_strong_ratio">强星占比</string>
+    <string name="tune_gps_acc">GPS 精度（米）</string>
+    <string name="tune_default_format">默认 %1$s（%2$s）</string>
+    <string name="tune_range_int">0~30</string>
+    <string name="tune_range_ratio">0~1</string>
+    <string name="tune_range_acc">5~50</string>
+    <string name="tune_hint">参数说明：强星数/强星占比越大室内不提醒越灵敏，GPS 精度越小室内不提醒越灵敏。</string>
+    <string name="tune_error">参数超范围或格式错误，已取消保存</string>
+    <string name="tune_save">保存</string>
+    <string name="tune_reset">恢复默认</string>
+
+    <string name="reminder_content">走路时请少看手机，注意周围环境</string>
+    <string name="reminder_confirm">我知道了，抬头看路</string>
+    <string name="channel_guard">步行守护</string>
+    <string name="channel_alert">看路提醒</string>
+    <string name="channel_alert_desc">看路提醒的浮动通知</string>
+    <string name="notif_action_ack">知道了</string>
+
+    <string-array name="reminder_titles">
+        <item>抬头看看</item>
+        <item>注意脚下</item>
+        <item>小心一点</item>
+        <item>环顾四周</item>
+        <item>别只看手机</item>
+        <item>小心台阶</item>
+        <item>注意安全</item>
+    </string-array>
+
+    <string name="guard_screen_off">灭屏待机（省电中）</string>
+    <string name="guard_locked">锁屏待机（解锁后提醒）</string>
+    <string name="guard_pocket">疑似在口袋（拿出后提醒）</string>
+    <string name="guard_indoor">室内（抑制提醒）</string>
+    <string name="guard_loc_confirming">位置确认中…</string>
+    <string name="guard_monitoring">正在监测行走中的用机行为…</string>
+    <string name="guard_walking_format">疑似行走 · 连贯步数 %1$d/%2$d（已持续 %3$d秒）</string>
+    <string name="guard_still_format">静止 · 连贯步数 %1$d/%2$d</string>
+    <string name="guard_running_title">看路提醒运行中</string>
+</resources>
