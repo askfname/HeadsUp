@@ -37,7 +37,7 @@ object ReminderManager {
         if (Build.VERSION.SDK_INT < 26) return
         val nm = ctx.getSystemService(NotificationManager::class.java) ?: return
         nm.createNotificationChannel(
-            NotificationChannel(CH_GUARD, "步行守护（常驻）", NotificationManager.IMPORTANCE_LOW)
+            NotificationChannel(CH_GUARD, "步行守护", NotificationManager.IMPORTANCE_LOW)
         )
         nm.createNotificationChannel(
             NotificationChannel(CH_ALERT, "看路提醒", NotificationManager.IMPORTANCE_HIGH).apply {
@@ -213,7 +213,6 @@ object ReminderManager {
             texts.addView(content)
             row.addView(iconWrap)
             row.addView(texts)
-            // 下行：左对齐胶囊按钮
             val actionRow = android.widget.LinearLayout(ctx).apply {
                 orientation = android.widget.LinearLayout.HORIZONTAL
                 gravity = Gravity.START
@@ -262,7 +261,7 @@ object ReminderManager {
         })
     }
 
-    // 软件内震动：短促两次
+    // 震动提醒
     private fun vibrate(ctx: Context) {
         if (!Prefs.isVibrate(ctx)) return
         try {

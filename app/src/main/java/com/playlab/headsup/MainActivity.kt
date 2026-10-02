@@ -2,6 +2,7 @@ package com.playlab.headsup
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -16,11 +17,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Warning
@@ -28,9 +31,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -428,7 +433,7 @@ private fun HomeScreen(resumeSeq: Int) {
                     )
                     Spacer(Modifier.height(4.dp))
                     Text("灵敏度", style = MaterialTheme.typography.bodyMedium)
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {                        // 选中态与测试按钮同色（primary 动态色）
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         val chipColors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = MaterialTheme.colorScheme.primary,
                             selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
@@ -531,10 +536,15 @@ private fun HomeScreen(resumeSeq: Int) {
                 }
             }
 
+            // 关于
+            AboutCard()
+
             Text(
-                "提醒不能替代注意力，走路时请尽量少看手机。",
+                "# 提醒不能替代注意力，走路时请尽量少看手机",
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
             )
         }
 
@@ -811,6 +821,205 @@ private fun DetectStatusCard(enabled: Boolean) {
             }
         }
     }
+}
+
+/** 关于卡片 */
+@Composable
+private fun AboutCard() {
+    val ctx = LocalContext.current
+    var showLicense by remember { mutableStateOf(false) }
+    var showTerms by remember { mutableStateOf(false) }
+    var showDonate by remember { mutableStateOf(false) }
+    // 版本号取自 PackageManager，避免开 BuildConfig
+    val version = remember {
+        try {
+            val pi = ctx.packageManager.getPackageInfo(ctx.packageName, 0)
+            val code = if (Build.VERSION.SDK_INT >= 28) pi.longVersionCode else pi.versionCode.toLong()
+            "${pi.versionName} ($code)"
+        } catch (_: Exception) { "2.1 (2)" }
+    }
+    val year = remember { java.util.Calendar.getInstance().get(java.util.Calendar.YEAR) }
+
+    Card(Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("关于", style = MaterialTheme.typography.titleMedium)
+            // 赞助
+            Surface(
+                onClick = { showDonate = true },
+                shape = RoundedCornerShape(24.dp),
+                color = Color(0xFFFFE3B3),
+                contentColor = Color(0xFF6B4A00),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    Modifier.padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Filled.Favorite, null)
+                        Spacer(Modifier.width(8.dp))
+                        Text("赞助支持", style = MaterialTheme.typography.titleMedium)
+                    }
+                    Text(
+                        "喜欢这个应用？请开发者喝杯咖啡吧",
+                        style = MaterialTheme.typography.bodySmall,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+            // 应用名 + 版本 + 版权
+            Column(verticalArrangement = Arrangement.spacedBy(1.8.dp)) {
+                Text("看路提醒", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
+                Text(
+                    "Version: $version",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    "Copyright © $year PlayLab",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text("开发者", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
+                Text(
+                    "Play 实验室",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            AboutRow("官方网站", "https://playlab.eu.org") { openUrl(ctx, "https://playlab.eu.org") }
+            AboutRow("GitHub", "查看 Github 仓库") { openUrl(ctx, "https://github.com/askfname/HeadsUp") }
+            AboutRow("开源许可协议", "查看开源许可") { showLicense = true }
+            AboutRow("使用条款", "查看使用条款") { showTerms = true }
+        }
+    }
+
+    // 赞助弹窗：按地区二选一
+    if (showDonate) {
+        AlertDialog(
+            onDismissRequest = { showDonate = false },
+            title = { Text("赞助支持") },
+            text = {
+                Column(
+                    Modifier.verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Text("选择适合你的赞助渠道：")
+                    DonateChannel(
+                        "爱发电",
+                        "国内用户推荐",
+                        "https://afdian.com/a/playlab",
+                        "前往爱发电"
+                    )
+                    DonateChannel(
+                        "Ko-fi",
+                        "海外用户推荐",
+                        "https://ko-fi.com/playlaboratory",
+                        "前往 Ko-fi"
+                    )
+                }
+            },
+            confirmButton = { TextButton(onClick = { showDonate = false }) { Text("关闭") } }
+        )
+    }
+
+    // 开源许可弹窗
+    if (showLicense) {
+        AlertDialog(
+            onDismissRequest = { showLicense = false },
+            title = { Text("开源许可协议") },
+            text = {
+                Column(
+                    Modifier.verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    LicenseEntry("Kotlin / Android Gradle Plugin", "Apache License 2.0")
+                    LicenseEntry("AndroidX Core / Activity Compose", "Apache License 2.0")
+                    LicenseEntry(
+                        "Jetpack Compose（UI / Material3 / Icons / BOM 2024.06.00）",
+                        "Apache License 2.0"
+                    )
+                    LicenseEntry("WorkManager 2.9.0", "Apache License 2.0")
+                    LicenseEntry("Play Services Location 21.3.0", "Apache License 2.0")
+                }
+            },
+            confirmButton = { TextButton(onClick = { showLicense = false }) { Text("关闭") } }
+        )
+    }
+    // 使用条款弹窗
+    if (showTerms) {
+        AlertDialog(
+            onDismissRequest = { showTerms = false },
+            title = { Text("使用条款") },
+            text = {
+                Column(Modifier.verticalScroll(rememberScrollState())) {
+                    Text(
+                        "1. 本应用仅为行走看手机的辅助提醒，不能替代注意力，行走时请遵守交通规则，尽量少看手机；\n" +
+                            "2. “室内不提醒”功能受设备 GPS 硬件与所处环境影响，室内外判断结果仅供参考；\n" +
+                            "3. 本软件按“原样”提供，不作任何明示或暗示保证，包括但不限于适销性与适用性保证；\n" +
+                            "4. 在任何情况下，无论是合同、侵权或其他情形，作者均不对因使用本软件而产生的任何索赔、损害或其他责任承担责任。"
+                    )
+                }
+            },
+            confirmButton = { TextButton(onClick = { showTerms = false }) { Text("知道了") } }
+        )
+    }
+}
+
+/** 关于页单行链接 */
+@Composable
+private fun AboutRow(title: String, desc: String, onClick: () -> Unit) {
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Column(Modifier.weight(1f)) {
+            Text(title, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
+            Text(
+                desc, style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        TextButton(onClick = onClick) { Text("查看") }
+    }
+}
+
+/** 许可条目 */
+@Composable
+private fun LicenseEntry(lib: String, license: String) {
+    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Text(lib, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+        Text(
+            license,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+/** 赞助渠道 */
+@Composable
+private fun DonateChannel(title: String, desc: String, url: String, btn: String) {
+    val ctx = LocalContext.current
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(title, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+        Text(
+            desc,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        OutlinedButton(onClick = { openUrl(ctx, url) }, modifier = Modifier.fillMaxWidth()) { Text(btn) }
+    }
+}
+
+// 浏览器打开链接
+private fun openUrl(ctx: Context, url: String) {
+    try {
+        ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        })
+    } catch (_: Exception) { }
 }
 
 @Composable
