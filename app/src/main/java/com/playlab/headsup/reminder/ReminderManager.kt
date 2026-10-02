@@ -100,10 +100,6 @@ object ReminderManager {
             ctx, 0, Intent(ctx, MainActivity::class.java),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        val full = PendingIntent.getActivity(
-            ctx, 1, Intent(ctx, ReminderActivity::class.java),
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
         val n = NotificationCompat.Builder(ctx, CH_ALERT)
             .setSmallIcon(R.drawable.ic_notify)
             .setContentTitle(randomTitle())
@@ -113,7 +109,6 @@ object ReminderManager {
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setAutoCancel(true)
             .setContentIntent(open)
-            .setFullScreenIntent(full, false) // 锁屏时才全屏，平时只浮动横幅
             .addAction(0, "知道了", dismissPI(ctx))
             .build()
         nm.notify(NOTIFY_ID, n)
@@ -160,8 +155,12 @@ object ReminderManager {
             val onPrimary = if (dark) sys("system_accent1_900", 0xFF381E72.toInt())
             else sys("system_accent1_0", 0xFFFFFFFF.toInt())
 
-            // 外层透明容器（提供左右边距，营造悬浮感）
-            val root = android.widget.FrameLayout(ctx)
+            // 外层透明容器
+            val root = android.widget.FrameLayout(ctx).apply {
+                clipChildren = false
+                clipToPadding = false
+                setPadding(dp(16), dp(12), dp(16), dp(16))
+            }
             // 卡片主体：大圆角 + 阴影
             val card = android.widget.LinearLayout(ctx).apply {
                 orientation = android.widget.LinearLayout.VERTICAL
@@ -171,7 +170,7 @@ object ReminderManager {
                     cornerRadius = dp(28).toFloat()
                     setColor(container)
                 }
-                elevation = dp(6).toFloat()
+                elevation = dp(2).toFloat()
             }
             // 上行：图标 + 标题文案
             val row = android.widget.LinearLayout(ctx).apply {
@@ -238,7 +237,7 @@ object ReminderManager {
             root.addView(card, android.widget.FrameLayout.LayoutParams(
                 android.widget.FrameLayout.LayoutParams.MATCH_PARENT,
                 android.widget.FrameLayout.LayoutParams.WRAP_CONTENT
-            ).apply { leftMargin = dp(16); rightMargin = dp(16) })
+            ))
             val params = WindowManager.LayoutParams(
                 WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,
@@ -247,9 +246,34 @@ object ReminderManager {
                 PixelFormat.TRANSLUCENT
             ).apply { gravity = Gravity.TOP; y = dp(8) }
             wm.addView(root, params)
-            val close = { try { wm.removeViewImmediate(root) } catch (_: Exception) { } }
-            btn.setOnClickListener { close() }
-            Handler(Looper.getMainLooper()).postDelayed({ close() }, 10_000)
+            // 弹出动画：下滑 + 淡入 + 微缩放
+            card.alpha = 0f
+            card.translationY = -dp(24).toFloat()
+            card.scaleX = 0.96f
+            card.scaleY = 0.96f
+            card.animate().alpha(1f).translationY(0f).scaleX(1f).scaleY(1f)
+                .setDuration(280)
+                .setInterpolator(android.view.animation.DecelerateInterpolator())
+                .start()
+            // 消失动画后移除，避免闪切
+            val main = Handler(Looper.getMainLooper())
+            var dismissed = false
+            fun dismiss() {
+                if (dismissed) return
+                dismissed = true
+                main.removeCallbacksAndMessages(null)
+                try {
+                    card.animate().alpha(0f).translationY(-dp(16).toFloat())
+                        .scaleX(0.97f).scaleY(0.97f).setDuration(200)
+                        .setInterpolator(android.view.animation.DecelerateInterpolator())
+                        .withEndAction { try { wm.removeView(root) } catch (_: Exception) { } }
+                        .start()
+                } catch (_: Exception) {
+                    try { wm.removeViewImmediate(root) } catch (_: Exception) { }
+                }
+            }
+            btn.setOnClickListener { dismiss() }
+            main.postDelayed({ dismiss() }, 10_000)
             return true
         } catch (_: Exception) { return false }
     }

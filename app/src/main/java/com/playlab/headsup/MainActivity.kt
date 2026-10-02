@@ -15,6 +15,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -32,7 +34,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -48,6 +52,7 @@ import com.playlab.headsup.ui.theme.HeadsUpTheme
 import com.playlab.headsup.util.IndoorDetector
 import com.playlab.headsup.util.KeepAliveHelper
 import com.playlab.headsup.util.PermissionHelper
+import kotlin.math.abs
 
 /** 主界面：开关 / 提醒方式 / 权限 / 保活，Material You 单页布局 */
 class MainActivity : ComponentActivity() {
@@ -89,6 +94,8 @@ private fun HomeScreen(resumeSeq: Int) {
     var showCoreDialog by remember { mutableStateOf(false) } // 引导去开身体活动/通知
     var showIndoorHelp by remember { mutableStateOf(false) } // “室内不提醒”功能说明 + 高级设置
     var tick by remember { mutableIntStateOf(0) }
+    val scrollState = rememberScrollState()
+    val viewConfig = LocalViewConfiguration.current
 
     // 系统不再弹窗（不再询问）则直接引导
     fun requestRuntime(
@@ -317,7 +324,7 @@ private fun HomeScreen(resumeSeq: Int) {
     ) { _ ->
         Column(
             Modifier.fillMaxSize()
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(scrollState)
                 .windowInsetsPadding(WindowInsets.safeDrawing)
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -345,7 +352,7 @@ private fun HomeScreen(resumeSeq: Int) {
             Card(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text("提醒方式", style = MaterialTheme.typography.titleMedium)
-                    ModeRow("浮动通知", "顶部横幅，不打断操作", Prefs.MODE_FLOAT, mode) {
+                    ModeRow("浮动通知", "顶部横幅，需悬浮通知权限", Prefs.MODE_FLOAT, mode) {
                         mode = it; Prefs.setMode(ctx, it); tick++
                     }
                     ModeRow("弹窗提醒", "悬浮窗卡片，需悬浮窗权限", Prefs.MODE_POPUP, mode) {
@@ -423,14 +430,46 @@ private fun HomeScreen(resumeSeq: Int) {
                     }
                     Spacer(Modifier.height(4.dp))
                     Text("提醒间隔：${cooldown}秒", style = MaterialTheme.typography.bodyMedium)
-                    Slider(
-                        value = cooldown.toFloat(),
-                        onValueChange = {
-                            cooldown = it.toInt()
-                            Prefs.setCooldown(ctx, it.toInt())
-                        },
-                        valueRange = 30f..300f, steps = 8
-                    )
+                    // 方向锁：竖滑接管并转交父滚动，避免误拖滑块
+                    Box(
+                        Modifier.pointerInput(scrollState, viewConfig) {
+                            awaitEachGesture {
+                                val down = awaitFirstDown(requireUnconsumed = false)
+                                val init = cooldown
+                                var dx = 0f
+                                var dy = 0f
+                                val slop = viewConfig.touchSlop
+                                while (true) {
+                                    val e = awaitPointerEvent()
+                                    val c = e.changes.firstOrNull { it.id == down.id } ?: break
+                                    if (!c.pressed) break
+                                    dx += c.position.x - c.previousPosition.x
+                                    dy += c.position.y - c.previousPosition.y
+                                    if (abs(dy) > slop / 2 && abs(dy) > abs(dx)) {
+                                        // 竖滑：还原按压跳变，手动滚列表
+                                        if (cooldown != init) {
+                                            cooldown = init
+                                            Prefs.setCooldown(ctx, init)
+                                        }
+                                        val d = c.position.y - c.previousPosition.y
+                                        c.consume()
+                                        scrollState.dispatchRawDelta(-d)
+                                    } else if (abs(dx) > slop && abs(dx) > abs(dy)) {
+                                        break // 横滑：交回滑块
+                                    }
+                                }
+                            }
+                        }
+                    ) {
+                        Slider(
+                            value = cooldown.toFloat(),
+                            onValueChange = {
+                                cooldown = it.toInt()
+                                Prefs.setCooldown(ctx, it.toInt())
+                            },
+                            valueRange = 30f..300f, steps = 8
+                        )
+                    }
                     Spacer(Modifier.height(4.dp))
                     Text("灵敏度", style = MaterialTheme.typography.bodyMedium)
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -843,13 +882,12 @@ private fun AboutCard() {
     Card(Modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text("关于", style = MaterialTheme.typography.titleMedium)
-            // 赞助
             Surface(
                 onClick = { showDonate = true },
                 shape = RoundedCornerShape(24.dp),
                 color = Color(0xFFFFE3B3),
                 contentColor = Color(0xFF6B4A00),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
             ) {
                 Column(
                     Modifier.padding(16.dp),
