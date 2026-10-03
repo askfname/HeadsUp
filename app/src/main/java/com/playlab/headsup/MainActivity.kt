@@ -23,7 +23,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Info
@@ -37,6 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalViewConfiguration
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -335,8 +335,14 @@ private fun HomeScreen(resumeSeq: Int) {
             // 状态卡
             ElevatedCard(Modifier.fillMaxWidth()) {
                 Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                    FilledTonalIconButton(onClick = {}) {
-                        Icon(Icons.AutoMirrored.Filled.DirectionsWalk, null)
+                    FilledTonalIconButton(
+                        onClick = {},
+                        colors = IconButtonDefaults.filledTonalIconButtonColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        ),
+                    ) {
+                        Icon(painterResource(R.drawable.ic_notify), null, Modifier.size(28.dp))
                     }
                     Spacer(Modifier.width(12.dp))
                     Column(Modifier.weight(1f)) {
@@ -441,7 +447,7 @@ private fun HomeScreen(resumeSeq: Int) {
                         // 功能说明入口
                         IconButton(
                             onClick = { showIndoorHelp = true },
-                            modifier = Modifier.padding(end = 5.dp),
+                            modifier = Modifier.padding(end = 4.dp),
                         ) {
                             Icon(Icons.Filled.Info, contentDescription = stringResource(R.string.indoor_help_title))
                         }

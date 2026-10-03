@@ -5,8 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
+import androidx.compose.ui.res.painterResource
 import androidx.compose.material3.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,8 +30,15 @@ class ReminderActivity : ComponentActivity() {
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        FilledTonalIconButton(onClick = {}, modifier = Modifier.size(96.dp)) {
-                            Icon(Icons.AutoMirrored.Filled.DirectionsWalk, null, Modifier.size(56.dp))
+                        FilledTonalIconButton(
+                            onClick = {},
+                            modifier = Modifier.size(96.dp),
+                            colors = IconButtonDefaults.filledTonalIconButtonColors(
+                                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            ),
+                        ) {
+                            Icon(painterResource(R.drawable.ic_notify), null, Modifier.size(68.dp).offset(y = 4.dp))
                         }
                         Spacer(Modifier.height(24.dp))
                         Text(ReminderManager.randomTitle(this@ReminderActivity), style = MaterialTheme.typography.headlineMedium)

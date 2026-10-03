@@ -198,7 +198,10 @@ object ReminderManager {
             val icon = android.widget.ImageView(ctx).apply {
                 setImageResource(R.drawable.ic_notify)
                 imageTintList = android.content.res.ColorStateList.valueOf(onPrimaryContainer)
-                layoutParams = android.widget.FrameLayout.LayoutParams(dp(28), dp(28), Gravity.CENTER)
+                layoutParams = android.widget.FrameLayout.LayoutParams(dp(32), dp(32)).apply {
+                    gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
+                    topMargin = dp(10)
+                }
             }
             iconWrap.addView(icon)
             val texts = android.widget.LinearLayout(ctx).apply {
