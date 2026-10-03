@@ -4,18 +4,18 @@
   <img src="images/headsup_en.png" alt="Heads Up promo banner" width="100%">
 </p>
 
-# Heads Up — Watch Your Step Reminder
+# Heads Up
 
-A general-purpose Android "watch your step" reminder app with a modern Material You design. It automatically reminds you to look up from your phone while walking (including stairs).
+A general-purpose Android "Heads Up" app with a modern Material You design. It automatically reminds you to look up from your phone while walking (including stairs).
 
 ## Features
 
 - **On-device gait detection**: `STEP_DETECTOR` as the primary pipeline, fused with accelerometer / gyroscope + proximity sensor, no GMS required
 - **False-positive protection**: triggers only after N consecutive steps with consistent rhythm (cadence band + stability check);
   no counting while the screen is off / locked / in pocket, resets after you stop walking; 3 sensitivity levels drive all thresholds
-- **Three reminder styles**: heads-up notification / overlay popup / full-screen reminder;
+- **Three reminder styles**: Pop-up notification / Floating reminder / Full-screen reminder;
   popup mode uses the overlay permission
-- **No reminders indoors** (off by default): suppresses reminders when GPS indicates indoors, GPS is not used when the switch is off
+- **Mute indoors** (off by default): suppresses reminders when GPS indicates indoors, GPS is not used when the switch is off
 - **Outdoor detection**: median of visible strong satellites, prefers good-accuracy GPS fixes,
   indoor verdicts are cached for 30s, unknown is treated as outdoors
 - **Live status card**: service heartbeat / consecutive steps / sensors / indoor / satellites (fix / strong / total) / GMS status,
