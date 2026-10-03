@@ -1,7 +1,37 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
+}
+
+val signingPropertiesFile = rootProject.file("keystore.properties")
+val signingProperties = Properties().apply {
+    if (signingPropertiesFile.isFile) {
+        signingPropertiesFile.inputStream().use { load(it) }
+    }
+}
+fun signingValue(name: String): String? =
+    providers.gradleProperty(name).orNull ?: System.getenv(name) ?: signingProperties.getProperty(name)
+
+val storeFilePath = signingValue("HEADSUP_STORE_FILE")
+val releaseStoreFile = storeFilePath?.let { rootProject.file(it) } ?: rootProject.file("../headsup.jks")
+val releaseStorePassword = signingValue("HEADSUP_STORE_PASSWORD")
+val releaseKeyAlias = signingValue("HEADSUP_KEY_ALIAS")
+val releaseKeyPassword = signingValue("HEADSUP_KEY_PASSWORD")
+val releaseSigningConfigured = releaseStoreFile.isFile &&
+    !releaseStorePassword.isNullOrBlank() &&
+    !releaseKeyAlias.isNullOrBlank() &&
+    !releaseKeyPassword.isNullOrBlank()
+
+if (releaseSigningConfigured) {
+    android.signingConfigs.create("release") {
+        storeFile = releaseStoreFile
+        storePassword = releaseStorePassword
+        keyAlias = releaseKeyAlias
+        keyPassword = releaseKeyPassword
+    }
 }
 
 android {
@@ -22,6 +52,9 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            if (releaseSigningConfigured) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
     }
     buildFeatures { compose = true }
@@ -30,6 +63,19 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions { jvmTarget = "17" }
+}
+
+val validateReleaseSigning = tasks.register("validateReleaseSigning") {
+    doLast {
+        check(releaseSigningConfigured) {
+            "Release signing is not configured. Set HEADSUP_STORE_PASSWORD, HEADSUP_KEY_ALIAS, and HEADSUP_KEY_PASSWORD in the ignored keystore.properties file or Gradle/environment properties."
+        }
+    }
+}
+tasks.configureEach {
+    if (name == "packageRelease" || name == "bundleRelease") {
+        dependsOn(validateReleaseSigning)
+    }
 }
 
 dependencies {

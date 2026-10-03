@@ -1,5 +1,6 @@
 # Gradle / Android 构建产物
 .gradle/
+.kotlin/
 build/
 app/build/
 captures/
@@ -10,6 +11,9 @@ captures/
 
 # 本地配置（SDK 路径等）
 local.properties
+keystore.properties
+*.jks
+*.keystore
 
 # IDE
 .idea/
