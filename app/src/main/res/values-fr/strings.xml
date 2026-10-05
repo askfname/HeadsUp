@@ -159,11 +159,13 @@
     <string name="tune_strong_count">Satellites forts</string>
     <string name="tune_strong_ratio">Proportion de signal fort</string>
     <string name="tune_gps_acc">Précision GPS (m)</string>
+    <string name="tune_vis_cn0">CN0 des satellites forts (dB-Hz)</string>
     <string name="tune_default_format">Par défaut %1$s (%2$s)</string>
     <string name="tune_range_int">0–30</string>
     <string name="tune_range_ratio">0–1</string>
     <string name="tune_range_acc">5–50</string>
-    <string name="tune_hint">Un nombre ou une proportion plus élevés de satellites forts rendent le silence à l\'intérieur plus sensible ; une précision GPS plus faible le rend également plus sensible.</string>
+    <string name="tune_range_cn0">10–40</string>
+    <string name="tune_hint">Plus le seuil CN0 est élevé, plus le silence à l\'intérieur est sensible ; même effet avec un nombre ou une proportion plus élevés de satellites forts, ou une précision GPS plus faible.</string>
     <string name="tune_error">Paramètres hors limites ou non valides ; modifications non enregistrées</string>
     <string name="tune_save">Enregistrer</string>
     <string name="tune_reset">Restaurer</string>

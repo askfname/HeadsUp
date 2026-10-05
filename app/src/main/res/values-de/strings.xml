@@ -159,11 +159,13 @@
     <string name="tune_strong_count">Starke Satelliten</string>
     <string name="tune_strong_ratio">Starksignalanteil</string>
     <string name="tune_gps_acc">GPS-Genauigkeit (m)</string>
+    <string name="tune_vis_cn0">CN0 starker Satelliten (dB-Hz)</string>
     <string name="tune_default_format">Standard %1$s (%2$s)</string>
     <string name="tune_range_int">0–30</string>
     <string name="tune_range_ratio">0–1</string>
     <string name="tune_range_acc">5–50</string>
-    <string name="tune_hint">Höhere Anzahl bzw. höherer Anteil starker Satelliten erhöht die Empfindlichkeit der Innenraum-Stummschaltung; kleinere GPS-Genauigkeit erhöht sie ebenfalls.</string>
+    <string name="tune_range_cn0">10–40</string>
+    <string name="tune_hint">Eine höhere CN0-Schwelle starker Satelliten erhöht die Empfindlichkeit der Innenraum-Stummschaltung; höhere Anzahl bzw. höherer Anteil erhöhen sie ebenfalls, ebenso kleinere GPS-Genauigkeit.</string>
     <string name="tune_error">Parameter außerhalb des Bereichs oder ungültig; Änderungen wurden nicht gespeichert</string>
     <string name="tune_save">Speichern</string>
     <string name="tune_reset">Zurücksetzen</string>

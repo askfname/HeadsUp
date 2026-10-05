@@ -775,6 +775,7 @@ private fun IndoorHelpDialog(
     var fVisIn by remember { mutableStateOf(eff.visIndoor.toString()) }
     var fRatioIn by remember { mutableStateOf(eff.ratioIndoor.toString()) }
     var fGpsAcc by remember { mutableStateOf(eff.gpsAcc.toString()) }
+    var fVisCn0 by remember { mutableStateOf(eff.visCn0.toString()) }
 
     // 空=默认，超范围报错；成功后自动关闭
     fun save() {
@@ -787,15 +788,19 @@ private fun IndoorHelpDialog(
         val gpsAcc = fGpsAcc.trim().let {
             if (it.isEmpty()) null else it.toFloatOrNull()?.takeIf { v -> v in 5f..50f }
         }
+        val visCn0 = fVisCn0.trim().let {
+            if (it.isEmpty()) null else it.toFloatOrNull()?.takeIf { v -> v in 10f..40f }
+        }
         // 非空但非法即报错
         if ((fVisIn.trim().isNotEmpty() && visIn == null) ||
             (fRatioIn.trim().isNotEmpty() && ratioIn == null) ||
-            (fGpsAcc.trim().isNotEmpty() && gpsAcc == null)
+            (fGpsAcc.trim().isNotEmpty() && gpsAcc == null) ||
+            (fVisCn0.trim().isNotEmpty() && visCn0 == null)
         ) {
             err = ctx.getString(R.string.tune_error)
             return
         }
-        Prefs.saveIndoorCustom(ctx, visIn, ratioIn, gpsAcc)
+        Prefs.saveIndoorCustom(ctx, visIn, ratioIn, gpsAcc, visCn0)
         IndoorDetector.applyCustom(Prefs.getIndoorCustomOrNull(ctx))
         err = ""
         onChanged()
@@ -808,6 +813,7 @@ private fun IndoorHelpDialog(
         fVisIn = d.visIndoor.toString()
         fRatioIn = d.ratioIndoor.toString()
         fGpsAcc = d.gpsAcc.toString()
+        fVisCn0 = d.visCn0.toString()
         err = ""
         onChanged()
     }
@@ -831,6 +837,16 @@ private fun IndoorHelpDialog(
                     )
                 }
                 if (expanded) {
+                    TuneField(
+                        stringResource(R.string.tune_vis_cn0),
+                        fVisCn0,
+                        stringResource(
+                            R.string.tune_default_format,
+                            d.visCn0.toString(),
+                            stringResource(R.string.tune_range_cn0)
+                        ),
+                        KeyboardType.Decimal
+                    ) { fVisCn0 = it }
                     TuneField(
                         stringResource(R.string.tune_strong_count),
                         fVisIn,

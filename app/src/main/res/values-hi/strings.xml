@@ -159,11 +159,13 @@
     <string name="tune_strong_count">मज़बूत उपग्रह</string>
     <string name="tune_strong_ratio">मज़बूत संकेत अनुपात</string>
     <string name="tune_gps_acc">GPS सटीकता (मी)</string>
+    <string name="tune_vis_cn0">मज़बूत उपग्रह CN0 (dB-Hz)</string>
     <string name="tune_default_format">डिफ़ॉल्ट %1$s (%2$s)</string>
     <string name="tune_range_int">0–30</string>
     <string name="tune_range_ratio">0–1</string>
     <string name="tune_range_acc">5–50</string>
-    <string name="tune_hint">मज़बूत उपग्रह संख्या/अनुपात अधिक होने पर घर के अंदर मौन अधिक संवेदनशील, GPS सटीकता छोटी होने पर अधिक संवेदनशील।</string>
+    <string name="tune_range_cn0">10–40</string>
+    <string name="tune_hint">मज़बूत उपग्रह CN0 सीमा अधिक होने पर घर के अंदर मौन अधिक संवेदनशील, संख्या/अनुपात अधिक होने पर अधिक संवेदनशील, GPS सटीकता छोटी होने पर अधिक संवेदनशील।</string>
     <string name="tune_error">पैरामीटर सीमा से बाहर या अमान्य; सहेजा नहीं गया</string>
     <string name="tune_save">सहेजें</string>
     <string name="tune_reset">पुनर्स्थापित करें</string>

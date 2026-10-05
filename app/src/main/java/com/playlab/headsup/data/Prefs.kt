@@ -43,17 +43,20 @@ object Prefs {
         val visIndoor: Int = 7, // 室内强星数上限
         val ratioIndoor: Float = 0.4f, // 室内占比上限
         val gpsAcc: Float = 10f, // 精度优于此值按室外（越小越易判室内）
+        val visCn0: Float = 25f, // 强星门限（越小强星越多，越难判室内）
     )
 
     private const val K_IN_VIS_IN = "indoor_c_vis_in"
     private const val K_IN_RATIO_IN = "indoor_c_ratio_in"
     private const val K_IN_GPS_ACC = "indoor_c_gps_acc"
+    private const val K_IN_VIS_CN0 = "indoor_c_vis_cn0"
 
     // 旧版参数键：仅用于清理
     private const val K_IN_VIS_OUT_OLD = "indoor_c_vis_out"
     private const val K_IN_FIX_OUT_OLD = "indoor_c_fix_out"
     private const val K_IN_RATIO_OUT_OLD = "indoor_c_ratio_out"
     private const val K_IN_CONFIRM_OLD = "indoor_c_confirm"
+    private const val K_IN_FIX_CN0_OLD = "indoor_c_fix_cn0"
 
     // 有效参数：自定义缺省项回落默认
     fun getIndoorParams(ctx: Context): IndoorParams {
@@ -63,6 +66,7 @@ object Prefs {
             visIndoor = if (s.contains(K_IN_VIS_IN)) s.getInt(K_IN_VIS_IN, d.visIndoor) else d.visIndoor,
             ratioIndoor = if (s.contains(K_IN_RATIO_IN)) s.getFloat(K_IN_RATIO_IN, d.ratioIndoor) else d.ratioIndoor,
             gpsAcc = if (s.contains(K_IN_GPS_ACC)) s.getFloat(K_IN_GPS_ACC, d.gpsAcc) else d.gpsAcc,
+            visCn0 = if (s.contains(K_IN_VIS_CN0)) s.getFloat(K_IN_VIS_CN0, d.visCn0) else d.visCn0,
         )
     }
 
@@ -73,29 +77,33 @@ object Prefs {
     fun hasIndoorCustom(ctx: Context): Boolean {
         val s = sp(ctx)
         return s.contains(K_IN_VIS_IN) || s.contains(K_IN_RATIO_IN) ||
-            s.contains(K_IN_GPS_ACC)
+            s.contains(K_IN_GPS_ACC) || s.contains(K_IN_VIS_CN0)
     }
 
     // null 表示该项恢复默认；全 null 等同清空
     fun saveIndoorCustom(
         ctx: Context,
         visIndoor: Int?, ratioIndoor: Float?, gpsAcc: Float?,
+        visCn0: Float? = null,
     ) {
         val e = sp(ctx).edit()
         if (visIndoor == null) e.remove(K_IN_VIS_IN) else e.putInt(K_IN_VIS_IN, visIndoor)
         if (ratioIndoor == null) e.remove(K_IN_RATIO_IN) else e.putFloat(K_IN_RATIO_IN, ratioIndoor)
         if (gpsAcc == null) e.remove(K_IN_GPS_ACC) else e.putFloat(K_IN_GPS_ACC, gpsAcc)
+        if (visCn0 == null) e.remove(K_IN_VIS_CN0) else e.putFloat(K_IN_VIS_CN0, visCn0)
         e.remove(K_IN_VIS_OUT_OLD).remove(K_IN_FIX_OUT_OLD)
             .remove(K_IN_RATIO_OUT_OLD).remove(K_IN_CONFIRM_OLD)
+            .remove(K_IN_FIX_CN0_OLD)
         e.apply()
     }
 
     fun clearIndoorParams(ctx: Context) {
         sp(ctx).edit()
             .remove(K_IN_VIS_IN).remove(K_IN_RATIO_IN)
-            .remove(K_IN_GPS_ACC)
+            .remove(K_IN_GPS_ACC).remove(K_IN_VIS_CN0)
             .remove(K_IN_VIS_OUT_OLD).remove(K_IN_FIX_OUT_OLD)
             .remove(K_IN_RATIO_OUT_OLD).remove(K_IN_CONFIRM_OLD)
+            .remove(K_IN_FIX_CN0_OLD)
             .apply()
     }
 

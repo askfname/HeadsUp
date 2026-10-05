@@ -134,9 +134,9 @@ class HeadsUpService : Service() {
         }
     }
 
-    /** 真实发出：闩锁 UI 同步；发出后冷却期内 verdict 无用，延迟关 GPS */
+    /** 真实发出：室内结论由调用方单次 verdict 决定，此处不再复查 */
     private fun fireNow(): Boolean {
-        if (ReminderManager.fire(this)) {
+        if (ReminderManager.fire(this, false)) {
             detector.noteFired()
             // 发出后冷却期内 verdict 用不上，关 GPS（10s 延迟，冷却过期 tick 会按需再开）
             pendingSince = 0L
@@ -174,26 +174,28 @@ class HeadsUpService : Service() {
         detector = WalkDetector(
             onTrigger = { handleWalkTrigger() },
             onTick = { snap ->
-                // 单次求值：显示与挂起决策用同一结论，避免并发翻转导致显示室内也发送提醒
+                // 单次求值：先处理挂起再快照，显示与决策用同一结论
                 val v0 = IndoorDetector.verdict()
+                var fired = false
+                // 挂起提醒处理：停走取消；室内抑制；室外或超时发出
+                if (pendingSince > 0L) {
+                    val timedOut = SystemClock.elapsedRealtime() - pendingSince >= PENDING_TIMEOUT_MS
+                    if (!snap.walking) pendingSince = 0L // 停走取消
+                    else if (v0 == IndoorDetector.Verdict.INDOOR) pendingSince = 0L // 抑制
+                    else if (v0 == IndoorDetector.Verdict.OUTDOOR || timedOut) {
+                        pendingSince = 0L
+                        fired = fireNow() // 单次结论为准，不二次复查
+                    }
+                }
                 val withIndoor = snap.copy(
                     indoor = v0 == IndoorDetector.Verdict.INDOOR,
                     indoorPending = pendingSince > 0L,
                     sats = IndoorDetector.satInfo,
                 )
-                DetectState.snap = withIndoor
-                lastTick = withIndoor
-                var fired = false
-                // 挂起提醒处理：停走取消；室内抑制；室外或超时发出
-                if (pendingSince > 0L) {
-                    val v = IndoorDetector.verdict()
-                    val timedOut = SystemClock.elapsedRealtime() - pendingSince >= PENDING_TIMEOUT_MS
-                    if (!withIndoor.walking) pendingSince = 0L // 停走取消
-                    else if (v == IndoorDetector.Verdict.INDOOR) pendingSince = 0L // 抑制
-                    else if (v == IndoorDetector.Verdict.OUTDOOR || timedOut) {
-                        pendingSince = 0L
-                        fired = fireNow() // 超时按室外放行；fire 内复核可用性与冷却
-                    }
+                // 未发出才发布：发出时 fire 内重入 tick 已发布更新快照，此处防回写旧值
+                if (!fired) {
+                    DetectState.snap = withIndoor
+                    lastTick = withIndoor
                 }
                 // 行走驱动 GPS：只在“冷却已过 + 行走中”才开
                 // 被室内抑制的触发不消耗冷却，抑制成立后 GPS 会持续开着保温 verdict
@@ -364,8 +366,8 @@ class HeadsUpService : Service() {
         const val ACTION_GMS_HINT = "com.playlab.headsup.action.GMS_HINT"
         const val ACTION_RESUBSCRIBE = "com.playlab.headsup.action.RESUBSCRIBE"
         const val ACTION_REREGISTER = "com.playlab.headsup.action.REREGISTER"
-        // 挂起等 GPS 结论的最长等待时间（超时按室外放行，避免漏提醒）
-        private const val PENDING_TIMEOUT_MS = 20_000L
+        // 挂起等 GPS 结论的最长等待（与 GNSS 有效期 15s 对齐，超时按室外放行）
+        private const val PENDING_TIMEOUT_MS = 15_000L
         private const val TAG = "HeadsUpService"
 
         fun start(ctx: Context) {
