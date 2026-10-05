@@ -44,21 +44,20 @@ class HeadsUpService : Service() {
     private var sensorMgr: SensorManager? = null
     private var lastSensSig = "" // 灵敏度签名，变化才重置累计（否则每次 start 都会清零行走态）
 
-    // 屏幕状态：亮屏视为用机；灭屏解注册传感器（零事件零唤醒，反正灭屏不可能边走边看XD）
-    // 锁屏（亮屏但未解锁）与口袋（距离感应器遮挡）同样不累计、不提醒
-    // GPS 与传感器同进退：灭屏/锁屏/定位总开关断连省电，用机才追踪
-    // （室内 verdict 断连后过期失效，按户外放行）
+    // 判定优先级：屏幕/锁定 > 遮挡 > 步态 > 室内
+    // 不可用（息屏/锁定）时解注册全部传感器：步数作废，距离传感器也不用
+    // 可用（亮屏已解锁）时才注册
     private val screenReceiver = object : BroadcastReceiver() {
         override fun onReceive(c: Context, i: Intent) {
             when (i.action) {
                 Intent.ACTION_SCREEN_ON, Intent.ACTION_USER_PRESENT -> {
                     refreshUseState()
-                    sensorMgr?.let { detector.register(it) }
+                    syncSensors()
                     refreshIndoorTracking()
                 }
                 Intent.ACTION_SCREEN_OFF -> {
-                    detector.screenOn = false
-                    sensorMgr?.let { detector.unregister(it) }
+                    refreshUseState()
+                    syncSensors()
                     refreshIndoorTracking()
                 }
                 LocationManager.PROVIDERS_CHANGED_ACTION -> refreshIndoorTracking()
@@ -66,18 +65,26 @@ class HeadsUpService : Service() {
         }
     }
 
-    /** 从系统刷新亮灭屏/锁屏状态并同步给检测器 */
+    /** 从系统刷新亮灭屏/锁屏状态并同步给检测器（不可用时清步数、清挂起） */
     private fun refreshUseState() {
         val interactive = getSystemService(PowerManager::class.java)?.isInteractive ?: true
         val locked = getSystemService(KeyguardManager::class.java)?.isKeyguardLocked ?: false
-        detector.screenOn = interactive
-        detector.unlocked = !locked
+        detector.setUseState(interactive, !locked)
+        if (!detector.isUsable()) pendingSince = 0L
+    }
+
+    /** 按可用性统一注册/解注册传感器 */
+    private fun syncSensors() {
+        sensorMgr?.let {
+            if (detector.isUsable()) detector.register(it)
+            else detector.unregister(it)
+        }
     }
 
     /** 触发前复核：灭屏/锁屏/口袋直接拦截（防锁屏亮屏、口袋亮屏、GMS 延迟回调） */
     private fun isUsableNow(): Boolean {
         refreshUseState()
-        return detector.screenOn && detector.unlocked && !detector.pocketed
+        return detector.isUsable() && !detector.pocketed
     }
 
     // 挂起提醒：步态已确认但位置未决，等 GPS 结论再发（优先准确）
@@ -88,7 +95,7 @@ class HeadsUpService : Service() {
 
     /** 开关开 + 位置够用 + 定位总开关开 + 亮屏已解锁才追踪 GPS，否则停 */
     private fun refreshIndoorTracking() {
-        val usable = ::detector.isInitialized && detector.screenOn && detector.unlocked
+        val usable = ::detector.isInitialized && detector.isUsable()
         // 同步高级设置自定义参数（未变时内部跳过）
         IndoorDetector.applyCustom(Prefs.getIndoorCustomOrNull(this))
         if (Prefs.isEnabled(this) && Prefs.isIndoorMute(this) &&
@@ -199,7 +206,7 @@ class HeadsUpService : Service() {
         applySensIfChanged()
         sensorMgr = getSystemService(SensorManager::class.java)
         refreshUseState() // 先读真实亮灭屏/锁屏，再决定起传感器与 GPS
-        if (detector.screenOn) sensorMgr?.let { detector.register(it) }
+        syncSensors()
         refreshIndoorTracking()
         detector.publishState()
         registerReceiver(
@@ -221,6 +228,7 @@ class HeadsUpService : Service() {
         if (::detector.isInitialized) {
         applySensIfChanged()
             refreshUseState() // 后台进来的启动也要带最新亮锁屏态，GPS 才跟得上
+            syncSensors()
             refreshIndoorTracking()
         }
         when (intent?.action) {
@@ -236,7 +244,7 @@ class HeadsUpService : Service() {
             // 授权后重注册传感器：无身体活动权限时注册的监听收不到事件，必须重新注册
             ACTION_REREGISTER -> {
                 refreshUseState()
-                sensorMgr?.let { detector.reregister(it, detector.screenOn) }
+                sensorMgr?.let { detector.reregister(it, detector.isUsable()) }
             }
         }
         startForegroundGuard()

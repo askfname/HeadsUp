@@ -39,7 +39,7 @@ object DetectState {
  * 本机步态检测（不依赖 GMS），使用 STEP_DETECTOR（0x12）
  * 连续 N 步节律一致才触发；节律按硬件事件时间戳计算，ROM 批量投递也不影响
  * 防误触：步伐节律 + 加速度/陀螺仪动作幅度双重确认，原地晃动因旋转过大/幅度超限被打断
- * 锁屏或口袋（距离感应器遮挡）时直接丢弃步伐，不累计
+ * 优先级：屏幕/锁定 > 遮挡 > 步态；息屏/锁定解注册传感器且步数作废
  */
 class WalkDetector(
     private val onTrigger: () -> Unit,
@@ -48,7 +48,9 @@ class WalkDetector(
 
     var screenOn = true
     var unlocked = true // 锁屏不提醒
-    var pocketed = false // 口袋不提醒
+    var pocketed = false // 口袋不提醒（仅亮屏已解锁时有效）
+    /** 是否可用：优先级最高，息屏/锁定直接不可用 */
+    fun isUsable() = screenOn && unlocked
     var requiredSteps = 12 // 默认标准档，服务启动时按灵敏度覆盖
     // Language-independent status code; UI resolves it to localized text on every
     // recomposition, so it always follows the current system language.
@@ -77,6 +79,11 @@ class WalkDetector(
 
     private var hasStepDetector = false
     private var batchObserved = false // 是否观察到批量投递
+
+    // 口袋防抖：短暂遮挡不算口袋
+    private var rawNear = false
+    private var nearSince = 0L
+    private val pocketConfirmTask = Runnable { confirmPocket() }
 
     private val stepTimes = ArrayDeque<Long>() // 10s 窗口，仅 UI 显示
     private var lastStepTime = 0L
@@ -140,6 +147,7 @@ class WalkDetector(
         try { sm.unregisterListener(this) } catch (_: Exception) { }
         registered = false
         handler.removeCallbacks(tickTask)
+        handler.removeCallbacks(pocketConfirmTask)
         if (active) register(sm) else pushSnap()
     }
 
@@ -147,12 +155,41 @@ class WalkDetector(
         registered = false
         handler.removeCallbacks(tickTask)
         handler.removeCallbacks(resetTask)
+        handler.removeCallbacks(pocketConfirmTask)
         try { sm.unregisterListener(this) } catch (_: Exception) { }
         pushSnap() // 推送最终状态，UI 不显示 stale 快照
     }
 
+    /** 用机状态同步：不可用时步数作废、遮挡清零（优先级：屏幕/锁定 > 遮挡 > 步态） */
+    fun setUseState(screenOn: Boolean, unlocked: Boolean) {
+        val wasUsable = isUsable()
+        this.screenOn = screenOn
+        this.unlocked = unlocked
+        if (!isUsable()) {
+            rawNear = false
+            nearSince = 0L
+            pocketed = false
+            handler.removeCallbacks(pocketConfirmTask)
+            resetAll()
+            pushSnap()
+        } else if (!wasUsable) {
+            // 回到可用：从零累计，防解锁后误触发
+            resetAll()
+            pushSnap()
+        }
+    }
+
     /** 对外同步一次当前状态 */
     fun publishState() = pushSnap()
+
+    private fun resetAll() {
+        resetRun()
+        stepTimes.clear()
+        lastStepTime = 0L
+        accWin.clear()
+        gyroWin.clear()
+        handler.removeCallbacks(resetTask)
+    }
 
     /** 灵敏度切换：更新全部阈值并清零旧累计，避免旧步数带入新档位 */
     fun applySensitivity(
@@ -195,12 +232,13 @@ class WalkDetector(
     }
 
     /**
-     * 熔断门：此刻是否处于行走状态（连贯步数≥档位门限 且 5s 内有步伐，且在用机、无遮挡、动作幅度正常）
+     * 熔断门：优先级 屏幕/锁定 > 遮挡 > 步态；室内由服务层最后判定
      * 所有提醒触发前必须过此门，防止过期信号（延迟的 GMS 回调等）在静止时触发
      */
     fun isWalkingNow(): Boolean {
+        if (!isUsable()) return false
+        if (pocketed) return false
         if (runLen < candSteps) return false
-        if (!screenOn || !unlocked || pocketed) return false
         if (testMode) return true
         val now = SystemClock.elapsedRealtime()
         if (now - lastStepTime >= 5_000) return false
@@ -225,6 +263,7 @@ class WalkDetector(
     override fun onSensorChanged(e: SensorEvent) {
         when (e.sensor.type) {
             Sensor.TYPE_STEP_DETECTOR -> {
+                if (!isUsable()) return // 息屏/锁定步数作废
                 if (e.values[0] != 1f) return
                 val at = eventMs(e.timestamp)
                 // 批量投递标记：事件硬件时间远早于到达时间（>1.5s）
@@ -232,6 +271,7 @@ class WalkDetector(
                 onStepEvent(at = at)
             }
             Sensor.TYPE_ACCELEROMETER -> {
+                if (!isUsable()) return
                 val now = SystemClock.elapsedRealtime()
                 val m = kotlin.math.sqrt(
                     (e.values[0] * e.values[0] + e.values[1] * e.values[1] + e.values[2] * e.values[2]).toDouble(),
@@ -240,6 +280,7 @@ class WalkDetector(
                 pruneMotion(now)
             }
             Sensor.TYPE_GYROSCOPE -> {
+                if (!isUsable()) return
                 val now = SystemClock.elapsedRealtime()
                 val m = kotlin.math.sqrt(
                     (e.values[0] * e.values[0] + e.values[1] * e.values[1] + e.values[2] * e.values[2]).toDouble(),
@@ -248,9 +289,8 @@ class WalkDetector(
                 pruneMotion(now)
             }
             Sensor.TYPE_PROXIMITY -> {
-                // 距离感应器被遮挡（<最大量程）即判入口袋
-                pocketed = e.values[0] < e.sensor.maximumRange - 0.01f
-                pushSnap()
+                // 防抖：持续遮挡才算口袋，短暂遮挡忽略
+                onProximityChanged(e.values[0] < e.sensor.maximumRange - 0.01f)
             }
         }
     }
@@ -265,6 +305,43 @@ class WalkDetector(
         val cut = now - 8_000
         while (accWin.isNotEmpty() && accWin.first().first < cut) accWin.removeFirst()
         while (gyroWin.isNotEmpty() && gyroWin.first().first < cut) gyroWin.removeFirst()
+    }
+
+    // 仅亮屏已解锁时确认口袋
+    private fun pocketConfirmMs() = 2500L
+
+    private fun onProximityChanged(near: Boolean) {
+        if (!isUsable()) return // 息屏/锁定不使用距离传感器
+        val now = SystemClock.elapsedRealtime()
+        if (near) {
+            if (!rawNear) {
+                rawNear = true
+                nearSince = now
+                handler.removeCallbacks(pocketConfirmTask)
+                handler.postDelayed(pocketConfirmTask, pocketConfirmMs())
+            }
+        } else {
+            rawNear = false
+            nearSince = 0L
+            handler.removeCallbacks(pocketConfirmTask)
+            if (pocketed) {
+                pocketed = false
+                pushSnap()
+            }
+        }
+    }
+
+    private fun confirmPocket() {
+        if (!isUsable() || !rawNear || pocketed || nearSince == 0L) return
+        val need = pocketConfirmMs()
+        val elapsed = SystemClock.elapsedRealtime() - nearSince
+        if (elapsed >= need) {
+            pocketed = true
+            resetRun() // 口袋内步数作废，避免拿出后误触发
+            pushSnap()
+        } else {
+            handler.postDelayed(pocketConfirmTask, need - elapsed)
+        }
     }
 
     private fun resetRun() {

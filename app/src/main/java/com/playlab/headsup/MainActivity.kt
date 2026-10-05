@@ -41,6 +41,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -618,7 +619,14 @@ private fun HomeScreen(resumeSeq: Int) {
                         OutlinedButton(
                             onClick = { KeepAliveHelper.openAutoStart(ctx) },
                             modifier = Modifier.weight(1f)
-                        ) { Text(stringResource(R.string.autostart_settings)) }
+                        ) {
+                            // 长文案/大字体下单行省略，防止换行撑高按钮
+                            Text(
+                                stringResource(R.string.autostart_settings),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
                         OutlinedButton(
                             onClick = {
                                 // 已忽略则弹解除后台限制弹窗；未允许/被撤销则走电池白名单申请
@@ -633,7 +641,9 @@ private fun HomeScreen(resumeSeq: Int) {
                         ) {
                             Text(
                                 if (KeepAliveHelper.ignoringBattery(ctx)) stringResource(R.string.high_bg_action)
-                                else stringResource(R.string.battery_whitelist)
+                                else stringResource(R.string.battery_whitelist),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
                             )
                         }
                     }
