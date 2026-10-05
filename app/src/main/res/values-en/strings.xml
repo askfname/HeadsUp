@@ -102,12 +102,23 @@
     <string name="keepalive_title">Auto-start and keep-alive</string>
     <string name="autostart_settings">Auto-start</string>
     <string name="battery_whitelist">Battery whitelist</string>
-    <string name="battery_ignored">Unrestricted</string>
-    <string name="device_hint_xiaomi">Xiaomi: Settings → App settings → Authorization management → Auto-start</string>
-    <string name="device_hint_huawei">Huawei: Phone Manager → App launch management → Allow auto-start</string>
-    <string name="device_hint_oppo">OPPO / OnePlus: Phone Manager → Privacy permissions → Auto-start management</string>
-    <string name="device_hint_vivo">vivo: Settings → Apps → Auto-start</string>
+    <string name="device_vendor_xiaomi">Xiaomi:</string>
+    <string name="device_vendor_huawei">Huawei / Honor:</string>
+    <string name="device_vendor_oppo">OPPO / OnePlus:</string>
+    <string name="device_vendor_vivo">vivo / iQOO:</string>
+    <string name="device_hint_xiaomi">Settings → App settings → Authorization management → Auto-start</string>
+    <string name="device_hint_huawei">Phone Manager → App launch management → Allow auto-start</string>
+    <string name="device_hint_oppo">Phone Manager → Privacy permissions → Auto-start management</string>
+    <string name="device_hint_vivo">Settings → Apps → Auto-start</string>
     <string name="device_hint_default">Please allow auto-start and background operation in system settings</string>
+    <string name="device_highbg_xiaomi">Settings → Battery → Background config → Allow this app</string>
+    <string name="device_highbg_huawei">Settings → Battery → App launch management → Allow background activity</string>
+    <string name="device_highbg_oppo">Settings → Battery → Power consumption management → Allow full background behavior</string>
+    <string name="device_highbg_vivo">Settings → Battery → Background power consumption management → Allow high background power consumption</string>
+    <string name="device_highbg_default">Allow this app in “Background config / High background power consumption” and lock it in recent tasks</string>
+    <string name="high_bg_title">Please lift background restrictions</string>
+    <string name="high_bg_msg">Background restriction policies on some customized ROMs can disconnect sensor connections. Please allow this app in “Background config / High background power consumption” and lock it in recent tasks, otherwise walking and phone-use detection may stop working.</string>
+    <string name="high_bg_action">Lift background restrictions</string>
 
     <!-- About -->
     <string name="about_title">About</string>

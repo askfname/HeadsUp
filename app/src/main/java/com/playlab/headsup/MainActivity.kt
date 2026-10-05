@@ -95,6 +95,7 @@ private fun HomeScreen(resumeSeq: Int) {
     var pendingPopup by remember { mutableStateOf(false) } // 弹窗提醒缺悬浮窗权限，授权后才切换
     var showLocDialog by remember { mutableStateOf(false) } // 引导去开位置权限
     var showCoreDialog by remember { mutableStateOf(false) } // 引导去开身体活动/通知
+    var showHighBgDialog by remember { mutableStateOf(false) } // 忽略电池优化后引导高后台耗电
     var showIndoorHelp by remember { mutableStateOf(false) } // “室内不提醒”功能说明 + 高级设置
     var tick by remember { mutableIntStateOf(0) }
     val scrollState = rememberScrollState()
@@ -180,6 +181,14 @@ private fun HomeScreen(resumeSeq: Int) {
     val settingsLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { refreshAll() }
+
+    // 电池白名单返回：已忽略则弹窗引导高后台耗电 + 锁定任务卡片
+    val batteryLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) {
+        refreshAll()
+        if (KeepAliveHelper.ignoringBattery(ctx)) showHighBgDialog = true
+    }
 
     val permLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -584,10 +593,24 @@ private fun HomeScreen(resumeSeq: Int) {
 
             // 保活
             Card(Modifier.fillMaxWidth()) {
+                @Suppress("unused") val _keepTick = tick // 跟随电池白名单状态（允许/撤销）刷新
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(stringResource(R.string.keepalive_title), style = MaterialTheme.typography.titleMedium)
+                    // 已知厂商才显示厂商名行，未知厂商仅显示下方两条通用路径
+                    KeepAliveHelper.deviceVendor(ctx)?.let { vendor ->
+                        Text(
+                            vendor,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                     Text(
                         KeepAliveHelper.deviceHint(ctx),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        KeepAliveHelper.highBgHint(ctx),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -598,17 +621,18 @@ private fun HomeScreen(resumeSeq: Int) {
                         ) { Text(stringResource(R.string.autostart_settings)) }
                         OutlinedButton(
                             onClick = {
-                                try {
-                                    settingsLauncher.launch(KeepAliveHelper.batteryWhitelistIntent(ctx))
+                                // 已忽略则弹解除后台限制弹窗；未允许/被撤销则走电池白名单申请
+                                if (KeepAliveHelper.ignoringBattery(ctx)) showHighBgDialog = true
+                                else try {
+                                    batteryLauncher.launch(KeepAliveHelper.batteryWhitelistIntent(ctx))
                                 } catch (_: Exception) {
                                     KeepAliveHelper.requestBatteryWhitelist(ctx)
                                 }
                             },
                             modifier = Modifier.weight(1f),
-                            enabled = !KeepAliveHelper.ignoringBattery(ctx)
                         ) {
                             Text(
-                                if (KeepAliveHelper.ignoringBattery(ctx)) stringResource(R.string.battery_ignored)
+                                if (KeepAliveHelper.ignoringBattery(ctx)) stringResource(R.string.high_bg_action)
                                 else stringResource(R.string.battery_whitelist)
                             )
                         }
@@ -686,6 +710,39 @@ private fun HomeScreen(resumeSeq: Int) {
                 dismissButton = {
                     TextButton(onClick = { showCoreDialog = false; pendingEnable = false }) {
                         Text(stringResource(R.string.dialog_cancel))
+                    }
+                }
+            )
+        }
+
+        // 忽略电池优化后：已知厂商给直达入口，未知仅文字引导手动设置
+        if (showHighBgDialog) {
+            val highBgKnown = KeepAliveHelper.isHighBgSupported()
+            AlertDialog(
+                onDismissRequest = { showHighBgDialog = false },
+                title = { Text(stringResource(R.string.high_bg_title)) },
+                text = { Text(stringResource(R.string.high_bg_msg)) },
+                confirmButton = {
+                    if (highBgKnown) {
+                        TextButton(onClick = {
+                            showHighBgDialog = false
+                            if (!KeepAliveHelper.openHighBackground(ctx)) {
+                                try {
+                                    settingsLauncher.launch(KeepAliveHelper.appDetailsIntent(ctx))
+                                } catch (_: Exception) { }
+                            }
+                        }) { Text(stringResource(R.string.dialog_go_settings)) }
+                    } else {
+                        TextButton(onClick = { showHighBgDialog = false }) {
+                            Text(stringResource(R.string.dialog_know))
+                        }
+                    }
+                },
+                dismissButton = {
+                    if (highBgKnown) {
+                        TextButton(onClick = { showHighBgDialog = false }) {
+                            Text(stringResource(R.string.dialog_know))
+                        }
                     }
                 }
             )

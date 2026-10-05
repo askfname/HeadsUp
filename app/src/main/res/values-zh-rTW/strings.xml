@@ -7,7 +7,7 @@
     <string name="home_status_on">守護中</string>
     <string name="home_status_off">已關閉</string>
     <string name="home_status_on_desc">走路時看手機會提醒你</string>
-    <string name="home_status_off_desc">開啟守護以監測行走狀態</string>
+    <string name="home_status_off_desc">開啟守護以偵測行走狀態</string>
 
     <string name="section_reminder_method">提醒方式</string>
     <string name="mode_float_title">彈窗提醒</string>
@@ -96,12 +96,23 @@
     <string name="keepalive_title">自啟與保活</string>
     <string name="autostart_settings">自啟動設定</string>
     <string name="battery_whitelist">電池白名單</string>
-    <string name="battery_ignored">已忽略電池最佳化</string>
-    <string name="device_hint_xiaomi">小米：設定 → 應用設定 → 授權管理 → 自啟動</string>
-    <string name="device_hint_huawei">華為：手機管家 → 應用啟動管理 → 允許自啟動</string>
-    <string name="device_hint_oppo">OPPO/一加：手機管家 → 權限隱私 → 自啟動管理</string>
-    <string name="device_hint_vivo">vivo：設定 → 應用 → 自啟動</string>
+    <string name="device_vendor_xiaomi">小米：</string>
+    <string name="device_vendor_huawei">華為 / 榮耀：</string>
+    <string name="device_vendor_oppo">OPPO / 一加：</string>
+    <string name="device_vendor_vivo">vivo / iQOO：</string>
+    <string name="device_hint_xiaomi">設定 → 應用設定 → 授權管理 → 自啟動</string>
+    <string name="device_hint_huawei">手機管家 → 應用啟動管理 → 允許自啟動</string>
+    <string name="device_hint_oppo">手機管家 → 權限隱私 → 自啟動管理</string>
+    <string name="device_hint_vivo">設定 → 應用 → 自啟動</string>
     <string name="device_hint_default">請在系統設定中允許自啟動及背景執行</string>
+    <string name="device_highbg_xiaomi">設定 → 省電與電池 → 後台配置中允許本應用</string>
+    <string name="device_highbg_huawei">設定 → 電池 → 啟動管理 → 允許後台活動</string>
+    <string name="device_highbg_oppo">設定 → 電池 → 耗電管理 → 允許完全後台行為</string>
+    <string name="device_highbg_vivo">設定 → 電池 → 後台耗電管理 → 允許後台高耗電</string>
+    <string name="device_highbg_default">請在「後台配置 / 高後台耗電」中允許本應用，並鎖定任務卡片</string>
+    <string name="high_bg_title">請解除後台限制</string>
+    <string name="high_bg_msg">部分客製系統的後台限制策略會中斷感測器連線，請在「後台配置 / 高後台耗電」中允許本應用，並將本應用鎖定在任務卡片，否則可能導致無法偵測步行與用機狀態。</string>
+    <string name="high_bg_action">解除後台限制</string>
 
     <string name="about_title">關於</string>
     <string name="donate_title">贊助支持</string>
@@ -179,7 +190,7 @@
     <string name="guard_pocket">疑似在口袋（取出後提醒）</string>
     <string name="guard_indoor">室內（抑制提醒）</string>
     <string name="guard_loc_confirming">位置確認中…</string>
-    <string name="guard_monitoring">正在監測行走中的手機使用行為…</string>
+    <string name="guard_monitoring">正在偵測行走中的手機使用行為…</string>
     <string name="guard_walking_format">疑似行走 · 連貫步數 %1$d/%2$d（已持續 %3$d秒）</string>
     <string name="guard_still_format">靜止 · 連貫步數 %1$d/%2$d</string>
     <string name="guard_running_title">看路提醒執行中</string>

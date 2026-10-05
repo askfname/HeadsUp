@@ -8,6 +8,8 @@
 
 A general-purpose Android "Heads Up" app with a modern Material You design. It automatically reminds you to look up from your phone while walking (including stairs).
 
+  > ⚠️ Background restriction policies on some customized ROMs can disconnect sensor connections. Please allow this app in “Background config / High background power consumption” and lock it in recent tasks, otherwise walking and phone-use detection may stop working.
+
 ## Features
 
 - **On-device gait detection**: `STEP_DETECTOR` as the primary pipeline, fused with accelerometer / gyroscope + proximity sensor, no GMS required

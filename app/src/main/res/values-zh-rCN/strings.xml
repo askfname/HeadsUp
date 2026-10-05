@@ -8,7 +8,7 @@
     <string name="home_status_on">守护中</string>
     <string name="home_status_off">已关闭</string>
     <string name="home_status_on_desc">走路时看手机会提醒你</string>
-    <string name="home_status_off_desc">开启守护监测行走状态</string>
+    <string name="home_status_off_desc">开启守护检测行走状态</string>
 
     <string name="section_reminder_method">提醒方式</string>
     <string name="mode_float_title">弹窗提醒</string>
@@ -97,12 +97,23 @@
     <string name="keepalive_title">自启与保活</string>
     <string name="autostart_settings">自启动设置</string>
     <string name="battery_whitelist">电池白名单</string>
-    <string name="battery_ignored">已忽略电池优化</string>
-    <string name="device_hint_xiaomi">小米：设置 → 应用设置 → 授权管理 → 自启动</string>
-    <string name="device_hint_huawei">华为：手机管家 → 应用启动管理 → 允许自启动</string>
-    <string name="device_hint_oppo">OPPO/一加：手机管家 → 权限隐私 → 自启动管理</string>
-    <string name="device_hint_vivo">vivo：设置 → 应用 → 自启动</string>
+    <string name="device_vendor_xiaomi">小米：</string>
+    <string name="device_vendor_huawei">华为 / 荣耀：</string>
+    <string name="device_vendor_oppo">OPPO / 一加：</string>
+    <string name="device_vendor_vivo">vivo / iQOO：</string>
+    <string name="device_hint_xiaomi">设置 → 应用设置 → 授权管理 → 自启动</string>
+    <string name="device_hint_huawei">手机管家 → 应用启动管理 → 允许自启动</string>
+    <string name="device_hint_oppo">手机管家 → 权限隐私 → 自启动管理</string>
+    <string name="device_hint_vivo">设置 → 应用 → 自启动</string>
     <string name="device_hint_default">请在系统设置中允许自启动 + 后台运行</string>
+    <string name="device_highbg_xiaomi">设置 → 省电与电池 → 后台配置中允许本应用</string>
+    <string name="device_highbg_huawei">设置 → 电池 → 启动管理 → 允许后台活动</string>
+    <string name="device_highbg_oppo">设置 → 电池 → 耗电管理 → 允许完全后台行为</string>
+    <string name="device_highbg_vivo">设置 → 电池 → 后台耗电管理 → 允许后台高耗电</string>
+    <string name="device_highbg_default">请在“后台配置 / 高后台耗电”中允许本应用，并锁定任务卡片</string>
+    <string name="high_bg_title">请解除后台限制</string>
+    <string name="high_bg_msg">部分定制系统的后台限制策略会断开传感器连接，请在“后台配置 / 高后台耗电”中允许本应用，并将本应用锁定在任务卡片，否则可能导致无法检测步行和用机状态。</string>
+    <string name="high_bg_action">解除后台限制</string>
 
     <string name="about_title">关于</string>
     <string name="donate_title">赞助支持</string>
@@ -180,7 +191,7 @@
     <string name="guard_pocket">疑似在口袋（拿出后提醒）</string>
     <string name="guard_indoor">室内（抑制提醒）</string>
     <string name="guard_loc_confirming">位置确认中…</string>
-    <string name="guard_monitoring">正在监测行走中的用机行为…</string>
+    <string name="guard_monitoring">正在检测行走中的用机行为…</string>
     <string name="guard_walking_format">疑似行走 · 连贯步数 %1$d/%2$d（已持续 %3$d秒）</string>
     <string name="guard_still_format">静止 · 连贯步数 %1$d/%2$d</string>
     <string name="guard_running_title">看路提醒运行中</string>
