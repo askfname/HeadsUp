@@ -99,6 +99,9 @@ class WalkDetector(
 
     private val handler = Handler(Looper.getMainLooper())
     private var testMode = false
+    private var testTriggerDispatched = false
+    private val testStepTasks = mutableListOf<Runnable>()
+    private var testFinishTask: Runnable? = null
     private var registered = false
 
     // 慢心跳（10s，Doze 下可被系统合并）：只做窗口裁剪和快照推送
@@ -245,19 +248,43 @@ class WalkDetector(
         return gaitOk(now)
     }
 
-    /** 模拟步行中：端到端测试走即时通路，不挂起等 GPS */
+    /** 模拟步行状态：用于界面反馈 */
     fun isSimulating() = testMode
 
-    /** 模拟步行：走真实检测通路（供设置页端到端测试），起止都推送快照供按钮置灰 */
+    /** 模拟步行：走与真实步行相同的提醒及室内判定通路 */
     fun injectTestBurst() {
         if (testMode) return
         testMode = true
+        testTriggerDispatched = false
         pushSnap()
         val n = requiredSteps + 4
         for (i in 0 until n) {
-            handler.postDelayed({ onStepEvent() }, i * 500L)
+            val task = Runnable { onStepEvent() }
+            testStepTasks += task
+            handler.postDelayed(task, i * 500L)
         }
-        handler.postDelayed({ testMode = false; pushSnap() }, n * 500L + 2_000)
+        testFinishTask = Runnable {
+            testMode = false
+            testTriggerDispatched = false
+            testStepTasks.clear()
+            testFinishTask = null
+            pushSnap()
+        }
+        handler.postDelayed(testFinishTask!!, n * 500L + 2_000)
+    }
+
+    /** 页面离开时取消尚未执行的模拟步伐 */
+    fun cancelTestBurst() {
+        testStepTasks.forEach(handler::removeCallbacks)
+        testStepTasks.clear()
+        testFinishTask?.let(handler::removeCallbacks)
+        testFinishTask = null
+        if (!testMode) return
+        testMode = false
+        testTriggerDispatched = false
+        handler.removeCallbacks(resetTask)
+        resetRun()
+        pushSnap()
     }
 
     override fun onSensorChanged(e: SensorEvent) {
@@ -443,8 +470,11 @@ class WalkDetector(
             return
         }
         // 触发线：达连贯步数即回调（不清零：抑制/挂起不消耗步数，冷却防重发，显示不断链）
-        if (runLen >= requiredSteps && (testMode || (screenOn && unlocked && !pocketed && gaitOk(at)))) {
+        if (runLen >= requiredSteps && (testMode || (screenOn && unlocked && !pocketed && gaitOk(at))) &&
+            (!testMode || !testTriggerDispatched)
+        ) {
             // 不清空 runLen/stepTimes：连续行走保持显示，停走由 resetTask 清零
+            if (testMode) testTriggerDispatched = true
             onTrigger()
         }
         // 每次步伐后重约定点：超时无后续即判停走（单次延迟任务，开销可忽略）

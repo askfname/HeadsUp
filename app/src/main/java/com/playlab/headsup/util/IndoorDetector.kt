@@ -16,9 +16,8 @@ import com.playlab.headsup.data.Prefs
 import java.util.concurrent.Executor
 
 /**
- * GPS 室内判断：只判室内
- *
- * 达室内阈值即室内，其余按室外放行
+ * GPS 室内判断：
+ * 仅在证据明确时确认室内或室外，边界信号保持未知
  */
 object IndoorDetector {
 
@@ -34,25 +33,24 @@ object IndoorDetector {
     // GPS 精度确认次数（单次可能是室内漂移虚 fix）
     private const val GPS_GOOD_NEED = 2
 
-    // 室内进入：总数 >= 8 用强星+占比双判；总数 < 8 只看强星+定位星（小样本占比无意义）
+    // 大样本使用强星比例为主、按卫星规模归一化后的强星数为辅
     private const val VIS_INDOOR = 7
     private const val VIS_RATIO_INDOOR = 0.4f
     private const val BIG_TOTAL = 8
+    private const val STRONG_COUNT_REFERENCE_SATS = 24
 
-    // 室内退出滞后：明显室外才退出，封顶防自定义过大锁死室内
+    // 室外确认滞后：必须同时具备足够的强星数量和比例
     private const val EXIT_VIS_MARGIN = 3
-    private const val EXIT_VIS_MAX = 12
     private const val EXIT_RATIO_MARGIN = 0.2f
     private const val EXIT_RATIO_MAX = 0.9f
 
     // 连续满足/不满足确认数后切换
     private const val CONFIRM_SAMPLES = 2
 
-    // 冷启动预热：本轮定位初期不确认室内（首批稀疏回调像深室内）
-    private const val WARMUP_MS = 5_000L
-
-    // 卫星判室外最少回调数：中位数稳定即放行（预热5s仍兜底）
-    private const val MIN_SAMPLES_OUTDOOR = 5
+    // 独立 GNSS 样本：回调密集时只采一份，避免重复状态快速形成结论
+    private const val GNSS_SAMPLE_MIN_INTERVAL_MS = 1_000L
+    private const val GNSS_SAMPLE_WINDOW_MS = 8_000L
+    private const val MIN_GNSS_SAMPLE_SPAN_MS = 2_000L
 
     // 无行走后延迟关闭：短暂停走不断流，复走结论仍新鲜
     private const val LINGER_MS = 10_000L
@@ -74,6 +72,9 @@ object IndoorDetector {
     @Volatile
     var indoor = false
         private set
+
+    @Volatile
+    private var outdoor = false
 
     @Volatile
     var satInfo = ""
@@ -102,25 +103,21 @@ object IndoorDetector {
     var customParams: Prefs.IndoorParams? = null
         private set
 
-    // 应用自定义（相同则跳过，避免清零累计）
+    // 应用自定义，CN0 改变后旧窗口无法重算，必须重新收集样本
     @Synchronized
     fun applyCustom(p: Prefs.IndoorParams?) {
         if (customParams == p) return
         customParams = p
-        indoorConfirmCount = 0
-        outdoorConfirmCount = 0
-        gpsStreak = 0
-        // 立即按新参数重判，不等下一次回调
-        refresh()
+        indoor = false
+        outdoor = false
+        cachedAt = 0L
+        lastGpsFixAt = 0L
+        lastGpsAcc = Float.MAX_VALUE
+        resetGnssState()
     }
 
-    // 本轮定位起始时间（预热判断用）
-    @Volatile
-    private var activeSince = 0L
-
-    // 本轮定位收到的 GNSS 回调数（结论是否充分的依据）
-    @Volatile
-    private var satSamples = 0
+    // 最近独立 GNSS 样本的时间，必须填满滑窗且覆盖足够时间才允许判决
+    private val sampleTimes = ArrayDeque<Long>()
 
     // 位置结论三态：挂起提醒用
     enum class Verdict { INDOOR, OUTDOOR, UNKNOWN }
@@ -133,10 +130,11 @@ object IndoorDetector {
     @Volatile
     private var cachedAt = 0L
 
-    // 强星/总数/定位星滑动窗口：中位数抗单次波动
+    // 强星、有效 CN0 星、报告总星和定位星滑动窗口：中位数抗单次波动
     private const val SAT_WIN = 3
     private val visWin = ArrayDeque<Int>()
-    private val satWin = ArrayDeque<Int>()
+    private val validWin = ArrayDeque<Int>()
+    private val reportedWin = ArrayDeque<Int>()
     private val fixWin = ArrayDeque<Int>()
 
     // 连续室内候选次数
@@ -462,6 +460,7 @@ object IndoorDetector {
         lastGpsAcc = Float.MAX_VALUE
 
         indoor = false
+        outdoor = false
         cachedAt = 0L
 
         indoorConfirmCount = 0
@@ -584,10 +583,6 @@ object IndoorDetector {
         activeOn =
             gpsUpdatesOn || gnssOn
 
-        // 记录本轮定位起点（预热用，已在定位中则保持原值）
-        if (activeOn && activeSince == 0L) {
-            activeSince = SystemClock.elapsedRealtime()
-        }
     }
 
 
@@ -595,6 +590,7 @@ object IndoorDetector {
     // Legacy GNSS Registration
     // ============================================================
 
+    @SuppressLint("MissingPermission")
     @Suppress("DEPRECATION")
     @Synchronized
     private fun registerGnssLegacy() {
@@ -618,10 +614,6 @@ object IndoorDetector {
 
             activeOn =
                 gpsUpdatesOn || gnssOn
-
-            if (activeOn && activeSince == 0L) {
-                activeSince = SystemClock.elapsedRealtime()
-            }
 
             if (!registered) {
 
@@ -687,14 +679,13 @@ object IndoorDetector {
 
         activeOn = false
 
-        activeSince = 0L
-
-        satSamples = 0
+        sampleTimes.clear()
 
         gpsStreak = 0
 
         visWin.clear()
-        satWin.clear()
+        validWin.clear()
+        reportedWin.clear()
         fixWin.clear()
     }
 
@@ -713,9 +704,8 @@ object IndoorDetector {
                 synchronized(this@IndoorDetector) {
                     var fix = 0
                     var vis = 0
-
-                    val total =
-                        status.satelliteCount
+                    var valid = 0
+                    val total = status.satelliteCount
 
                     // 强星门限自定义（无自定义用默认）；定位星固定18
                     val visCn0 = customParams?.visCn0 ?: VIS_CN0
@@ -729,6 +719,7 @@ object IndoorDetector {
                         if (cn0.isNaN() || cn0 < 0f) {
                             continue
                         }
+                        valid++
 
                         // 辅助统计： usedInFix + CN0 >= 18
                         if (
@@ -744,19 +735,30 @@ object IndoorDetector {
                         }
                     }
 
+                    val now = SystemClock.elapsedRealtime()
+                    lastGnssAt = now
+
+                    // 将高频重复回调合并为独立时间样本
+                    if (sampleTimes.isNotEmpty() &&
+                        now - sampleTimes.last() < GNSS_SAMPLE_MIN_INTERVAL_MS
+                    ) {
+                        return
+                    }
+
                     // 滑动窗口
                     pushWin(visWin, vis)
-                    pushWin(satWin, total)
+                    pushWin(validWin, valid)
+                    pushWin(reportedWin, total)
                     pushWin(fixWin, fix)
+                    sampleTimes.addLast(now)
+                    trimSampleTimes(now)
+                    while (sampleTimes.size > SAT_WIN) {
+                        sampleTimes.removeFirst()
+                    }
 
-                    // 显示：定位星/强星/总数（均为滑动中位数，与判决一致）
+                    // 显示使用报告总星；判定比例使用仅含有效 CN0 的 validWin
                     satInfo =
-                        "${median(fixWin)}/${median(visWin)}/${median(satWin)}"
-
-                    lastGnssAt =
-                        SystemClock.elapsedRealtime()
-
-                    satSamples++
+                        "${median(fixWin)}/${median(visWin)}/${median(reportedWin)}"
 
                     refresh()
                 }
@@ -766,18 +768,13 @@ object IndoorDetector {
 
     /**
      * true：确认室内，抑制提醒
-     * false：室外或未知，允许提醒
+     * false：室外或未知
      */
     @Synchronized
     fun isIndoorNow(): Boolean {
 
         val now =
             SystemClock.elapsedRealtime()
-
-        // 高精度 GPS 直接按室外
-        if (gpsGoodNow(now)) {
-            return false
-        }
 
         sweepExpired(now)
 
@@ -787,7 +784,7 @@ object IndoorDetector {
 
 
     /**
-     * 三态结论：室内明确抑制；室外发提醒；未知挂起等 GPS（超时由调用方按室外放行）
+     * 三态结论：室内明确抑制；室外发提醒；未知继续等待采样
      */
     @Synchronized
     fun verdict(): Verdict {
@@ -795,38 +792,18 @@ object IndoorDetector {
         val now =
             SystemClock.elapsedRealtime()
 
-        // 高精度定位直接室外（连续好定位，可信）
-        if (gpsGoodNow(now)) {
-            return Verdict.OUTDOOR
-        }
-
         sweepExpired(now)
 
         if (indoor) {
             return Verdict.INDOOR
         }
-
-        val fresh =
-            lastGnssAt > 0L &&
-                now - lastGnssAt < GNSS_VALID_MS
-
-        if (!fresh) {
+        if (!hasStableGnssSamples(now)) {
             return Verdict.UNKNOWN
         }
-
-        // 预热或样本不足：无法排除冷启动爬坡，不判室外
-        val warming =
-            activeSince > 0L &&
-                now - activeSince < WARMUP_MS
-
-        if (warming || satSamples < MIN_SAMPLES_OUTDOOR) {
-            return Verdict.UNKNOWN
-        }
-
-        return Verdict.OUTDOOR
+        return if (outdoor || gpsGoodNow(now)) Verdict.OUTDOOR else Verdict.UNKNOWN
     }
 
-    // 懒过期：无新鲜 GNSS 且室内缓存过期时清结论（读路径统一调用）
+    // 无新鲜 GNSS 且室内缓存过期时清结论
     @Synchronized
     private fun sweepExpired(now: Long) {
         if (indoor &&
@@ -865,18 +842,18 @@ object IndoorDetector {
         if (lastGnssAt <= 0L || now - lastGnssAt >= GNSS_VALID_MS) {
             return false
         }
-        if (satWin.isEmpty()) {
+        if (!hasStableGnssSamples(now)) {
             return false
         }
         val p = customParams
         val visIn = p?.visIndoor ?: VIS_INDOOR
         val ratioIn = p?.ratioIndoor ?: VIS_RATIO_INDOOR
-        val total = median(satWin)
+        val total = median(validWin)
         val vis = median(visWin)
         val fix = median(fixWin)
         val ratio = if (total > 0) vis.toFloat() / total.toFloat() else 0f
         return if (total >= BIG_TOTAL) {
-            vis <= visIn && ratio <= ratioIn
+            vis <= indoorStrongLimit(total, visIn) && ratio <= ratioIn
         } else {
             vis <= visIn && fix <= 2
         }
@@ -971,7 +948,7 @@ object IndoorDetector {
     }
 
 
-    // 更新室内状态：只判室内，其余按室外
+    // 更新室内外状态：边界带保持未知，避免将信号冲突误当作室外
     @Synchronized
     private fun refresh() {
 
@@ -982,36 +959,23 @@ object IndoorDetector {
         val visIn = p?.visIndoor ?: VIS_INDOOR
         val ratioIn = p?.ratioIndoor ?: VIS_RATIO_INDOOR
 
+        // 必须有满三项、跨足够时间的独立样本，避免冷启动和高频重复回调误判
+        if (!hasStableGnssSamples(now)) {
+            return
+        }
+
         // GPS 连续高精度才按室外（单次漂移不断 verdict，交给卫星逻辑）
         if (gpsGoodNow(now)) {
-
             indoor = false
-
+            outdoor = true
             cachedAt = 0L
-
             indoorConfirmCount = 0
             outdoorConfirmCount = 0
-
-            return
-        }
-
-        // 无新鲜 GNSS 不改状态，isIndoorNow() 处理缓存过期
-        val gnssFresh =
-            lastGnssAt > 0L &&
-                now - lastGnssAt < GNSS_VALID_MS
-
-        if (!gnssFresh) {
-            return
-        }
-
-        // 窗口为空即无样本，不判决
-        if (satWin.isEmpty()) {
             return
         }
 
         // 中位数判决，抗单次波动
-        val total =
-            median(satWin)
+        val total = median(validWin)
 
         val vis =
             median(visWin)
@@ -1023,39 +987,31 @@ object IndoorDetector {
             if (total > 0) vis.toFloat() / total.toFloat()
             else 0f
 
-        // 预热期：首批回调稀疏似深室内，只出不进
-        val warming =
-            activeSince > 0L &&
-                now - activeSince < WARMUP_MS
-
-        // 进入：大样本双判，小样本只看数量+定位星
+        // 进入：大样本以比例为主，并按有效卫星规模放宽绝对强星数
         val indoorEvidence =
             if (total >= BIG_TOTAL) {
-                vis <= visIn &&
+                vis <= indoorStrongLimit(total, visIn) &&
                     ratio <= ratioIn
             } else {
                 vis <= visIn &&
                     fix <= 2
             }
 
-        // 退出滞后：明显室外才退出（封顶保证可达）
+        // 明确室外必须同时满足数量与比例，避免高总星数环境被单一数量压倒
         val outdoorEvidence =
-            vis >= minOf(visIn + EXIT_VIS_MARGIN, EXIT_VIS_MAX) ||
-                (
-                    total >= BIG_TOTAL &&
-                        ratio >= minOf(ratioIn + EXIT_RATIO_MARGIN, EXIT_RATIO_MAX)
-                )
+            if (total >= BIG_TOTAL) {
+                vis >= outdoorStrongLimit(total, visIn) &&
+                    ratio >= minOf(ratioIn + EXIT_RATIO_MARGIN, EXIT_RATIO_MAX)
+            } else {
+                vis >= visIn + EXIT_VIS_MARGIN && fix >= 3
+            }
 
         if (indoorEvidence) {
 
             outdoorConfirmCount = 0
+            outdoor = false
 
-            if (warming) {
-
-                // 预热期不确认室内
-                indoorConfirmCount = 0
-
-            } else if (indoor) {
+            if (indoor) {
 
                 // 已室内则刷新缓存
                 cachedAt = now
@@ -1107,6 +1063,7 @@ object IndoorDetector {
                 }
 
                 indoor = false
+                outdoor = true
 
                 cachedAt = 0L
 
@@ -1115,7 +1072,8 @@ object IndoorDetector {
 
         } else {
 
-            // 中间带：两边计数清零，保持现状（抗抖）
+            // 中间带：没有明确室内或室外证据时保持未知
+            if (!indoor) outdoor = false
             indoorConfirmCount = 0
             outdoorConfirmCount = 0
         }
@@ -1146,6 +1104,34 @@ object IndoorDetector {
         ]
     }
 
+    private fun indoorStrongLimit(valid: Int, visIn: Int): Int {
+        return maxOf(visIn, kotlin.math.ceil(valid * visIn / STRONG_COUNT_REFERENCE_SATS.toFloat()).toInt())
+    }
+
+    private fun outdoorStrongLimit(valid: Int, visIn: Int): Int {
+        return indoorStrongLimit(valid, visIn) + EXIT_VIS_MARGIN
+    }
+
+    @Synchronized
+    private fun trimSampleTimes(now: Long) {
+        val cut = now - GNSS_SAMPLE_WINDOW_MS
+        while (sampleTimes.isNotEmpty() && sampleTimes.first() < cut) {
+            sampleTimes.removeFirst()
+        }
+    }
+
+    @Synchronized
+    private fun hasStableGnssSamples(now: Long): Boolean {
+        trimSampleTimes(now)
+        return lastGnssAt > 0L &&
+            now - lastGnssAt < GNSS_VALID_MS &&
+            visWin.size == SAT_WIN &&
+            validWin.size == SAT_WIN &&
+            fixWin.size == SAT_WIN &&
+            sampleTimes.size == SAT_WIN &&
+            sampleTimes.last() - sampleTimes.first() >= MIN_GNSS_SAMPLE_SPAN_MS
+    }
+
 
     // ============================================================
     // Reset
@@ -1155,14 +1141,14 @@ object IndoorDetector {
     private fun resetGnssState() {
 
         visWin.clear()
-        satWin.clear()
+        validWin.clear()
+        reportedWin.clear()
         fixWin.clear()
 
         lastGnssAt = 0L
 
         satInfo = ""
-
-        satSamples = 0
+        sampleTimes.clear()
 
         gpsStreak = 0
 

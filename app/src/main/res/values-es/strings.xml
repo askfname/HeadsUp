@@ -161,10 +161,10 @@
     <string name="tune_gps_acc">Precisión GPS (m)</string>
     <string name="tune_vis_cn0">CN0 de satélites fuertes (dB-Hz)</string>
     <string name="tune_default_format">Predeterminado %1$s (%2$s)</string>
-    <string name="tune_range_int">0–30</string>
-    <string name="tune_range_ratio">0–1</string>
-    <string name="tune_range_acc">5–50</string>
-    <string name="tune_range_cn0">10–40</string>
+    <string name="tune_range_int">3–10</string>
+    <string name="tune_range_ratio">0.2–0.6</string>
+    <string name="tune_range_acc">5–20</string>
+    <string name="tune_range_cn0">20–32</string>
     <string name="tune_hint">Un umbral CN0 más alto aumenta la sensibilidad del silenciamiento en interiores; también un mayor número o proporción de satélites fuertes; y una menor precisión GPS.</string>
     <string name="tune_error">Parámetros fuera de rango o no válidos; no se guardaron los cambios</string>
     <string name="tune_save">Guardar</string>

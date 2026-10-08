@@ -70,6 +70,7 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onPause() {
+        if (Prefs.isEnabled(this)) HeadsUpService.cancelSimulation(this)
         IndoorDetector.setUiOpen(false) // 离开主页：GPS 取消追踪
         super.onPause()
     }
@@ -120,14 +121,6 @@ private fun HomeScreen(resumeSeq: Int) {
             missing.forEach { Prefs.markAsked(ctx, it) }
             doLaunch()
         }
-    }
-
-    // 后台位置还能否弹出系统授权（API29 并申后判断用）
-    fun bgRationale(): Boolean {
-        val act = ctx as? Activity ?: return true
-        return ActivityCompat.shouldShowRequestPermissionRationale(
-            act, Manifest.permission.ACCESS_BACKGROUND_LOCATION
-        )
     }
 
     // 开关落盘与服务启停
@@ -214,11 +207,6 @@ private fun HomeScreen(resumeSeq: Int) {
             } else if (!PermissionHelper.hasForegroundLocation(ctx)) {
                 indoorMute = false; Prefs.setIndoorMute(ctx, false)
                 showLocDialog = true
-            } else if (Build.VERSION.SDK_INT == 29 && !bgRationale()) {
-                // 允许一次并申，系统不给后台入口即视为给足
-                Prefs.setLocationCompat(ctx, true)
-                indoorMute = true; Prefs.setIndoorMute(ctx, true); pendingIndoor = false
-                if (Prefs.isEnabled(ctx)) HeadsUpService.start(ctx)
             } else {
                 indoorMute = false; Prefs.setIndoorMute(ctx, false)
                 showLocDialog = true
@@ -573,9 +561,8 @@ private fun HomeScreen(resumeSeq: Int) {
                     }
                     PermRow(
                         stringResource(R.string.perm_location_title),
-                        if (PermissionHelper.requiresAlwaysLocation(ctx) &&
-                            !Prefs.isLocationCompat(ctx)
-                        ) stringResource(R.string.perm_location_desc_always) else stringResource(R.string.perm_location_desc_fg),
+                        if (PermissionHelper.requiresAlwaysLocation(ctx)) stringResource(R.string.perm_location_desc_always)
+                        else stringResource(R.string.perm_location_desc_fg),
                         PermissionHelper.isLocationEnough(ctx)
                     ) {
                         requestLocation()
@@ -780,16 +767,16 @@ private fun IndoorHelpDialog(
     // 空=默认，超范围报错；成功后自动关闭
     fun save() {
         val visIn = fVisIn.trim().let {
-            if (it.isEmpty()) null else it.toIntOrNull()?.takeIf { v -> v in 0..30 }
+            if (it.isEmpty()) null else it.toIntOrNull()?.takeIf { v -> v in 3..10 }
         }
         val ratioIn = fRatioIn.trim().let {
-            if (it.isEmpty()) null else it.toFloatOrNull()?.takeIf { v -> v in 0f..1f }
+            if (it.isEmpty()) null else it.toFloatOrNull()?.takeIf { v -> v.isFinite() && v in 0.2f..0.6f }
         }
         val gpsAcc = fGpsAcc.trim().let {
-            if (it.isEmpty()) null else it.toFloatOrNull()?.takeIf { v -> v in 5f..50f }
+            if (it.isEmpty()) null else it.toFloatOrNull()?.takeIf { v -> v.isFinite() && v in 5f..20f }
         }
         val visCn0 = fVisCn0.trim().let {
-            if (it.isEmpty()) null else it.toFloatOrNull()?.takeIf { v -> v in 10f..40f }
+            if (it.isEmpty()) null else it.toFloatOrNull()?.takeIf { v -> v.isFinite() && v in 20f..32f }
         }
         // 非空但非法即报错
         if ((fVisIn.trim().isNotEmpty() && visIn == null) ||
@@ -994,21 +981,21 @@ private fun DetectStatusCard(enabled: Boolean) {
             StateRow(stringResource(R.string.sensitivity_title), sensDesc)
             // 室内态跟随位置权限
             val locEnough = PermissionHelper.isLocationEnough(ctx)
-            val needAlways = PermissionHelper.requiresAlwaysLocation(ctx) &&
-                !Prefs.isLocationCompat(ctx)
+            val needAlways = PermissionHelper.requiresAlwaysLocation(ctx)
             // 直读检测器实时值（快照只在步伐/10s心跳刷新，会滞后）；信号中断不显示旧值
             val tracking = locEnough && IndoorDetector.isLocationOn(ctx)
             val liveSats = IndoorDetector.satInfo
             val satsFresh = tracking && IndoorDetector.isGnssFresh()
-            val liveIndoor = if (tracking) IndoorDetector.isIndoorNow() else snap.indoor
+            val liveVerdict = if (tracking) IndoorDetector.verdict() else null
             StateRow(
                 stringResource(R.string.state_indoor),
                 if (!locEnough && needAlways) stringResource(R.string.indoor_unknown_always)
                 else if (!locEnough) stringResource(R.string.indoor_unknown_need_perm)
                 else if (!Prefs.isIndoorMute(ctx)) stringResource(R.string.indoor_unknown_disabled)
                 else if (!IndoorDetector.isLocationOn(ctx)) stringResource(R.string.indoor_unknown_loc_off)
-                else if (snap.indoorPending) stringResource(R.string.indoor_confirming)
-                else if (liveIndoor) stringResource(R.string.indoor_yes) else stringResource(R.string.indoor_no),
+                else if (snap.indoorPending || liveVerdict == IndoorDetector.Verdict.UNKNOWN) stringResource(R.string.indoor_confirming)
+                else if (liveVerdict == IndoorDetector.Verdict.INDOOR || (!tracking && snap.indoor)) stringResource(R.string.indoor_yes)
+                else stringResource(R.string.indoor_no),
             )
             StateRow(
                 stringResource(R.string.state_satellite),

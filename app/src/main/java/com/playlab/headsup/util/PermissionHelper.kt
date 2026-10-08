@@ -7,7 +7,6 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.provider.Settings
 import androidx.core.content.ContextCompat
-import com.playlab.headsup.data.Prefs
 
 /** 权限状态查询：身体活动 / 通知 / 位置 / 悬浮窗 */
 object PermissionHelper {
@@ -57,10 +56,8 @@ object PermissionHelper {
         if (!requiresAlwaysLocation(ctx)) hasForegroundLocation(ctx)
         else hasForegroundLocation(ctx) && hasBackgroundLocation(ctx)
 
-    /** 实际生效门：始终允许，或兼容模式（系统无后台入口）下前台已授 */
-    fun isLocationEnough(ctx: Context) =
-        hasAlwaysLocation(ctx) ||
-            (Prefs.isLocationCompat(ctx) && hasForegroundLocation(ctx))
+    /** 室内判断会在服务中访问位置，必须具有当前系统要求的授权 */
+    fun isLocationEnough(ctx: Context) = hasAlwaysLocation(ctx)
 
     fun hasOverlay(ctx: Context) = Settings.canDrawOverlays(ctx)
 

@@ -161,10 +161,10 @@
     <string name="tune_gps_acc">Точность GPS (м)</string>
     <string name="tune_vis_cn0">CN0 сильных спутников (дБ-Гц)</string>
     <string name="tune_default_format">По умолчанию %1$s (%2$s)</string>
-    <string name="tune_range_int">0–30</string>
-    <string name="tune_range_ratio">0–1</string>
-    <string name="tune_range_acc">5–50</string>
-    <string name="tune_range_cn0">10–40</string>
+    <string name="tune_range_int">3–10</string>
+    <string name="tune_range_ratio">0.2–0.6</string>
+    <string name="tune_range_acc">5–20</string>
+    <string name="tune_range_cn0">20–32</string>
     <string name="tune_hint">Чем выше порог CN0 сильных спутников, тем чувствительнее отключение в помещении; так же влияют большее число и доля сильных спутников и меньшая точность GPS.</string>
     <string name="tune_error">Параметры вне диапазона или неверны; изменения не сохранены</string>
     <string name="tune_save">Сохранить</string>

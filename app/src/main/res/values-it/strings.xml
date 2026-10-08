@@ -161,10 +161,10 @@
     <string name="tune_gps_acc">Precisione GPS (m)</string>
     <string name="tune_vis_cn0">CN0 satelliti forti (dB-Hz)</string>
     <string name="tune_default_format">Predefinito %1$s (%2$s)</string>
-    <string name="tune_range_int">0–30</string>
-    <string name="tune_range_ratio">0–1</string>
-    <string name="tune_range_acc">5–50</string>
-    <string name="tune_range_cn0">10–40</string>
+    <string name="tune_range_int">3–10</string>
+    <string name="tune_range_ratio">0.2–0.6</string>
+    <string name="tune_range_acc">5–20</string>
+    <string name="tune_range_cn0">20–32</string>
     <string name="tune_hint">Una soglia CN0 più alta rende il silenzio al chiuso più sensibile; così come un numero o una quota maggiori di satelliti forti; e una minore precisione GPS.</string>
     <string name="tune_error">Parametri fuori intervallo o non validi; modifiche non salvate</string>
     <string name="tune_save">Salva</string>

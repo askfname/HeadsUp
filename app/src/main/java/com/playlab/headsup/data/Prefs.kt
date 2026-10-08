@@ -63,12 +63,14 @@ object Prefs {
         val s = sp(ctx)
         val d = IndoorParams()
         return IndoorParams(
-            visIndoor = if (s.contains(K_IN_VIS_IN)) s.getInt(K_IN_VIS_IN, d.visIndoor) else d.visIndoor,
-            ratioIndoor = if (s.contains(K_IN_RATIO_IN)) s.getFloat(K_IN_RATIO_IN, d.ratioIndoor) else d.ratioIndoor,
-            gpsAcc = if (s.contains(K_IN_GPS_ACC)) s.getFloat(K_IN_GPS_ACC, d.gpsAcc) else d.gpsAcc,
-            visCn0 = if (s.contains(K_IN_VIS_CN0)) s.getFloat(K_IN_VIS_CN0, d.visCn0) else d.visCn0,
+            visIndoor = if (s.contains(K_IN_VIS_IN)) s.getInt(K_IN_VIS_IN, d.visIndoor).coerceIn(3, 10) else d.visIndoor,
+            ratioIndoor = if (s.contains(K_IN_RATIO_IN)) s.getFloat(K_IN_RATIO_IN, d.ratioIndoor).finiteOrDefault(d.ratioIndoor).coerceIn(0.2f, 0.6f) else d.ratioIndoor,
+            gpsAcc = if (s.contains(K_IN_GPS_ACC)) s.getFloat(K_IN_GPS_ACC, d.gpsAcc).finiteOrDefault(d.gpsAcc).coerceIn(5f, 20f) else d.gpsAcc,
+            visCn0 = if (s.contains(K_IN_VIS_CN0)) s.getFloat(K_IN_VIS_CN0, d.visCn0).finiteOrDefault(d.visCn0).coerceIn(20f, 32f) else d.visCn0,
         )
     }
+
+    private fun Float.finiteOrDefault(default: Float) = if (isFinite()) this else default
 
     // 无任何自定义时返回 null（调用方用默认）
     fun getIndoorCustomOrNull(ctx: Context): IndoorParams? =
@@ -87,10 +89,10 @@ object Prefs {
         visCn0: Float? = null,
     ) {
         val e = sp(ctx).edit()
-        if (visIndoor == null) e.remove(K_IN_VIS_IN) else e.putInt(K_IN_VIS_IN, visIndoor)
-        if (ratioIndoor == null) e.remove(K_IN_RATIO_IN) else e.putFloat(K_IN_RATIO_IN, ratioIndoor)
-        if (gpsAcc == null) e.remove(K_IN_GPS_ACC) else e.putFloat(K_IN_GPS_ACC, gpsAcc)
-        if (visCn0 == null) e.remove(K_IN_VIS_CN0) else e.putFloat(K_IN_VIS_CN0, visCn0)
+        if (visIndoor == null) e.remove(K_IN_VIS_IN) else e.putInt(K_IN_VIS_IN, visIndoor.coerceIn(3, 10))
+        if (ratioIndoor == null) e.remove(K_IN_RATIO_IN) else e.putFloat(K_IN_RATIO_IN, ratioIndoor.finiteOrDefault(IndoorParams().ratioIndoor).coerceIn(0.2f, 0.6f))
+        if (gpsAcc == null) e.remove(K_IN_GPS_ACC) else e.putFloat(K_IN_GPS_ACC, gpsAcc.finiteOrDefault(IndoorParams().gpsAcc).coerceIn(5f, 20f))
+        if (visCn0 == null) e.remove(K_IN_VIS_CN0) else e.putFloat(K_IN_VIS_CN0, visCn0.finiteOrDefault(IndoorParams().visCn0).coerceIn(20f, 32f))
         e.remove(K_IN_VIS_OUT_OLD).remove(K_IN_FIX_OUT_OLD)
             .remove(K_IN_RATIO_OUT_OLD).remove(K_IN_CONFIRM_OLD)
             .remove(K_IN_FIX_CN0_OLD)
@@ -106,11 +108,6 @@ object Prefs {
             .remove(K_IN_FIX_CN0_OLD)
             .apply()
     }
-
-    /** 位置兼容模式：系统不提供始终允许入口时前台即够用（API29 并申确认后置位） */
-    fun isLocationCompat(ctx: Context) = sp(ctx).getBoolean("location_compat", false)
-    fun setLocationCompat(ctx: Context, v: Boolean) =
-        sp(ctx).edit().putBoolean("location_compat", v).apply()
 
     /** 申请过的权限：系统不再弹窗（不再询问）时直接引导去设置 */
     fun wasAsked(ctx: Context, perm: String) =

@@ -73,12 +73,16 @@ object ReminderManager {
     fun randomTitle(): String = "HeadsUp"
 
     /** 统一入口：按用户选择的模式提醒，返回是否真正发出（冷却/灭屏/锁屏会被拦截） */
-    fun fire(ctx: Context, checkIndoor: Boolean = true): Boolean {
-        if (!Prefs.canTrigger(ctx)) return false
+    fun fire(
+        ctx: Context,
+        checkIndoor: Boolean = true,
+        skipCooldown: Boolean = false,
+    ): Boolean {
+        if (!skipCooldown && !Prefs.canTrigger(ctx)) return false
         if (!isUsable(ctx)) return false // 灭屏/锁屏兜底：延迟回调到此时已无意义
         // 室内抑制：开关开且 GPS 判室内才拦截，开关关则不用 GPS
         if (checkIndoor && Prefs.isIndoorMute(ctx) && IndoorDetector.isIndoorNow()) return false
-        Prefs.markTriggered(ctx)
+        if (!skipCooldown) Prefs.markTriggered(ctx)
         ensureChannels(ctx)
         vibrate(ctx)
         when (Prefs.getMode(ctx)) {
@@ -99,8 +103,7 @@ object ReminderManager {
 
     /** 供设置页测试：跳过冷却与室内判断，直接提醒 */
     fun test(ctx: Context) {
-        Prefs.resetCooldown(ctx)
-        fire(ctx, checkIndoor = false)
+        fire(ctx, checkIndoor = false, skipCooldown = true)
     }
 
     // ---- 方式1：浮动通知（heads-up 横幅） ----
