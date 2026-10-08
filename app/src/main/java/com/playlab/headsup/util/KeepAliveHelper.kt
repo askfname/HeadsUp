@@ -8,14 +8,9 @@ import android.net.Uri
 import android.os.Build
 import android.os.PowerManager
 import android.provider.Settings
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
 import com.playlab.headsup.R
-import com.playlab.headsup.worker.KeepAliveWorker
-import java.util.concurrent.TimeUnit
 
-/** 保活：电池白名单 / 厂商自启 / WorkManager */
+/** 后台限制设置引导。系统和厂商策略不能由应用自行绕过 */
 object KeepAliveHelper {
     fun ignoringBattery(ctx: Context): Boolean {
         val pm = ctx.getSystemService(PowerManager::class.java) ?: return true
@@ -137,14 +132,6 @@ object KeepAliveHelper {
             )
             else -> emptyList()
         }
-    }
-
-    /** 每 60 分钟检查服务是否存活（FGS+START_STICKY 是主力，此为低频兜底） */
-    fun scheduleKeepAlive(ctx: Context) {
-        val req = PeriodicWorkRequestBuilder<KeepAliveWorker>(60, TimeUnit.MINUTES).build()
-        WorkManager.getInstance(ctx).enqueueUniquePeriodicWork(
-            "headsup_keepalive", ExistingPeriodicWorkPolicy.UPDATE, req
-        )
     }
 
     fun openAppSettings(ctx: Context) {

@@ -1,21 +1,20 @@
 package com.playlab.headsup.service
 
-import android.app.AlarmManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.PackageManager
+import android.content.pm.ServiceInfo
 import android.hardware.SensorManager
 import android.location.LocationManager
-import android.os.Build
 import android.os.IBinder
 import android.os.PowerManager
 import android.os.SystemClock
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.core.app.ServiceCompat
 import android.app.KeyguardManager
 import com.google.android.gms.location.ActivityRecognition
 import com.google.android.gms.location.ActivityTransition
@@ -29,13 +28,11 @@ import com.playlab.headsup.detection.DetectState
 import com.playlab.headsup.detection.WalkDetector
 import com.playlab.headsup.reminder.ReminderManager
 import com.playlab.headsup.util.IndoorDetector
-import com.playlab.headsup.util.KeepAliveHelper
 import com.playlab.headsup.util.PermissionHelper
 
 /**
  * 步行检测前台服务：
- * 主链路 = 本机 STEP_DETECTOR 检测（不依赖 GMS）
- * GMS ActivityRecognition 降级为提示通道（须经活体确认才提醒）
+ * 本机 STEP_DETECTOR 为主链路；GMS Activity Recognition 仅作加速提示
  */
 class HeadsUpService : Service() {
 
@@ -166,7 +163,7 @@ class HeadsUpService : Service() {
         else if (s.indoorPending && Prefs.isIndoorMute(this)) notifyGuard(getString(R.string.guard_loc_confirming))
         else refreshGuard(s.walking, s.runLen, s.runNeed, s.walkElapsedSec)
     }
-    /** 灵敏度变化才应用：GMS 回调每次都走 start，直接重置会把刚攒的步数清掉 */
+    /** 灵敏度变化才应用，避免重复启动时清空已累计的步数 */
     private fun applySensIfChanged() {
         val p = Prefs.gaitParams(this)
         val sig = "${p.steps}-${p.minIv}-${p.maxIv}-${p.absMs}-${p.ratio}-${p.gyro}-${p.accMin}-${p.accMax}-${p.cand}-${p.maxMiss}-${p.idleMs}"
@@ -238,10 +235,8 @@ class HeadsUpService : Service() {
                 addAction(LocationManager.PROVIDERS_CHANGED_ACTION)
             },
         )
+        subscribeGms()
     }
-
-    private var needsSubscribe = true // 进程新建后首次需要订阅
-    private var gmsSubscribedAt = 0L
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         // 灵敏度切换后重进即生效（仅变化时重置，避免 GMS 回调把累计清掉）
@@ -261,32 +256,44 @@ class HeadsUpService : Service() {
                 pendingSimulation = false
                 IndoorDetector.noteIdle()
             }
-            // GMS 只是提示：同样走统一触发入口（活体+位置结论都在内部复核）
-            ACTION_GMS_HINT -> {
-                if (::detector.isInitialized && detector.isWalkingNow()) handleWalkTrigger()
-            }
-            ACTION_RESUBSCRIBE -> needsSubscribe = true
             // 授权后重注册传感器：无身体活动权限时注册的监听收不到事件，必须重新注册
             ACTION_REREGISTER -> {
                 refreshUseState()
                 sensorMgr?.let { detector.reregister(it, detector.isUsable()) }
             }
+            ACTION_GMS_HINT -> {
+                if (::detector.isInitialized && detector.isWalkingNow()) handleWalkTrigger()
+            }
+            ACTION_RESUBSCRIBE -> subscribeGms()
         }
-        startForegroundGuard()
-        // 节流订阅（避免重订阅自激循环）
-        val now = SystemClock.elapsedRealtime()
-        if (needsSubscribe || now - gmsSubscribedAt > 30 * 60 * 1000L) {
-            needsSubscribe = false
-            gmsSubscribedAt = now
-            subscribeGms()
-        }
-        KeepAliveHelper.scheduleKeepAlive(this)
-        return START_STICKY
+        return if (startForegroundGuard()) START_STICKY else START_NOT_STICKY
     }
 
     /** 常驻通知：附带实时检测状态 */
-    private fun startForegroundGuard() {
-        startForeground(ReminderManager.GUARD_ID, buildGuard(getString(R.string.guard_monitoring)))
+    private fun startForegroundGuard(): Boolean {
+        val type = ServiceInfo.FOREGROUND_SERVICE_TYPE_HEALTH or
+            if (Prefs.isIndoorMute(this) && PermissionHelper.isLocationEnough(this)) {
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
+            } else {
+                0
+            }
+        return try {
+            ServiceCompat.startForeground(
+                this,
+                ReminderManager.GUARD_ID,
+                buildGuard(getString(R.string.guard_monitoring)),
+                type,
+            )
+            true
+        } catch (e: SecurityException) {
+            Log.w(TAG, "Unable to promote monitoring service", e)
+            stopSelf()
+            false
+        } catch (e: IllegalArgumentException) {
+            Log.w(TAG, "Unsupported monitoring service type", e)
+            stopSelf()
+            false
+        }
     }
 
     private fun refreshGuard(walking: Boolean, run: Int, need: Int, elapsed: Int) {
@@ -319,62 +326,59 @@ class HeadsUpService : Service() {
             .build()
     }
 
-    /** GMS 加速通道：成功/失败都记录状态，失败不影响本机主链路 */
     private fun subscribeGms() {
         if (checkSelfPermission(android.Manifest.permission.ACTIVITY_RECOGNITION) !=
-            PackageManager.PERMISSION_GRANTED
+            android.content.pm.PackageManager.PERMISSION_GRANTED
         ) {
             detector.gmsStatus = WalkDetector.GmsStatus.NO_PERM
+            detector.publishState()
             return
         }
         try {
-            val types = listOf(
-                DetectedActivity.WALKING, DetectedActivity.RUNNING, DetectedActivity.ON_FOOT,
-            )
-            val transitions = types.flatMap {
+            val transitions = listOf(
+                DetectedActivity.WALKING,
+                DetectedActivity.RUNNING,
+                DetectedActivity.ON_FOOT,
+            ).flatMap { type ->
                 listOf(
-                    ActivityTransition.Builder().setActivityType(it)
+                    ActivityTransition.Builder().setActivityType(type)
                         .setActivityTransition(ActivityTransition.ACTIVITY_TRANSITION_ENTER).build(),
-                    ActivityTransition.Builder().setActivityType(it)
+                    ActivityTransition.Builder().setActivityType(type)
                         .setActivityTransition(ActivityTransition.ACTIVITY_TRANSITION_EXIT).build(),
                 )
             }
-            val pi = PendingIntent.getBroadcast(
-                this, 0, Intent(this, ActivityUpdateReceiver::class.java),
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE,
-            )
             ActivityRecognition.getClient(this)
-                .requestActivityTransitionUpdates(ActivityTransitionRequest(transitions), pi)
-                .addOnSuccessListener { detector.gmsStatus = WalkDetector.GmsStatus.AVAILABLE }
+                .requestActivityTransitionUpdates(ActivityTransitionRequest(transitions), gmsCallback())
+                .addOnSuccessListener {
+                    detector.gmsStatus = WalkDetector.GmsStatus.AVAILABLE
+                    detector.publishState()
+                }
                 .addOnFailureListener { e ->
                     detector.gmsStatus = WalkDetector.GmsStatus.UNAVAILABLE
-                    Log.w(TAG, "GMS ActivityRecognition 不可用，本机检测继续工作: $e")
+                    detector.publishState()
+                    Log.w(TAG, "GMS Activity Recognition is unavailable; using local sensors", e)
                 }
         } catch (e: Exception) {
             detector.gmsStatus = WalkDetector.GmsStatus.UNAVAILABLE
-            Log.w(TAG, "GMS 订阅异常，本机检测继续工作: $e")
+            detector.publishState()
+            Log.w(TAG, "GMS Activity Recognition setup failed; using local sensors", e)
         }
     }
 
-    /** 进程被杀后自启 */
-    override fun onTaskRemoved(rootIntent: Intent?) {
-        try {
-            val pi = PendingIntent.getBroadcast(
-                this, 0, Intent("com.playlab.headsup.action.RESTART_SERVICE").setPackage(packageName),
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-            )
-            val am = getSystemService(AlarmManager::class.java)
-            if (Build.VERSION.SDK_INT >= 31 && am?.canScheduleExactAlarms() == false) {
-                am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 30_000, pi)
-            } else {
-                am?.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 30_000, pi)
-            }
-        } catch (_: Exception) { }
-        super.onTaskRemoved(rootIntent)
-    }
+    private fun gmsCallback() = PendingIntent.getBroadcast(
+        this,
+        0,
+        Intent(this, ActivityUpdateReceiver::class.java).setAction(ACTION_ACTIVITY_UPDATE),
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE,
+    )
 
     override fun onDestroy() {
         IndoorDetector.stop()
+        try {
+            ActivityRecognition.getClient(this).removeActivityTransitionUpdates(gmsCallback())
+        } catch (e: Exception) {
+            Log.w(TAG, "Unable to remove GMS Activity Recognition updates", e)
+        }
         try { unregisterReceiver(screenReceiver) } catch (_: Exception) { }
         try {
             sensorMgr?.let {
@@ -387,50 +391,62 @@ class HeadsUpService : Service() {
     companion object {
         const val ACTION_SIMULATE = "com.playlab.headsup.action.SIMULATE"
         const val ACTION_CANCEL_SIMULATION = "com.playlab.headsup.action.CANCEL_SIMULATION"
+        const val ACTION_REREGISTER = "com.playlab.headsup.action.REREGISTER"
         const val ACTION_GMS_HINT = "com.playlab.headsup.action.GMS_HINT"
         const val ACTION_RESUBSCRIBE = "com.playlab.headsup.action.RESUBSCRIBE"
-        const val ACTION_REREGISTER = "com.playlab.headsup.action.REREGISTER"
+        const val ACTION_ACTIVITY_UPDATE = "com.playlab.headsup.action.ACTIVITY_UPDATE"
         // 挂起等 GPS 结论的最长等待，超时仍未知时按室内静音策略抑制
         private const val PENDING_TIMEOUT_MS = 15_000L
         private const val TAG = "HeadsUpService"
 
-        fun start(ctx: Context) {
-            val i = Intent(ctx, HeadsUpService::class.java)
-            if (Build.VERSION.SDK_INT >= 26) ctx.startForegroundService(i)
-            else ctx.startService(i)
+        fun start(ctx: Context): Boolean {
+            return try {
+                val i = Intent(ctx, HeadsUpService::class.java)
+                ctx.startForegroundService(i)
+                true
+            } catch (e: SecurityException) {
+                Log.w(TAG, "Unable to start monitoring service", e)
+                false
+            } catch (e: IllegalStateException) {
+                Log.w(TAG, "Monitoring service start was not allowed", e)
+                false
+            }
         }
 
-        /** 身体活动权限授予后：传感器必须重注册才会来事件，只重订阅 GMS 不够 */
+        /** 身体活动权限授予后，重新注册传感器以开始接收事件 */
         fun reregister(ctx: Context) {
-            try {
-                val i = Intent(ctx, HeadsUpService::class.java).setAction(ACTION_REREGISTER)
-                if (Build.VERSION.SDK_INT >= 26) ctx.startForegroundService(i)
-                else ctx.startService(i)
-            } catch (_: Exception) { }
+            startWithAction(ctx, ACTION_REREGISTER)
+        }
+
+        fun resubscribe(ctx: Context) {
+            startWithAction(ctx, ACTION_RESUBSCRIBE)
         }
 
         fun stop(ctx: Context) {
             ctx.stopService(Intent(ctx, HeadsUpService::class.java))
         }
 
-        /** 权限后授予等场景：强制重新订阅 GMS（平时节流，不必每次 start 都订阅） */
-        fun resubscribe(ctx: Context) {
-            val i = Intent(ctx, HeadsUpService::class.java).setAction(ACTION_RESUBSCRIBE)
-            if (Build.VERSION.SDK_INT >= 26) ctx.startForegroundService(i)
-            else ctx.startService(i)
-        }
-
         /** 模拟步行：走真实检测通路的端到端测试 */
         fun simulate(ctx: Context) {
-            val i = Intent(ctx, HeadsUpService::class.java).setAction(ACTION_SIMULATE)
-            if (Build.VERSION.SDK_INT >= 26) ctx.startForegroundService(i)
-            else ctx.startService(i)
+            startWithAction(ctx, ACTION_SIMULATE)
         }
 
         fun cancelSimulation(ctx: Context) {
-            val i = Intent(ctx, HeadsUpService::class.java).setAction(ACTION_CANCEL_SIMULATION)
-            if (Build.VERSION.SDK_INT >= 26) ctx.startForegroundService(i)
-            else ctx.startService(i)
+            startWithAction(ctx, ACTION_CANCEL_SIMULATION)
+        }
+
+        private fun startWithAction(ctx: Context, action: String): Boolean {
+            return try {
+                val i = Intent(ctx, HeadsUpService::class.java).setAction(action)
+                ctx.startForegroundService(i)
+                true
+            } catch (e: SecurityException) {
+                Log.w(TAG, "Unable to send monitoring service action", e)
+                false
+            } catch (e: IllegalStateException) {
+                Log.w(TAG, "Monitoring service action was not allowed", e)
+                false
+            }
         }
     }
 }

@@ -52,18 +52,14 @@ class WalkDetector(
     /** 是否可用：优先级最高，息屏/锁定直接不可用 */
     fun isUsable() = screenOn && unlocked
     var requiredSteps = 12 // 默认标准档，服务启动时按灵敏度覆盖
-    // Language-independent status code; UI resolves it to localized text on every
-    // recomposition, so it always follows the current system language.
     var gmsStatus = GmsStatus.UNKNOWN
 
-    /** GMS status codes */
     object GmsStatus {
         const val UNKNOWN = "unknown"
         const val AVAILABLE = "available"
         const val UNAVAILABLE = "unavailable"
         const val NO_PERM = "no_perm"
     }
-
     // 灵敏度联动：步数越多、节律容差越小、动作门限越严、显示门限越高
     var minInterval = 350L
     var maxInterval = 1700L

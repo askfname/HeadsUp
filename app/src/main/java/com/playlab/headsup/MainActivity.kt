@@ -130,7 +130,6 @@ private fun HomeScreen(resumeSeq: Int) {
         if (on) {
             ReminderManager.ensureChannels(ctx)
             HeadsUpService.start(ctx)
-            KeepAliveHelper.scheduleKeepAlive(ctx)
         } else {
             HeadsUpService.stop(ctx)
         }
@@ -166,9 +165,6 @@ private fun HomeScreen(resumeSeq: Int) {
             pendingEnable = false; applyEnabled(true)
         }
         tick++
-        if (Prefs.isEnabled(ctx)) {
-            try { HeadsUpService.start(ctx) } catch (_: Exception) { }
-        }
     }
 
     // 系统设置页返回立即刷新
@@ -194,7 +190,7 @@ private fun HomeScreen(resumeSeq: Int) {
             else applyEnabled(false)
         }
         tick++
-        // 权限后授予：传感器重注册（缺权限时注册的监听收不到事件）+ GMS 重订阅
+        // 权限后重新注册传感器并订阅 GMS 辅助通道。
         if (Prefs.isEnabled(ctx)) {
             HeadsUpService.reregister(ctx)
             HeadsUpService.resubscribe(ctx)
@@ -218,10 +214,10 @@ private fun HomeScreen(resumeSeq: Int) {
         }
     }
 
-    // 进程重启后服务可能已死：进前台即拉起
+    // 用户回到前台时可安全恢复已开启的监测
     LaunchedEffect(Unit) {
         if (Prefs.isEnabled(ctx)) {
-            try { HeadsUpService.start(ctx) } catch (_: Exception) { }
+            HeadsUpService.start(ctx)
         }
     }
 
@@ -1004,7 +1000,6 @@ private fun DetectStatusCard(enabled: Boolean) {
                 else if (liveSats.isBlank()) stringResource(R.string.sat_waiting)
                 else stringResource(R.string.sat_value_format, liveSats)
             )
-            // GMS 状态以语言无关的状态码存储，每次重组时映射到语言 XML 中的对应字段，
             val gmsText = when (snap.gms) {
                 WalkDetector.GmsStatus.AVAILABLE -> stringResource(R.string.gms_available)
                 WalkDetector.GmsStatus.UNAVAILABLE -> stringResource(R.string.gms_unavailable)
@@ -1175,7 +1170,6 @@ private fun AboutCard() {
                         "Jetpack Compose (UI / Material3 / Icons / BOM 2024.06.00)",
                         "Apache License 2.0"
                     )
-                    LicenseEntry("WorkManager 2.9.0", "Apache License 2.0")
                     LicenseEntry("Play Services Location 21.3.0", "Apache License 2.0")
                 }
             },

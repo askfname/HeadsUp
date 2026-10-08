@@ -10,13 +10,12 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
-    <!-- 前台服务 + 自启 + 保活 -->
+    <!-- 前台服务 + 开机恢复 -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_HEALTH" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
-    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <!-- 弹窗提醒悬浮窗 -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
@@ -49,13 +48,13 @@
             </intent-filter>
         </activity>
 
-        <!-- 步行检测与室内判断前台服务 -->
+        <!-- 步行检测前台服务；室内判断运行时按需附加 location 类型 -->
         <service
             android:name=".service.HeadsUpService"
             android:exported="false"
-            android:foregroundServiceType="location" />
+            android:foregroundServiceType="health|location" />
 
-        <!-- ActivityRecognition 回调 -->
+        <!-- GMS 活动识别回调与通知操作 -->
         <receiver
             android:name=".service.ActivityUpdateReceiver"
             android:exported="false">
@@ -65,16 +64,13 @@
             </intent-filter>
         </receiver>
 
-        <!-- 开机 / 更新后自启 + 任务移除后拉活 -->
+        <!-- 开机或更新后恢复用户已开启的监测 -->
         <receiver
             android:name=".service.BootReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
-                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
-                <action android:name="com.playlab.headsup.action.RESTART_SERVICE" />
             </intent-filter>
         </receiver>
     </application>

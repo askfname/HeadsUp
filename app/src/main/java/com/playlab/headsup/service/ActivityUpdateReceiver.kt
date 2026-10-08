@@ -1,6 +1,7 @@
 package com.playlab.headsup.service
 
 import android.app.NotificationManager
+import android.app.ActivityManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -10,11 +11,7 @@ import com.google.android.gms.location.ActivityTransitionResult
 import com.google.android.gms.location.DetectedActivity
 import com.playlab.headsup.data.Prefs
 
-/**
- * GMS 步行回调 + 通知按钮消除
- * 注意：GMS 回调可能延迟数分钟到达，这里只转交 Hint 给服务，
- * 由服务用检测器活体状态二次确认后才提醒；且不再重启服务（避免重订阅自激循环）
- */
+/** GMS 步行提示与通知操作 */
 class ActivityUpdateReceiver : BroadcastReceiver() {
     override fun onReceive(ctx: Context, intent: Intent) {
         if (intent.action == "com.playlab.headsup.action.DISMISS") {
@@ -22,27 +19,32 @@ class ActivityUpdateReceiver : BroadcastReceiver() {
                 ?.cancel(com.playlab.headsup.reminder.ReminderManager.NOTIFY_ID)
             return
         }
-        if (!Prefs.isEnabled(ctx)) return
+        if (!Prefs.isEnabled(ctx) || !ActivityTransitionResult.hasResult(intent)) return
+        val walking = ActivityTransitionResult.extractResult(intent)?.transitionEvents
+            ?.any { it.isWalkingEnter() } == true
+        if (!walking || !monitoringRunning(ctx)) return
+        // This only reaches an existing FGS; it is never a background revival path
         try {
-            if (ActivityTransitionResult.hasResult(intent)) {
-                val walking = ActivityTransitionResult.extractResult(intent)?.transitionEvents
-                    ?.any { it.isWalkingEnter() } == true
-                if (walking) {
-                    try {
-                        ctx.startService(
-                            Intent(ctx, HeadsUpService::class.java)
-                                .setAction(HeadsUpService.ACTION_GMS_HINT),
-                        )
-                    } catch (_: Exception) { /* 后台启动被系统拒绝则丢弃本次 Hint */ }
-                }
-            }
-        } catch (_: Exception) { }
+            ctx.startService(Intent(ctx, HeadsUpService::class.java).setAction(HeadsUpService.ACTION_GMS_HINT))
+        } catch (e: RuntimeException) {
+            android.util.Log.w(TAG, "Unable to deliver GMS hint", e)
+        }
     }
 
+    @Suppress("DEPRECATION")
+    private fun monitoringRunning(ctx: Context): Boolean =
+        ctx.getSystemService(ActivityManager::class.java)
+            ?.getRunningServices(Int.MAX_VALUE)
+            ?.any { it.service.className == HeadsUpService::class.java.name } == true
+
     private fun ActivityTransitionEvent.isWalkingEnter(): Boolean {
-        val walk = activityType == DetectedActivity.WALKING ||
+        val walking = activityType == DetectedActivity.WALKING ||
             activityType == DetectedActivity.RUNNING ||
-            activityType == DetectedActivity.ON_FOOT // 含上下楼
-        return walk && transitionType == ActivityTransition.ACTIVITY_TRANSITION_ENTER
+            activityType == DetectedActivity.ON_FOOT
+        return walking && transitionType == ActivityTransition.ACTIVITY_TRANSITION_ENTER
+    }
+
+    private companion object {
+        const val TAG = "ActivityUpdateReceiver"
     }
 }
