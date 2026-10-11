@@ -57,6 +57,8 @@
     <string name="proximity_no">아니요</string>
     <string name="state_sensor">센서</string>
     <string name="sensor_step">걸음 감지</string>
+    <string name="sensor_counter">걸음 수 카운터</string>
+    <string name="sensor_gms_accelerometer">GMS + 가속도계</string>
     <string name="sensor_none">걸음 센서 없음 (이 기기에서는 감지 미지원)</string>
     <string name="state_indoor">실내</string>
     <string name="indoor_unknown_always">알 수 없음 (위치 “항상 허용” 필요)</string>

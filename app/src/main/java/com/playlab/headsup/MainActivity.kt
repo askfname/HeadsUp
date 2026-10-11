@@ -164,6 +164,7 @@ private fun HomeScreen(resumeSeq: Int) {
         if (pendingEnable && PermissionHelper.coreGranted(ctx)) {
             pendingEnable = false; applyEnabled(true)
         }
+        if (Prefs.isEnabled(ctx)) HeadsUpService.refreshDetection(ctx)
         tick++
     }
 
@@ -192,8 +193,7 @@ private fun HomeScreen(resumeSeq: Int) {
         tick++
         // 权限后重新注册传感器并订阅 GMS 辅助通道。
         if (Prefs.isEnabled(ctx)) {
-            HeadsUpService.reregister(ctx)
-            HeadsUpService.resubscribe(ctx)
+            HeadsUpService.refreshDetection(ctx)
         }
         // 室内开关跟随权限；29 并申后仍缺后台看系统能力；拒绝则引导
         if (pendingIndoor) {
@@ -971,8 +971,12 @@ private fun DetectStatusCard(enabled: Boolean) {
             )
             StateRow(
                 stringResource(R.string.state_sensor),
-                if (snap.hasStepDetector) stringResource(R.string.sensor_step)
-                else stringResource(R.string.sensor_none),
+                when (snap.sensorBackend) {
+                    WalkDetector.SensorBackend.STEP_DETECTOR -> stringResource(R.string.sensor_step)
+                    WalkDetector.SensorBackend.STEP_COUNTER -> stringResource(R.string.sensor_counter)
+                    WalkDetector.SensorBackend.GMS_ACCELEROMETER -> stringResource(R.string.sensor_gms_accelerometer)
+                    else -> stringResource(R.string.sensor_none)
+                },
             )
             StateRow(stringResource(R.string.sensitivity_title), sensDesc)
             // 室内态跟随位置权限

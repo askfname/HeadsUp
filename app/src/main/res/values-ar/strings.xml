@@ -57,6 +57,8 @@
     <string name="proximity_no">لا</string>
     <string name="state_sensor">المستشعر</string>
     <string name="sensor_step">كاشف الخطوات</string>
+    <string name="sensor_counter">عداد الخطوات</string>
+    <string name="sensor_gms_accelerometer">GMS + مقياس التسارع</string>
     <string name="sensor_none">لا يوجد مستشعر خطوات (الكشف غير مدعوم على هذا الجهاز)</string>
     <string name="state_indoor">داخل المبنى</string>
     <string name="indoor_unknown_always">غير معروف (يتطلب الموقع “السماح طوال الوقت”)</string>

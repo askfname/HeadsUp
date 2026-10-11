@@ -57,6 +57,8 @@
     <string name="proximity_no">No</string>
     <string name="state_sensor">Sensor</string>
     <string name="sensor_step">Detector de pasos</string>
+    <string name="sensor_counter">Contador de pasos</string>
+    <string name="sensor_gms_accelerometer">GMS + acelerometro</string>
     <string name="sensor_none">Sin sensor de pasos (detección no compatible en este dispositivo)</string>
     <string name="state_indoor">Interiores</string>
     <string name="indoor_unknown_always">Desconocido (requiere ubicación «Permitir siempre»)</string>

@@ -57,6 +57,8 @@
     <string name="proximity_no">否</string>
     <string name="state_sensor">感測器</string>
     <string name="sensor_step">步伐</string>
+    <string name="sensor_counter">步數計數器</string>
+    <string name="sensor_gms_accelerometer">GMS + 加速度計</string>
     <string name="sensor_none">無步伐感測器（此裝置不支援偵測）</string>
     <string name="state_indoor">室內</string>
     <string name="indoor_unknown_always">未知（需一律允許定位）</string>

@@ -61,6 +61,8 @@
     <string name="proximity_no">No</string>
     <string name="state_sensor">Sensor</string>
     <string name="sensor_step">Step detector</string>
+    <string name="sensor_counter">Step counter</string>
+    <string name="sensor_gms_accelerometer">GMS + accelerometer</string>
     <string name="sensor_none">No step sensor (detection not supported on this device)</string>
     <string name="state_indoor">Indoors</string>
     <string name="indoor_unknown_always">Unknown (requires “Allow all the time” location)</string>

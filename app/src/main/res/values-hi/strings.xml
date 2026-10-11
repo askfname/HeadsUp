@@ -57,6 +57,8 @@
     <string name="proximity_no">नहीं</string>
     <string name="state_sensor">सेंसर</string>
     <string name="sensor_step">कदम संसूचक</string>
+    <string name="sensor_counter">कदम काउंटर</string>
+    <string name="sensor_gms_accelerometer">GMS + एक्सेलेरोमीटर</string>
     <string name="sensor_none">कदम सेंसर नहीं (इस डिवाइस पर पहचान समर्थित नहीं)</string>
     <string name="state_indoor">घर के अंदर</string>
     <string name="indoor_unknown_always">अज्ञात (“हमेशा अनुमति दें” स्थान आवश्यक)</string>

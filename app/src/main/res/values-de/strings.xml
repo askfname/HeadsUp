@@ -57,6 +57,8 @@
     <string name="proximity_no">Nein</string>
     <string name="state_sensor">Sensor</string>
     <string name="sensor_step">Schritterkennung</string>
+    <string name="sensor_counter">Schrittzaehler</string>
+    <string name="sensor_gms_accelerometer">GMS + Beschleunigungssensor</string>
     <string name="sensor_none">Kein Schrittsensor (Erkennung auf diesem Gerät nicht unterstützt)</string>
     <string name="state_indoor">Innenraum</string>
     <string name="indoor_unknown_always">Unbekannt (Standort „Immer zulassen“ erforderlich)</string>

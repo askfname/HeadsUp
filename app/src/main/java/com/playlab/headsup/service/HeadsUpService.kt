@@ -10,6 +10,7 @@ import android.content.pm.ServiceInfo
 import android.hardware.SensorManager
 import android.location.LocationManager
 import android.os.IBinder
+import android.os.Build
 import android.os.PowerManager
 import android.os.SystemClock
 import android.util.Log
@@ -176,6 +177,7 @@ class HeadsUpService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+        isRunning = true
         ReminderManager.ensureChannels(this)
         detector = WalkDetector(
             onTrigger = { handleWalkTrigger() },
@@ -262,7 +264,10 @@ class HeadsUpService : Service() {
                 sensorMgr?.let { detector.reregister(it, detector.isUsable()) }
             }
             ACTION_GMS_HINT -> {
-                if (::detector.isInitialized && detector.isWalkingNow()) handleWalkTrigger()
+                if (::detector.isInitialized) {
+                    val walking = sensorMgr?.let { detector.onGmsWalkingHint(it) } == true
+                    if (walking) handleWalkTrigger()
+                }
             }
             ACTION_RESUBSCRIBE -> subscribeGms()
         }
@@ -271,19 +276,17 @@ class HeadsUpService : Service() {
 
     /** 常驻通知：附带实时检测状态 */
     private fun startForegroundGuard(): Boolean {
-        val type = ServiceInfo.FOREGROUND_SERVICE_TYPE_HEALTH or
-            if (Prefs.isIndoorMute(this) && PermissionHelper.isLocationEnough(this)) {
-                ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
-            } else {
-                0
-            }
         return try {
-            ServiceCompat.startForeground(
-                this,
-                ReminderManager.GUARD_ID,
-                buildGuard(getString(R.string.guard_monitoring)),
-                type,
-            )
+            val notification = buildGuard(getString(R.string.guard_monitoring))
+            if (Build.VERSION.SDK_INT >= 34) {
+                val type = ServiceInfo.FOREGROUND_SERVICE_TYPE_HEALTH or
+                    if (Prefs.isIndoorMute(this) && PermissionHelper.isLocationEnough(this)) {
+                        ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
+                    } else 0
+                ServiceCompat.startForeground(this, ReminderManager.GUARD_ID, notification, type)
+            } else {
+                startForeground(ReminderManager.GUARD_ID, notification)
+            }
             true
         } catch (e: SecurityException) {
             Log.w(TAG, "Unable to promote monitoring service", e)
@@ -326,6 +329,7 @@ class HeadsUpService : Service() {
             .build()
     }
 
+    @Suppress("MissingPermission") // Permission is checked before each GMS call.
     private fun subscribeGms() {
         if (checkSelfPermission(android.Manifest.permission.ACTIVITY_RECOGNITION) !=
             android.content.pm.PackageManager.PERMISSION_GRANTED
@@ -335,6 +339,9 @@ class HeadsUpService : Service() {
             return
         }
         try {
+            if (PermissionHelper.hasActivity(this)) {
+                ActivityRecognition.getClient(this).removeActivityTransitionUpdates(gmsCallback())
+            }
             val transitions = listOf(
                 DetectedActivity.WALKING,
                 DetectedActivity.RUNNING,
@@ -372,12 +379,16 @@ class HeadsUpService : Service() {
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE,
     )
 
+    @Suppress("MissingPermission") // Permission can be revoked between the guard and this cleanup.
     override fun onDestroy() {
+        isRunning = false
         IndoorDetector.stop()
-        try {
-            ActivityRecognition.getClient(this).removeActivityTransitionUpdates(gmsCallback())
-        } catch (e: Exception) {
-            Log.w(TAG, "Unable to remove GMS Activity Recognition updates", e)
+        if (PermissionHelper.hasActivity(this)) {
+            try {
+                ActivityRecognition.getClient(this).removeActivityTransitionUpdates(gmsCallback())
+            } catch (e: Exception) {
+                Log.w(TAG, "Unable to remove GMS Activity Recognition updates", e)
+            }
         }
         try { unregisterReceiver(screenReceiver) } catch (_: Exception) { }
         try {
@@ -385,6 +396,7 @@ class HeadsUpService : Service() {
                 if (::detector.isInitialized) detector.unregister(it)
             }
         } catch (_: Exception) { }
+        if (::detector.isInitialized) detector.close()
         super.onDestroy()
     }
 
@@ -398,6 +410,7 @@ class HeadsUpService : Service() {
         // 挂起等 GPS 结论的最长等待，超时仍未知时按室内静音策略抑制
         private const val PENDING_TIMEOUT_MS = 15_000L
         private const val TAG = "HeadsUpService"
+        @Volatile var isRunning = false
 
         fun start(ctx: Context): Boolean {
             return try {
@@ -419,6 +432,11 @@ class HeadsUpService : Service() {
         }
 
         fun resubscribe(ctx: Context) {
+            startWithAction(ctx, ACTION_RESUBSCRIBE)
+        }
+
+        fun refreshDetection(ctx: Context) {
+            startWithAction(ctx, ACTION_REREGISTER)
             startWithAction(ctx, ACTION_RESUBSCRIBE)
         }
 

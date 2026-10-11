@@ -57,6 +57,8 @@
     <string name="proximity_no">Non</string>
     <string name="state_sensor">Capteur</string>
     <string name="sensor_step">Détecteur de pas</string>
+    <string name="sensor_counter">Compteur de pas</string>
+    <string name="sensor_gms_accelerometer">GMS + accelerometre</string>
     <string name="sensor_none">Aucun capteur de pas (détection non prise en charge sur cet appareil)</string>
     <string name="state_indoor">Intérieur</string>
     <string name="indoor_unknown_always">Inconnu (localisation « Toujours autoriser » requise)</string>

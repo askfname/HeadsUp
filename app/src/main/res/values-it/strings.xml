@@ -57,6 +57,8 @@
     <string name="proximity_no">No</string>
     <string name="state_sensor">Sensore</string>
     <string name="sensor_step">Rilevatore di passi</string>
+    <string name="sensor_counter">Contapassi</string>
+    <string name="sensor_gms_accelerometer">GMS + accelerometro</string>
     <string name="sensor_none">Nessun sensore di passi (rilevamento non supportato su questo dispositivo)</string>
     <string name="state_indoor">Interni</string>
     <string name="indoor_unknown_always">Sconosciuto (richiede posizione «Consenti sempre»)</string>

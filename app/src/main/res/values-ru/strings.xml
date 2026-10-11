@@ -57,6 +57,8 @@
     <string name="proximity_no">Нет</string>
     <string name="state_sensor">Датчик</string>
     <string name="sensor_step">Детектор шагов</string>
+    <string name="sensor_counter">Счетчик шагов</string>
+    <string name="sensor_gms_accelerometer">GMS + акселерометр</string>
     <string name="sensor_none">Нет датчика шагов (обнаружение не поддерживается на этом устройстве)</string>
     <string name="state_indoor">Помещение</string>
     <string name="indoor_unknown_always">Неизвестно (требуется местоположение «Разрешить всегда»)</string>

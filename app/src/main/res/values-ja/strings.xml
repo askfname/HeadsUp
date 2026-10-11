@@ -57,6 +57,8 @@
     <string name="proximity_no">なし</string>
     <string name="state_sensor">センサー</string>
     <string name="sensor_step">歩行検出</string>
+    <string name="sensor_counter">歩数計</string>
+    <string name="sensor_gms_accelerometer">GMS + 加速度センサー</string>
     <string name="sensor_none">歩行センサーなし（本機では検出非対応）</string>
     <string name="state_indoor">屋内</string>
     <string name="indoor_unknown_always">不明（位置情報の「常に許可」が必要）</string>

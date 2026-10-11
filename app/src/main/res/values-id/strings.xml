@@ -57,6 +57,8 @@
     <string name="proximity_no">Tidak</string>
     <string name="state_sensor">Sensor</string>
     <string name="sensor_step">Detektor langkah</string>
+    <string name="sensor_counter">Penghitung langkah</string>
+    <string name="sensor_gms_accelerometer">GMS + akselerometer</string>
     <string name="sensor_none">Tanpa sensor langkah (deteksi tidak didukung di perangkat ini)</string>
     <string name="state_indoor">Dalam ruangan</string>
     <string name="indoor_unknown_always">Tidak diketahui (perlu lokasi “Selalu izinkan”)</string>
