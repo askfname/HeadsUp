@@ -41,9 +41,9 @@ object Prefs {
     /** 室内判断参数：只判室内，达阈值即室内，其余按室外 */
     data class IndoorParams(
         val visIndoor: Int = 7, // 室内强星数上限
-        val ratioIndoor: Float = 0.4f, // 室内占比上限
+        val ratioIndoor: Float = 0.45f, // 室内占比上限
         val gpsAcc: Float = 10f, // 精度优于此值按室外（越小越易判室内）
-        val visCn0: Float = 25f, // 强星门限（越小强星越多，越难判室内）
+        val visCn0: Float = 27f, // 强星门限（越小强星越多，越难判室内）
     )
 
     private const val K_IN_VIS_IN = "indoor_c_vis_in"
@@ -66,7 +66,7 @@ object Prefs {
             visIndoor = if (s.contains(K_IN_VIS_IN)) s.getInt(K_IN_VIS_IN, d.visIndoor).coerceIn(3, 10) else d.visIndoor,
             ratioIndoor = if (s.contains(K_IN_RATIO_IN)) s.getFloat(K_IN_RATIO_IN, d.ratioIndoor).finiteOrDefault(d.ratioIndoor).coerceIn(0.2f, 0.6f) else d.ratioIndoor,
             gpsAcc = if (s.contains(K_IN_GPS_ACC)) s.getFloat(K_IN_GPS_ACC, d.gpsAcc).finiteOrDefault(d.gpsAcc).coerceIn(5f, 20f) else d.gpsAcc,
-            visCn0 = if (s.contains(K_IN_VIS_CN0)) s.getFloat(K_IN_VIS_CN0, d.visCn0).finiteOrDefault(d.visCn0).coerceIn(20f, 32f) else d.visCn0,
+            visCn0 = if (s.contains(K_IN_VIS_CN0)) s.getFloat(K_IN_VIS_CN0, d.visCn0).finiteOrDefault(d.visCn0).coerceIn(20f, 35f) else d.visCn0,
         )
     }
 
@@ -92,7 +92,7 @@ object Prefs {
         if (visIndoor == null) e.remove(K_IN_VIS_IN) else e.putInt(K_IN_VIS_IN, visIndoor.coerceIn(3, 10))
         if (ratioIndoor == null) e.remove(K_IN_RATIO_IN) else e.putFloat(K_IN_RATIO_IN, ratioIndoor.finiteOrDefault(IndoorParams().ratioIndoor).coerceIn(0.2f, 0.6f))
         if (gpsAcc == null) e.remove(K_IN_GPS_ACC) else e.putFloat(K_IN_GPS_ACC, gpsAcc.finiteOrDefault(IndoorParams().gpsAcc).coerceIn(5f, 20f))
-        if (visCn0 == null) e.remove(K_IN_VIS_CN0) else e.putFloat(K_IN_VIS_CN0, visCn0.finiteOrDefault(IndoorParams().visCn0).coerceIn(20f, 32f))
+        if (visCn0 == null) e.remove(K_IN_VIS_CN0) else e.putFloat(K_IN_VIS_CN0, visCn0.finiteOrDefault(IndoorParams().visCn0).coerceIn(20f, 35f))
         e.remove(K_IN_VIS_OUT_OLD).remove(K_IN_FIX_OUT_OLD)
             .remove(K_IN_RATIO_OUT_OLD).remove(K_IN_CONFIRM_OLD)
             .remove(K_IN_FIX_CN0_OLD)

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">HeadsUp</string>
     <string name="desc">Своевременные напоминания при использовании телефона на ходу — поднимите взгляд</string>
@@ -166,7 +166,7 @@
     <string name="tune_range_int">3–10</string>
     <string name="tune_range_ratio">0.2–0.6</string>
     <string name="tune_range_acc">5–20</string>
-    <string name="tune_range_cn0">20–32</string>
+    <string name="tune_range_cn0">20–35</string>
     <string name="tune_hint">Чем выше порог CN0 сильных спутников, тем чувствительнее отключение в помещении; так же влияют большее число и доля сильных спутников и меньшая точность GPS.</string>
     <string name="tune_error">Параметры вне диапазона или неверны; изменения не сохранены</string>
     <string name="tune_save">Сохранить</string>

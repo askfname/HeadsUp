@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">HeadsUp</string>
     <string name="desc">보행 중 스마트폰 사용 시 적시에 알림을 제공하여 전방을 확인하세요</string>
@@ -166,7 +166,7 @@
     <string name="tune_range_int">3–10</string>
     <string name="tune_range_ratio">0.2–0.6</string>
     <string name="tune_range_acc">5–20</string>
-    <string name="tune_range_cn0">20–32</string>
+    <string name="tune_range_cn0">20–35</string>
     <string name="tune_hint">강신호 위성 CN0 임계값이 클수록 실내 무음이 민감해지고, 강신호 위성 수·비율이 클수록 민감해지며, GPS 정확도가 작을수록 민감해집니다.</string>
     <string name="tune_error">매개변수가 범위를 벗어났거나 잘못되어 저장하지 않았습니다</string>
     <string name="tune_save">저장</string>

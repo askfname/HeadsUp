@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">看路提醒</string>
     <string name="desc">走路使用手機時及時提醒，抬頭看看路</string>
@@ -166,7 +166,7 @@
     <string name="tune_range_int">3~10</string>
     <string name="tune_range_ratio">0.2~0.6</string>
     <string name="tune_range_acc">5~20</string>
-    <string name="tune_range_cn0">20~32</string>
+    <string name="tune_range_cn0">20~35</string>
     <string name="tune_hint">參數說明：強星門限越大，室內不提醒越靈敏；強星數/強星占比越大，室內不提醒越靈敏；GPS 精度越小，室內不提醒越靈敏。</string>
     <string name="tune_error">參數超出範圍或格式錯誤，已取消儲存</string>
     <string name="tune_save">儲存</string>

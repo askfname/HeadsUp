@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">HeadsUp</string>
     <string name="desc">Lembretes oportunos ao usar o telemóvel a caminhar — olhe para o caminho</string>
@@ -166,7 +166,7 @@
     <string name="tune_range_int">3–10</string>
     <string name="tune_range_ratio">0.2–0.6</string>
     <string name="tune_range_acc">5–20</string>
-    <string name="tune_range_cn0">20–32</string>
+    <string name="tune_range_cn0">20–35</string>
     <string name="tune_hint">Um limiar CN0 mais alto aumenta a sensibilidade do silenciamento em interiores; tal como um maior número ou proporção de satélites fortes; e uma menor precisão GPS.</string>
     <string name="tune_error">Parâmetros fora do intervalo ou inválidos; alterações não guardadas</string>
     <string name="tune_save">Guardar</string>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- 中文环境使用中文应用名称与开发者名称 -->
     <string name="app_name">看路提醒</string>
@@ -167,7 +167,7 @@
     <string name="tune_range_int">3~10</string>
     <string name="tune_range_ratio">0.2~0.6</string>
     <string name="tune_range_acc">5~20</string>
-    <string name="tune_range_cn0">20~32</string>
+    <string name="tune_range_cn0">20~35</string>
     <string name="tune_hint">参数说明：强星门限越大室内不提醒越灵敏，强星数/强星占比越大室内不提醒越灵敏，GPS 精度越小室内不提醒越灵敏。</string>
     <string name="tune_error">参数超范围或格式错误，已取消保存</string>
     <string name="tune_save">保存</string>

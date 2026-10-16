@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">HeadsUp</string>
     <string name="desc">चलते समय फ़ोन देखने पर समय पर याद दिलाए — सिर उठाकर रास्ता देखें</string>
@@ -166,7 +166,7 @@
     <string name="tune_range_int">3–10</string>
     <string name="tune_range_ratio">0.2–0.6</string>
     <string name="tune_range_acc">5–20</string>
-    <string name="tune_range_cn0">20–32</string>
+    <string name="tune_range_cn0">20–35</string>
     <string name="tune_hint">मज़बूत उपग्रह CN0 सीमा अधिक होने पर घर के अंदर मौन अधिक संवेदनशील, संख्या/अनुपात अधिक होने पर अधिक संवेदनशील, GPS सटीकता छोटी होने पर अधिक संवेदनशील।</string>
     <string name="tune_error">पैरामीटर सीमा से बाहर या अमान्य; सहेजा नहीं गया</string>
     <string name="tune_save">सहेजें</string>

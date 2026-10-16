@@ -753,6 +753,7 @@ private fun IndoorHelpDialog(
     val d = Prefs.IndoorParams()
     var expanded by remember { mutableStateOf(false) }
     var err by remember { mutableStateOf("") }
+    val dialogScroll = rememberScrollState()
     // 输入框初始显示有效参数（无自定义即默认）
     val eff = remember { Prefs.getIndoorParams(ctx) }
     var fVisIn by remember { mutableStateOf(eff.visIndoor.toString()) }
@@ -772,7 +773,7 @@ private fun IndoorHelpDialog(
             if (it.isEmpty()) null else it.toFloatOrNull()?.takeIf { v -> v.isFinite() && v in 5f..20f }
         }
         val visCn0 = fVisCn0.trim().let {
-            if (it.isEmpty()) null else it.toFloatOrNull()?.takeIf { v -> v.isFinite() && v in 20f..32f }
+            if (it.isEmpty()) null else it.toFloatOrNull()?.takeIf { v -> v.isFinite() && v in 20f..35f }
         }
         // 非空但非法即报错
         if ((fVisIn.trim().isNotEmpty() && visIn == null) ||
@@ -805,7 +806,7 @@ private fun IndoorHelpDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.indoor_help_title)) },
         text = {
-            Column(Modifier.verticalScroll(rememberScrollState())) {
+            Column(Modifier.verticalScroll(dialogScroll).imePadding()) {
                 Text(
                     stringResource(R.string.indoor_help_desc),
                     style = MaterialTheme.typography.bodySmall,

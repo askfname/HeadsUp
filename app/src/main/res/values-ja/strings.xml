@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">HeadsUp</string>
     <string name="desc">歩行中のスマートフォン利用時に適時リマインドし、前方を確認しましょう</string>
@@ -166,7 +166,7 @@
     <string name="tune_range_int">3～10</string>
     <string name="tune_range_ratio">0.2～0.6</string>
     <string name="tune_range_acc">5～20</string>
-    <string name="tune_range_cn0">20～32</string>
+    <string name="tune_range_cn0">20～35</string>
     <string name="tune_hint">強信号衛星CN0のしきい値が大きいほど屋内ミュートは敏感になり、強信号衛星数・比率が大きいほど敏感になり、GPS 精度が小さいほど敏感になります。</string>
     <string name="tune_error">パラメータが範囲外または無効なため、保存を中止しました</string>
     <string name="tune_save">保存</string>

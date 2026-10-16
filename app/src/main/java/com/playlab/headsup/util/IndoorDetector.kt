@@ -26,7 +26,7 @@ object IndoorDetector {
     private const val CN0_STRONG = 18f
 
     // 强星
-    private const val VIS_CN0 = 25f
+    private const val VIS_CN0 = 27f
 
     // GPS 精度
     private const val GPS_GOOD_ACC_M = 10f
@@ -35,7 +35,7 @@ object IndoorDetector {
 
     // 大样本使用强星比例为主、按卫星规模归一化后的强星数为辅
     private const val VIS_INDOOR = 7
-    private const val VIS_RATIO_INDOOR = 0.4f
+    private const val VIS_RATIO_INDOOR = 0.45f
     private const val BIG_TOTAL = 8
     private const val STRONG_COUNT_REFERENCE_SATS = 24
 

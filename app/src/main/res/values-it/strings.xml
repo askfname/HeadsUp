@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">HeadsUp</string>
     <string name="desc">Promemoria tempestivi quando usi il telefono camminando: guarda la strada</string>
@@ -166,7 +166,7 @@
     <string name="tune_range_int">3–10</string>
     <string name="tune_range_ratio">0.2–0.6</string>
     <string name="tune_range_acc">5–20</string>
-    <string name="tune_range_cn0">20–32</string>
+    <string name="tune_range_cn0">20–35</string>
     <string name="tune_hint">Una soglia CN0 più alta rende il silenzio al chiuso più sensibile; così come un numero o una quota maggiori di satelliti forti; e una minore precisione GPS.</string>
     <string name="tune_error">Parametri fuori intervallo o non validi; modifiche non salvate</string>
     <string name="tune_save">Salva</string>

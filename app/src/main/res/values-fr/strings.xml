@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">HeadsUp</string>
     <string name="desc">Rappels opportuns lors de l\'utilisation du téléphone en marchant — levez les yeux</string>
@@ -166,7 +166,7 @@
     <string name="tune_range_int">3–10</string>
     <string name="tune_range_ratio">0.2–0.6</string>
     <string name="tune_range_acc">5–20</string>
-    <string name="tune_range_cn0">20–32</string>
+    <string name="tune_range_cn0">20–35</string>
     <string name="tune_hint">Plus le seuil CN0 est élevé, plus le silence à l\'intérieur est sensible ; même effet avec un nombre ou une proportion plus élevés de satellites forts, ou une précision GPS plus faible.</string>
     <string name="tune_error">Paramètres hors limites ou non valides ; modifications non enregistrées</string>
     <string name="tune_save">Enregistrer</string>
