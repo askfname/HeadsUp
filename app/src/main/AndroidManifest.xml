@@ -20,6 +20,52 @@
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- 厂商管家页跳转所需：EMUI 自 2021 起要求声明，否则直接 SecurityException -->
+    <uses-permission android:name="com.huawei.permission.external_app_settings.USE_COMPONENT" />
+    <uses-permission android:name="com.hihonor.permission.external_app_settings.USE_COMPONENT" />
+    <!-- ColorOS 显式跳转要求声明，否则抛 SecurityException -->
+    <uses-permission android:name="oppo.permission.OPPO_COMPONENT_SAFE" />
+
+    <!-- Android 11+ 包可见性：自启动/后台页需 resolve 校验 -->
+    <queries>
+        <package android:name="com.miui.securitycenter" />
+        <package android:name="com.miui.powerkeeper" />
+        <package android:name="com.huawei.systemmanager" />
+        <package android:name="com.hihonor.systemmanager" />
+        <package android:name="com.honor.systemmanager" />
+        <package android:name="com.coloros.safecenter" />
+        <package android:name="com.coloros.oppoguardelf" />
+        <package android:name="com.oplus.battery" />
+        <package android:name="com.oppo.safe" />
+        <package android:name="com.oneplus.security" />
+        <package android:name="com.vivo.permissionmanager" />
+        <package android:name="com.vivo.abe" />
+        <package android:name="com.iqoo.secure" />
+        <package android:name="com.samsung.android.lool" />
+        <package android:name="com.samsung.android.sm" />
+        <package android:name="com.samsung.android.sm_cn" />
+        <package android:name="com.meizu.safe" />
+        <package android:name="com.asus.mobilemanager" />
+        <package android:name="com.letv.android.letvsafe" />
+        <package android:name="com.zui.safecenter" />
+        <package android:name="com.evenwell.powersaving.g3" />
+        <package android:name="com.htc.pitroad" />
+        <package android:name="com.zte.heartyservice" />
+        <package android:name="com.sonymobile.cta" />
+        <package android:name="com.transsion.phonemaster" />
+        <package android:name="com.itel.autobootmanager" />
+        <intent>
+            <action android:name="android.settings.IGNORE_BATTERY_OPTIMIZATION_SETTINGS" />
+        </intent>
+        <intent>
+            <action android:name="android.settings.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+            <data android:scheme="package" />
+        </intent>
+        <intent>
+            <action android:name="android.settings.APPLICATION_DETAILS_SETTINGS" />
+            <data android:scheme="package" />
+        </intent>
+    </queries>
 
     <application
         android:name=".HeadsUpApp"
