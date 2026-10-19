@@ -9,6 +9,7 @@ import android.os.HandlerThread
 import android.os.Looper
 import android.os.SystemClock
 import android.util.Log
+import java.util.ArrayDeque
 import kotlin.math.abs
 import kotlin.math.max
 
@@ -55,12 +56,17 @@ class WalkDetector(
         const val GMS_ACCELEROMETER = "gms_accelerometer"
     }
 
+    @Volatile
     var screenOn = true
+    @Volatile
     var unlocked = true // 锁屏不提醒
+    @Volatile
     var pocketed = false // 口袋不提醒（仅亮屏已解锁时有效）
     /** 是否可用：优先级最高，息屏/锁定直接不可用 */
     fun isUsable() = screenOn && unlocked
+    @Volatile
     var requiredSteps = 12 // 默认标准档，服务启动时按灵敏度覆盖
+    @Volatile
     var gmsStatus = GmsStatus.UNKNOWN
 
     object GmsStatus {
@@ -70,18 +76,29 @@ class WalkDetector(
         const val NO_PERM = "no_perm"
     }
     // 灵敏度联动：步数越多、节律容差越小、动作门限越严、显示门限越高
+    @Volatile
     var minInterval = 350L
+    @Volatile
     var maxInterval = 1700L
+    @Volatile
     var stableAbsMs = 260L
+    @Volatile
     var stableRatio = 0.5f
+    @Volatile
     var gyroMax = 1.4f // 本轮陀螺仪均值上限，超限判为晃动
+    @Volatile
     var accStdMin = 0.25f // 本轮加速度标准差下限，过静不是持机走路
+    @Volatile
     var accStdMax = 4.2f // 本轮加速度标准差上限，超限判为晃动
+    @Volatile
     var candSteps = 4 // 显示/活体门限（灵敏3/标准4/严格6）
+    @Volatile
     var maxMiss = 1 // 连续不规律步不断链的次数
+    @Volatile
     var idleResetMs = 3400L // 末步后判停走的延迟
     private var lastTriggerAt = 0L
 
+    @Volatile
     private var sensorBackend = SensorBackend.NONE
     private var stepCounterBaseline: Float? = null
     private var stepCounterLastValue: Float? = null
@@ -92,6 +109,14 @@ class WalkDetector(
     private var nearSince = 0L
     private val pocketConfirmTask = Runnable { confirmPocket() }
 
+    /*
+     * 并发保护：
+     * stepTimes、lastIvs、runLen、lastStepTime 等步态状态
+     * 由当前 WalkDetector 实例锁保护
+     *
+     * accWin、gyroWin 使用独立的 windowLock 保护
+     * 避免高频加速度和陀螺仪事件占用整个检测器的实例锁
+     */
     private val stepTimes = ArrayDeque<Long>() // 10s 窗口，仅 UI 显示
     private var lastStepTime = 0L
     private val lastIvs = ArrayDeque<Long>() // 最近3个好间隔，取中位数比单步比较抗趔趄
@@ -102,6 +127,10 @@ class WalkDetector(
     // 动作幅度缓存（8s 窗口）：加速度模长 / 陀螺仪模长，用于区分走路与原地晃动
     private val accWin = ArrayDeque<Pair<Long, Float>>()
     private val gyroWin = ArrayDeque<Pair<Long, Float>>()
+
+    // 所有 accWin / gyroWin 的读写必须使用这把锁
+    private val windowLock = Any()
+
     private var hasGyro = false
     private var accelerometerRegistered = false
     private var gyroscopeRegistered = false
@@ -118,29 +147,45 @@ class WalkDetector(
     private var testTriggerDispatched = false
     private val testStepTasks = mutableListOf<Runnable>()
     private var testFinishTask: Runnable? = null
+    @Volatile
     private var registered = false
     private var sensorManager: SensorManager? = null
 
     // 慢心跳（10s，Doze 下可被系统合并）：只做窗口裁剪和快照推送
     private val tickTask = object : Runnable {
         override fun run() {
-            prune()
-            pruneMotion(SystemClock.elapsedRealtime())
-            if (sensorBackend == SensorBackend.GMS_ACCELEROMETER &&
-                fallbackUntil > 0L && SystemClock.elapsedRealtime() >= fallbackUntil
-            ) stopFallbackMotion()
-            pushSnap()
-            handler.postDelayed(this, 10_000)
+            synchronized(this@WalkDetector) {
+                if (!registered) return
+                prune()
+                pruneMotion(SystemClock.elapsedRealtime())
+                if (
+                    sensorBackend == SensorBackend.GMS_ACCELEROMETER &&
+                    fallbackUntil > 0L &&
+                    SystemClock.elapsedRealtime() >= fallbackUntil
+                ) {
+                    stopFallbackMotion()
+                }
+                pushSnap()
+
+                // 必须在实例锁保护期间安排下一次任务
+                // unregister() 随后获取锁时便能可靠移除该任务
+                if (registered) {
+                    handler.postDelayed(this, 10_000L)
+                }
+            }
         }
     }
 
     // 精确停走重置：末步后超时无新步伐即清零（不依赖慢心跳，保证 UI 不滞后）
     private val resetTask = Runnable {
-        resetRun()
-        pushSnap()
+        synchronized(this@WalkDetector) {
+            resetRun()
+            pushSnap()
+        }
     }
 
     // 优先硬件步伐事件；无硬件时仅在 GMS 行走候选期启用加速度确认
+    @Synchronized
     fun register(sm: SensorManager) {
         if (registered) return
         registered = true
@@ -164,10 +209,13 @@ class WalkDetector(
                 sensorBackend = SensorBackend.GMS_ACCELEROMETER
             }
         }
-        if (sensorBackend != SensorBackend.GMS_ACCELEROMETER) registerMotionGates(sm)
-        sm.getDefaultSensor(Sensor.TYPE_PROXIMITY)?.let {
-            proximityRegistered = register(sm, it, SensorManager.SENSOR_DELAY_NORMAL)
+        if (sensorBackend != SensorBackend.GMS_ACCELEROMETER) {registerMotionGates(sm)
         }
+        sm.getDefaultSensor(Sensor.TYPE_PROXIMITY)?.let {
+            proximityRegistered =
+                register(sm, it, SensorManager.SENSOR_DELAY_NORMAL)
+        }
+        handler.removeCallbacks(tickTask)
         handler.post(tickTask)
         pushSnap()
     }
@@ -179,6 +227,7 @@ class WalkDetector(
         false
     }
 
+    @Synchronized
     private fun registerMotionGates(sm: SensorManager) {
         if (!accelerometerRegistered) {
             sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)?.let {
@@ -187,17 +236,22 @@ class WalkDetector(
         }
         if (!gyroscopeRegistered) {
             sm.getDefaultSensor(Sensor.TYPE_GYROSCOPE)?.let {
-                gyroscopeRegistered = register(sm, it, SensorManager.SENSOR_DELAY_GAME)
+                gyroscopeRegistered =
+                    register(sm, it, SensorManager.SENSOR_DELAY_GAME)
                 hasGyro = gyroscopeRegistered
             }
         }
     }
 
     /** GMS 只打开有限的加速度确认窗口，不能单独产生提醒 */
+    @Synchronized
     fun onGmsWalkingHint(sm: SensorManager): Boolean {
-        if (sensorBackend != SensorBackend.GMS_ACCELEROMETER) return isWalkingNow()
+        if (sensorBackend != SensorBackend.GMS_ACCELEROMETER) {
+            return isWalkingNow()
+        }
         if (!isUsable() || pocketed) return false
-        fallbackUntil = SystemClock.elapsedRealtime() + FALLBACK_WINDOW_MS
+        fallbackUntil =
+            SystemClock.elapsedRealtime() + FALLBACK_WINDOW_MS
         fallbackLastPeakAt = 0L
         fallbackPeakArmed = true
         fallbackGravity = 0f
@@ -205,30 +259,44 @@ class WalkDetector(
         return false
     }
 
+    @Synchronized
     private fun stopFallbackMotion() {
         val sm = sensorManager ?: return
         if (accelerometerRegistered || gyroscopeRegistered) {
-            try { sm.unregisterListener(this) } catch (_: RuntimeException) { }
+            try {
+                sm.unregisterListener(this)
+            } catch (_: RuntimeException) {
+            }
             accelerometerRegistered = false
             gyroscopeRegistered = false
             hasGyro = false
             proximityRegistered = false
             sm.getDefaultSensor(Sensor.TYPE_PROXIMITY)?.let {
-                proximityRegistered = register(sm, it, SensorManager.SENSOR_DELAY_NORMAL)
+                proximityRegistered =
+                    register(sm, it, SensorManager.SENSOR_DELAY_NORMAL)
             }
         }
         fallbackUntil = 0L
     }
 
     /** 重注册：授权后补回传感器事件（register幂等 early-return，执行不到这里） */
+    @Synchronized
     fun reregister(sm: SensorManager, active: Boolean) {
-        try { sm.unregisterListener(this) } catch (_: Exception) { }
+        try {
+            sm.unregisterListener(this)
+        } catch (_: Exception) {
+        }
         registered = false
         handler.removeCallbacks(tickTask)
         handler.removeCallbacks(pocketConfirmTask)
-        if (active) register(sm) else pushSnap()
+        if (active) {
+            register(sm)
+        } else {
+            pushSnap()
+        }
     }
 
+    @Synchronized
     fun unregister(sm: SensorManager) {
         registered = false
         handler.removeCallbacks(tickTask)
@@ -245,6 +313,7 @@ class WalkDetector(
     }
 
     /** 用机状态同步：不可用时步数作废、遮挡清零（优先级：屏幕/锁定 > 遮挡 > 步态） */
+    @Synchronized
     fun setUseState(screenOn: Boolean, unlocked: Boolean) {
         val wasUsable = isUsable()
         this.screenOn = screenOn
@@ -266,16 +335,20 @@ class WalkDetector(
     /** 对外同步一次当前状态 */
     fun publishState() = pushSnap()
 
+    @Synchronized
     private fun resetAll() {
         resetRun()
         stepTimes.clear()
         lastStepTime = 0L
-        accWin.clear()
-        gyroWin.clear()
+        synchronized(windowLock) {
+            accWin.clear()
+            gyroWin.clear()
+        }
         handler.removeCallbacks(resetTask)
     }
 
     /** 灵敏度切换：更新全部阈值并清零旧累计，避免旧步数带入新档位 */
+    @Synchronized
     fun applySensitivity(
         steps: Int,
         minIv: Long = 350L,
@@ -305,34 +378,45 @@ class WalkDetector(
     }
 
     /** 真实提醒后闩锁：批量投递下整串步伐一次处理完，UI 显示“已提醒”而非“静止” */
+    @Synchronized
     fun noteFired() {
         lastTriggerAt = SystemClock.elapsedRealtime()
         pushSnap()
     }
 
+    @Synchronized
     private fun prune() {
-        val cut = SystemClock.elapsedRealtime() - 10_000
-        while (stepTimes.isNotEmpty() && stepTimes.first() < cut) stepTimes.removeFirst()
+        val cut = SystemClock.elapsedRealtime() - 10_000L
+
+        while (
+            stepTimes.isNotEmpty() &&
+            stepTimes.first() < cut
+        ) {
+            stepTimes.removeFirst()
+        }
     }
 
     /**
      * 熔断门：优先级 屏幕/锁定 > 遮挡 > 步态；室内由服务层最后判定
      * 所有提醒触发前必须过此门，防止过期信号（延迟的 GMS 回调等）在静止时触发
      */
+    @Synchronized
     fun isWalkingNow(): Boolean {
         if (!isUsable()) return false
         if (pocketed) return false
         if (runLen < candSteps) return false
         if (testMode) return true
         val now = SystemClock.elapsedRealtime()
-        if (now - lastStepTime >= 5_000) return false
+        if (now - lastStepTime >= 5_000L) return false
         return gaitOk(now)
     }
 
     /** 模拟步行状态：用于界面反馈 */
+    @Synchronized
     fun isSimulating() = testMode
 
     /** 模拟步行：走与真实步行相同的提醒及室内判定通路 */
+    @Synchronized
     fun injectTestBurst() {
         if (testMode) return
         testMode = true
@@ -345,16 +429,22 @@ class WalkDetector(
             handler.postDelayed(task, i * 500L)
         }
         testFinishTask = Runnable {
-            testMode = false
-            testTriggerDispatched = false
-            testStepTasks.clear()
-            testFinishTask = null
+            synchronized(this@WalkDetector) {
+                testMode = false
+                testTriggerDispatched = false
+                testStepTasks.clear()
+                testFinishTask = null
+            }
             pushSnap()
         }
-        handler.postDelayed(testFinishTask!!, n * 500L + 2_000)
+        handler.postDelayed(
+            testFinishTask!!,
+            n * 500L + 2_000L,
+        )
     }
 
     /** 页面离开时取消尚未执行的模拟步伐 */
+    @Synchronized
     fun cancelTestBurst() {
         testStepTasks.forEach(handler::removeCallbacks)
         testStepTasks.clear()
@@ -373,10 +463,7 @@ class WalkDetector(
             Sensor.TYPE_STEP_DETECTOR -> {
                 if (!isUsable()) return // 息屏/锁定步数作废
                 if (e.values[0] != 1f) return
-                val at = eventMs(e.timestamp)
-                // 批量投递标记：事件硬件时间远早于到达时间（>1.5s）
-                if (SystemClock.elapsedRealtime() - at > 1_500) batchObserved = true
-                onStepEvent(at = at)
+                onStepDetectorEvent(e)
             }
             Sensor.TYPE_STEP_COUNTER -> onStepCounter(e)
             Sensor.TYPE_ACCELEROMETER -> {
@@ -385,9 +472,18 @@ class WalkDetector(
                 val m = kotlin.math.sqrt(
                     (e.values[0] * e.values[0] + e.values[1] * e.values[1] + e.values[2] * e.values[2]).toDouble(),
                 ).toFloat()
-                accWin.addLast(now to m)
+
+                // 与状态重置使用不同的锁；加入缓存时再次检查可用状态
+                // 防止息屏/锁定状态切换后仍写入过期数据
+                synchronized(windowLock) {
+                    if (!isUsable()) return
+                    accWin.addLast(now to m)
+                }
                 pruneMotion(now)
-                if (sensorBackend == SensorBackend.GMS_ACCELEROMETER) onFallbackAcceleration(m, now)
+
+                if (sensorBackend == SensorBackend.GMS_ACCELEROMETER) {
+                    onFallbackAcceleration(m, now)
+                }
             }
             Sensor.TYPE_GYROSCOPE -> {
                 if (!isUsable()) return
@@ -395,7 +491,11 @@ class WalkDetector(
                 val m = kotlin.math.sqrt(
                     (e.values[0] * e.values[0] + e.values[1] * e.values[1] + e.values[2] * e.values[2]).toDouble(),
                 ).toFloat()
-                gyroWin.addLast(now to m)
+                synchronized(windowLock) {
+                    if (!isUsable()) return
+
+                    gyroWin.addLast(now to m)
+                }
                 pruneMotion(now)
             }
             Sensor.TYPE_PROXIMITY -> {
@@ -407,6 +507,17 @@ class WalkDetector(
 
     override fun onAccuracyChanged(s: Sensor?, acc: Int) = Unit
 
+    @Synchronized
+    private fun onStepDetectorEvent(e: SensorEvent) {
+        // 批量投递标记：事件硬件时间远早于到达时间（>1.5s）
+        val at = eventMs(e.timestamp)
+        if (SystemClock.elapsedRealtime() - at > 1_500L) {
+            batchObserved = true
+        }
+        onStepEvent(at = at)
+    }
+
+    @Synchronized
     private fun onStepCounter(e: SensorEvent) {
         if (!isUsable() || e.values.isEmpty()) return
         val value = e.values[0]
@@ -424,36 +535,70 @@ class WalkDetector(
         repeat(delta) { index -> onStepEvent(at - (delta - index - 1) * spacing) }
     }
 
+    @Synchronized
     private fun onFallbackAcceleration(magnitude: Float, now: Long) {
         if (now > fallbackUntil) return
         // Remove gravity before peak detection so phone orientation does not change the threshold.
-        fallbackGravity = if (fallbackGravity == 0f) magnitude else
-            FALLBACK_GRAVITY_ALPHA * fallbackGravity + (1f - FALLBACK_GRAVITY_ALPHA) * magnitude
+        fallbackGravity =
+            if (fallbackGravity == 0f) {
+                magnitude
+            } else {
+                FALLBACK_GRAVITY_ALPHA * fallbackGravity +
+                    (1f - FALLBACK_GRAVITY_ALPHA) * magnitude
+            }
         val linear = magnitude - fallbackGravity
-        if (linear < FALLBACK_REARM) fallbackPeakArmed = true
+        if (linear < FALLBACK_REARM) {
+            fallbackPeakArmed = true
+        }
         if (!fallbackPeakArmed || linear < FALLBACK_PEAK) return
-        if (fallbackLastPeakAt > 0 && now - fallbackLastPeakAt !in minInterval..maxInterval) {
-            if (now - fallbackLastPeakAt > maxInterval) resetRun()
+        if (
+            fallbackLastPeakAt > 0L &&
+            now - fallbackLastPeakAt !in minInterval..maxInterval
+        ) {
+            if (now - fallbackLastPeakAt > maxInterval) {
+                resetRun()
+            }
             return
         }
         fallbackPeakArmed = false
         fallbackLastPeakAt = now
-        onStepEvent(now, skipAccelerationGate = true)
+        onStepEvent(at = now, skipAccelerationGate = true)
     }
 
     // 硬件事件时间（与 elapsedRealtime 同基，批量投递下依然准确）；HAL 上报 0 则回退投递时间
     private fun eventMs(tsNs: Long) =
-        if (tsNs > 0) tsNs / 1_000_000 else SystemClock.elapsedRealtime()
+        if (tsNs > 0L) {
+            tsNs / 1_000_000L
+        } else {
+            SystemClock.elapsedRealtime()
+        }
+
+    private fun pruneMotionLocked(now: Long) {
+        val cut = now - 8_000L
+        while (
+            accWin.isNotEmpty() &&
+            accWin.first().first < cut
+        ) {
+            accWin.removeFirst()
+        }
+        while (
+            gyroWin.isNotEmpty() &&
+            gyroWin.first().first < cut
+        ) {
+            gyroWin.removeFirst()
+        }
+    }
 
     private fun pruneMotion(now: Long) {
-        val cut = now - 8_000
-        while (accWin.isNotEmpty() && accWin.first().first < cut) accWin.removeFirst()
-        while (gyroWin.isNotEmpty() && gyroWin.first().first < cut) gyroWin.removeFirst()
+        synchronized(windowLock) {
+            pruneMotionLocked(now)
+        }
     }
 
     // 仅亮屏已解锁时确认口袋
     private fun pocketConfirmMs() = 2500L
 
+    @Synchronized
     private fun onProximityChanged(near: Boolean) {
         if (!isUsable()) return // 息屏/锁定不使用距离传感器
         val now = SystemClock.elapsedRealtime()
@@ -475,8 +620,11 @@ class WalkDetector(
         }
     }
 
+    @Synchronized
     private fun confirmPocket() {
-        if (!isUsable() || !rawNear || pocketed || nearSince == 0L) return
+        if (!isUsable() || !rawNear || pocketed || nearSince == 0L) {
+            return
+        }
         val need = pocketConfirmMs()
         val elapsed = SystemClock.elapsedRealtime() - nearSince
         if (elapsed >= need) {
@@ -488,6 +636,7 @@ class WalkDetector(
         }
     }
 
+    @Synchronized
     private fun resetRun() {
         runLen = 0
         runStart = 0L
@@ -496,6 +645,7 @@ class WalkDetector(
     }
 
     // 最近好间隔的中位数：单次趔趄不带偏基准
+    @Synchronized
     private fun medianIv(fallback: Long): Long {
         if (lastIvs.isEmpty()) return fallback
         val s = lastIvs.sorted()
@@ -506,12 +656,30 @@ class WalkDetector(
      * 动作幅度门：本轮窗口内加速度标准差过大（剧烈晃动）或陀螺仪均值过大（大幅旋转）则判假
      * 样本不足（传感器缺失/刚启动）时放行，避免误杀
      */
+    @Synchronized
     private fun gaitOk(now: Long): Boolean {
-        val from = if (runStart > 0) runStart else now - 6_000
+        val from =
+            if (runStart > 0L) {
+                runStart
+            } else {
+                now - 6_000L
+            }
+
+        /*
+         * 在 windowLock 内复制缓存，随后在锁外计算
+         * 这样既不会在遍历期间被清空，也能缩短动作缓存锁的持有时间
+         */
+        val accSamples = synchronized(windowLock) {
+            accWin.toList()
+        }
+        val gyroSamples = synchronized(windowLock) {
+            gyroWin.toList()
+        }
+
         var n = 0
         var mean = 0.0
         var m2 = 0.0
-        for ((t, v) in accWin) {
+        for ((t, v) in accSamples) {
             if (t < from) continue
             n++
             val d = v - mean
@@ -520,25 +688,33 @@ class WalkDetector(
         }
         if (n >= 12) {
             val std = kotlin.math.sqrt(m2 / n)
-            if (std < accStdMin || std > accStdMax) return false // 过静或过烈都不是持机走路
+            if (std < accStdMin || std > accStdMax) {
+                return false // 过静或过烈都不是持机走路
+            }
         }
         if (hasGyro) {
             var gn = 0
             var gsum = 0.0
-            for ((t, v) in gyroWin) {
+            for ((t, v) in gyroSamples) {
                 if (t < from) continue
                 gn++
                 gsum += v
             }
-            if (gn >= 12 && gsum / gn > gyroMax) return false // 原地晃动旋转远大于走路看屏
+            if (gn >= 12 && gsum / gn > gyroMax) {
+                return false // 原地晃动旋转远大于走路看屏
+            }
         }
         return true
     }
 
     /** 步伐入口：节律 + 动作幅度双重确认；锁屏/口袋直接丢弃 */
-    private fun onStepEvent(at: Long = SystemClock.elapsedRealtime(), skipAccelerationGate: Boolean = false) {
+    @Synchronized
+    private fun onStepEvent(
+        at: Long = SystemClock.elapsedRealtime(),
+        skipAccelerationGate: Boolean = false,
+    ) {
         // 丢弃乱序/重复事件（迟到的批量旧事件不参与节律）
-        if (lastStepTime > 0 && at <= lastStepTime) return
+        if (lastStepTime > 0L && at <= lastStepTime) return
 
         // 非用机状态不累计：避免锁屏/口袋里的步数攒够后一拿出来就误报
         if (!testMode && (!screenOn || !unlocked || pocketed)) {
@@ -550,17 +726,19 @@ class WalkDetector(
 
         stepTimes.addLast(at)
         prune()
-        if (lastStepTime > 0) {
+        if (lastStepTime > 0L) {
             val iv = at - lastStepTime
             val inRange = iv in minInterval..maxInterval // 人类步频：走路/上下楼均在此带
             val ref = medianIv(iv)
             val stable = runLen < 2 ||
-                abs(iv - ref) <= max(stableAbsMs, (ref * stableRatio).toLong())
+                    abs(iv - ref) <= max(stableAbsMs, (ref * stableRatio).toLong())
             if (inRange && stable) {
                 runLen++
                 misses = 0
                 lastIvs.addLast(iv)
-                if (lastIvs.size > 3) lastIvs.removeFirst()
+                if (lastIvs.size > 3) {
+                    lastIvs.removeFirst()
+                }
             } else if (runLen >= 2 && misses < maxMiss) {
                 misses++ // 单次不规律不断链（迟钝硬件漏步/慢走趔趄），基准保持旧中位数
             } else {
@@ -576,7 +754,12 @@ class WalkDetector(
         }
         lastStepTime = at
         // 攒够显示门限后每步都验动作幅度，晃动直接打断，不让它攒到触发线
-        if (!testMode && !skipAccelerationGate && runLen >= candSteps && !gaitOk(at)) {
+        if (
+            !testMode &&
+            !skipAccelerationGate &&
+            runLen >= candSteps &&
+            !gaitOk(at)
+        ) {
             runLen = 1
             runStart = at
             misses = 0
@@ -588,12 +771,22 @@ class WalkDetector(
         }
         // 触发线：达连贯步数即回调（不清零：抑制/挂起不消耗步数，冷却防重发，显示不断链）
         if (runLen >= requiredSteps && (testMode || (screenOn && unlocked && !pocketed &&
-                (skipAccelerationGate || gaitOk(at)))) &&
+                            (skipAccelerationGate || gaitOk(at)))) &&
             (!testMode || !testTriggerDispatched)
         ) {
             // 不清空 runLen/stepTimes：连续行走保持显示，停走由 resetTask 清零
-            if (testMode) testTriggerDispatched = true
-            handler.post(onTrigger)
+            if (testMode) {
+                testTriggerDispatched = true
+            }
+
+            // 通过主线程异步派发提醒，不直接在持锁期间执行业务回调
+            handler.post {
+                // 等待当前检测状态更新结束，再在锁外执行回调
+                synchronized(this@WalkDetector) {
+                    // 仅用作同步屏障
+                }
+                onTrigger()
+            }
         }
         // 每次步伐后重约定点：超时无后续即判停走（单次延迟任务，开销可忽略）
         handler.removeCallbacks(resetTask)
@@ -601,28 +794,50 @@ class WalkDetector(
         pushSnap()
     }
 
+    /*
+     * 将快照构造与 onTick 回调分离
+     * 在主线程读取一致状态，退出同步区域后才执行外部回调
+     */
     private fun pushSnap() {
+        handler.post {
+            val snap = synchronized(this@WalkDetector) {
+                buildSnapshotLocked()
+            }
+            onTick(snap)
+        }
+    }
+
+    /*
+     * 调用方必须已持有当前 WalkDetector 实例锁
+     * DetectSnapshot 是不可变数据类，构建后可安全交给主线程回调
+     */
+    private fun buildSnapshotLocked(): DetectSnapshot {
         val now = SystemClock.elapsedRealtime()
         // 触发后 8s 内保持 walking：批量投递整串步伐毫秒级处理完，否则 UI 永远看不到行走态
-        val latched = lastTriggerAt > 0 && now - lastTriggerAt < 8_000
-        val snap = DetectSnapshot(
-                heartbeat = now,
-                walking = runLen >= candSteps || latched,
-                stepsInWindow = stepTimes.size,
-                runLen = runLen,
-                runNeed = requiredSteps,
-                walkElapsedSec = if (runStart == 0L) 0 else ((now - runStart) / 1000).toInt(),
-                screenOn = screenOn,
-                unlocked = unlocked,
-                pocketed = pocketed,
-                sensorBackend = sensorBackend,
-                batched = batchObserved,
-                gms = gmsStatus,
-                lastTriggerAt = lastTriggerAt,
-                simulating = testMode,
+        val latched =
+            lastTriggerAt > 0L &&
+                now - lastTriggerAt < 8_000L
+        return DetectSnapshot(
+            heartbeat = now,
+            walking = runLen >= candSteps || latched,
+            stepsInWindow = stepTimes.size,
+            runLen = runLen,
+            runNeed = requiredSteps,
+            walkElapsedSec =
+                if (runStart == 0L) {
+                    0
+                } else {
+                    ((now - runStart) / 1000L).toInt()
+                },
+            screenOn = screenOn,
+            unlocked = unlocked,
+            pocketed = pocketed,
+            sensorBackend = sensorBackend,
+            batched = batchObserved,
+            gms = gmsStatus,
+            lastTriggerAt = lastTriggerAt,
+            simulating = testMode,
         )
-        if (Looper.myLooper() == handler.looper) onTick(snap)
-        else handler.post { onTick(snap) }
     }
 
     fun close() {
