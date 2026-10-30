@@ -1,6 +1,5 @@
 package com.playlab.headsup.util
 
-import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.ComponentName
 import android.content.Context
@@ -19,19 +18,15 @@ object KeepAliveHelper {
         return pm.isIgnoringBatteryOptimizations(ctx.packageName)
     }
 
-    @SuppressLint("BatteryLife")
     fun requestBatteryWhitelist(ctx: Context) {
-        // 定制 ROM 可能删减该 Activity，逐级降级到电池设置 / 应用详情
-        if (tryStart(ctx, batteryWhitelistIntent(ctx))) return
-        if (tryStart(ctx, Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))) return
+        // 不申请电池优化豁免（Play 政策），仅打开系统优化列表由用户自行设置
+        if (tryStart(ctx, batteryOptimizationSettingsIntent())) return
         openAppSettings(ctx)
     }
 
-    /** 电池白名单意图（供设置返回回调启动，返回后可立即刷新状态） */
-    fun batteryWhitelistIntent(ctx: Context) =
-        Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
-            data = Uri.parse("package:${ctx.packageName}")
-        }
+    /** 系统电池优化列表（供设置返回回调启动，返回后可立即刷新状态） */
+    fun batteryOptimizationSettingsIntent() =
+        Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
 
     // 自启动：本机厂商优先，其余全量试错（兜底管家首页/应用详情/系统设置）
     fun openAutoStart(ctx: Context): Boolean {

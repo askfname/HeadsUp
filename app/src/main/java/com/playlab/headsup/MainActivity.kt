@@ -232,7 +232,27 @@ private fun HomeScreen(resumeSeq: Int) {
         if (resumeSeq > 0) refreshAll()
     }
 
+    fun notificationRuntimeGranted() = Build.VERSION.SDK_INT < 33 ||
+        ContextCompat.checkSelfPermission(ctx, Manifest.permission.POST_NOTIFICATIONS) ==
+            PackageManager.PERMISSION_GRANTED
+
+    fun openNotificationSettings() {
+        try {
+            settingsLauncher.launch(
+                Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                    .putExtra(Settings.EXTRA_APP_PACKAGE, ctx.packageName)
+            )
+        } catch (_: Exception) {
+            KeepAliveHelper.openAppSettings(ctx)
+        }
+    }
+
     fun requestCore() {
+        // 通知被系统关闭时运行时申请不会再弹窗，改为跳转通知设置
+        if (notificationRuntimeGranted() && !PermissionHelper.hasNotification(ctx)) {
+            openNotificationSettings()
+            return
+        }
         val perms = buildList {
             add(Manifest.permission.ACTIVITY_RECOGNITION)
             if (Build.VERSION.SDK_INT >= 33) add(Manifest.permission.POST_NOTIFICATIONS)
@@ -567,14 +587,13 @@ private fun HomeScreen(resumeSeq: Int) {
                         stringResource(R.string.perm_notif_desc),
                         PermissionHelper.hasNotification(ctx)
                     ) {
-                        if (Build.VERSION.SDK_INT >= 33) requestRuntime(
+                        if (notificationRuntimeGranted()) openNotificationSettings()
+                        else requestRuntime(
                             arrayOf(Manifest.permission.POST_NOTIFICATIONS),
                             onDead = { showCoreDialog = true }
                         ) {
                             permLauncher.launch(arrayOf(Manifest.permission.POST_NOTIFICATIONS))
-                        } else try {
-                            settingsLauncher.launch(KeepAliveHelper.appDetailsIntent(ctx))
-                        } catch (_: Exception) { }
+                        }
                     }
                     PermRow(
                         stringResource(R.string.perm_location_title),
@@ -633,10 +652,10 @@ private fun HomeScreen(resumeSeq: Int) {
                         }
                         OutlinedButton(
                             onClick = {
-                                // 已忽略则弹解除后台限制弹窗；未允许/被撤销则走电池白名单申请
+                                // 已忽略则弹解除后台限制弹窗；未允许/被撤销则打开系统电池优化列表
                                 if (KeepAliveHelper.ignoringBattery(ctx)) showHighBgDialog = true
                                 else try {
-                                    batteryLauncher.launch(KeepAliveHelper.batteryWhitelistIntent(ctx))
+                                    batteryLauncher.launch(KeepAliveHelper.batteryOptimizationSettingsIntent())
                                 } catch (_: Exception) {
                                     KeepAliveHelper.requestBatteryWhitelist(ctx)
                                 }
