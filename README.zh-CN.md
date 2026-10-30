@@ -55,9 +55,7 @@ app/src/main/java/com/playlab/headsup/
 │   ├── ActivityUpdateReceiver.kt
 │   └── BootReceiver.kt        # 开机自启/被杀拉活
 ├── reminder/
-│   ├── ReminderManager.kt     # 三种提醒方式（含室内抑制门控）
-│   └── ReminderActivity.kt    # 全屏提醒页
-├── worker/KeepAliveWorker.kt
+│   └── ReminderManager.kt     # 三种提醒方式，含全屏悬浮窗（含室内抑制门控）
 └── util/
     ├── IndoorDetector.kt      # GPS 室内判断（可见强星中位数+缓存+省电调度）
     ├── PermissionHelper.kt    # 权限状态查询（前台/后台/始终允许）

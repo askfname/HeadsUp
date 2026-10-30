@@ -15,7 +15,7 @@
     <string name="mode_popup_title">ポップアップ通知</string>
     <string name="mode_popup_desc">上部バナー、ポップアップ通知権限が必要</string>
     <string name="mode_full_title">全画面リマインド</string>
-    <string name="mode_full_desc">強制的な全画面割り込み、効果が最大</string>
+    <string name="mode_full_desc">全画面フローティングリマインド、他のアプリへの表示権限が必要</string>
     <string name="vibrate_title">リマインド時に振動</string>
     <string name="vibrate_desc">リマインドの発信時に振動する</string>
     <string name="indoor_mute_title">屋内では通知しない</string>
@@ -87,11 +87,11 @@
     <string name="perm_activity_desc">歩行・階段昇降を検出</string>
     <string name="perm_notif_title">通知</string>
     <string name="perm_notif_desc">リマインドに必須</string>
-    <string name="perm_location_title">位置情報（任意）</string>
-    <string name="perm_location_desc_always">屋内ミュートには「常に許可」が必要</string>
-    <string name="perm_location_desc_fg">屋内ミュートには位置情報権限が必要</string>
+    <string name="perm_location_title">屋内/屋外の判定</string>
+    <string name="perm_location_desc_always">主要機能：屋内でリマインドを停止するには「常に許可」が必要</string>
+    <string name="perm_location_desc_fg">主要機能：屋内でリマインドを停止するには位置情報権限が必要</string>
     <string name="perm_overlay_title">他のアプリへの表示</string>
-    <string name="perm_overlay_desc">ポップアップリマインドに必須</string>
+    <string name="perm_overlay_desc">ポップアップおよび全画面リマインドに必須</string>
     <string name="perm_open">有効にする</string>
     <string name="perm_granted">許可済み</string>
 
@@ -201,4 +201,14 @@
     <string name="guard_walking_format">歩行の可能性 · 連続歩数 %1$d/%2$d（継続 %3$d秒）</string>
     <string name="guard_still_format">静止 · 連続歩数 %1$d/%2$d</string>
     <string name="guard_running_title">HeadsUp 実行中</string>
+
+    <!-- Privacy policy + location disclosure -->
+    <string name="about_privacy">プライバシーポリシー</string>
+    <string name="about_privacy_desc">HeadsUp のデータの取り扱いについて</string>
+    <string name="loc_disclosure_title">屋内/屋外の判定に必要な位置情報</string>
+    <string name="loc_disclosure_msg">HeadsUp は、監視の有効中（バックグラウンドを含む）に位置情報を使用し、屋内かどうかを判定して屋内ではリマインドを停止します。位置情報はこの端末上でのみ処理され、アップロードされることはありません。屋内での停止をオフにするか、いつでも権限を取り消せます。</string>
+    <string name="loc_disclosure_continue">同意して続行</string>
+    <string name="loc_disclosure_cancel">今はしない</string>
+    <string name="loc_dialog_need_precise_title">正確な位置情報が必要です</string>
+    <string name="loc_dialog_need_precise_msg">屋内/屋外の判定には正確な位置情報が必要です。「アプリ情報 → 権限 → 位置情報」で「正確な位置情報を使用」をオンにし、「常に許可」を選択してください。</string>
 </resources>

@@ -6,7 +6,7 @@
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
     <!-- 通知 -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <!-- 位置（可选） -->
+    <!-- 位置：室内外识别核心功能 -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
@@ -16,9 +16,8 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
-    <!-- 弹窗提醒悬浮窗 -->
+    <!-- 弹窗 / 全屏提醒悬浮窗 -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <!-- 厂商管家页跳转所需：EMUI 自 2021 起要求声明，否则直接 SecurityException -->
     <uses-permission android:name="com.huawei.permission.external_app_settings.USE_COMPONENT" />
@@ -75,15 +74,6 @@
         android:theme="@style/Theme.HeadsUp"
         android:localeConfig="@xml/locales_config"
         android:supportsRtl="true">
-
-        <activity
-            android:name=".reminder.ReminderActivity"
-            android:exported="false"
-            android:launchMode="singleTop"
-            android:excludeFromRecents="true"
-            android:showWhenLocked="true"
-            android:turnScreenOn="true"
-            android:theme="@style/Theme.HeadsUp" />
 
         <activity
             android:name=".MainActivity"

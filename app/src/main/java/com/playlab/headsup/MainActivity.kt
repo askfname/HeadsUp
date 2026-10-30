@@ -95,7 +95,9 @@ private fun HomeScreen(resumeSeq: Int) {
     var pendingIndoor by remember { mutableStateOf(false) } // 权限不足，授权后自动补开
     var pendingEnable by remember { mutableStateOf(false) } // 开启守护但缺核心权限，等授权结果
     var pendingPopup by remember { mutableStateOf(false) } // 弹窗提醒缺悬浮窗权限，授权后才切换
+    var pendingFull by remember { mutableStateOf(false) } // 全屏提醒缺悬浮窗权限，授权后才切换
     var showLocDialog by remember { mutableStateOf(false) } // 引导去开位置权限
+    var showLocDisclosure by remember { mutableStateOf(false) } // 申请定位前的显著披露
     var showCoreDialog by remember { mutableStateOf(false) } // 引导去开身体活动/通知
     var showHighBgDialog by remember { mutableStateOf(false) } // 忽略电池优化后引导高后台耗电
     var showIndoorHelp by remember { mutableStateOf(false) } // “室内不提醒”功能说明 + 高级设置
@@ -160,6 +162,13 @@ private fun HomeScreen(resumeSeq: Int) {
                 mode = Prefs.MODE_POPUP; Prefs.setMode(ctx, Prefs.MODE_POPUP)
             }
         }
+        // 全屏提醒同样要求悬浮窗权限
+        if (pendingFull) {
+            pendingFull = false
+            if (PermissionHelper.hasOverlay(ctx)) {
+                mode = Prefs.MODE_FULL; Prefs.setMode(ctx, Prefs.MODE_FULL)
+            }
+        }
         // 设置页回来补开守护
         if (pendingEnable && PermissionHelper.coreGranted(ctx)) {
             pendingEnable = false; applyEnabled(true)
@@ -200,9 +209,6 @@ private fun HomeScreen(resumeSeq: Int) {
             if (PermissionHelper.isLocationEnough(ctx)) {
                 indoorMute = true; Prefs.setIndoorMute(ctx, true); pendingIndoor = false
                 if (Prefs.isEnabled(ctx)) HeadsUpService.start(ctx)
-            } else if (!PermissionHelper.hasForegroundLocation(ctx)) {
-                indoorMute = false; Prefs.setIndoorMute(ctx, false)
-                showLocDialog = true
             } else {
                 indoorMute = false; Prefs.setIndoorMute(ctx, false)
                 showLocDialog = true
@@ -236,8 +242,13 @@ private fun HomeScreen(resumeSeq: Int) {
         }
     }
 
-    // 位置申请：Q 允许前后台一次并申（弹窗可直授始终允许）；30+ 先前台，后台走设置
+    // 位置申请：先展示显著披露，确认后再请求系统权限
     fun requestLocation() {
+        showLocDisclosure = true
+    }
+
+    // Q 允许前后台一次并申（弹窗可直授始终允许）；30+ 先前台，后台走设置
+    fun requestLocationPermission() {
         if (Build.VERSION.SDK_INT == 29) {
             requestRuntime(
                 arrayOf(
@@ -318,9 +329,10 @@ private fun HomeScreen(resumeSeq: Int) {
         modifier = Modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.surface,
         contentWindowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp),
-    ) { _ ->
+    ) { innerPadding ->
         Column(
             Modifier.fillMaxSize()
+                .padding(innerPadding)
                 .verticalScroll(scrollState)
                 .windowInsetsPadding(WindowInsets.safeDrawing)
                 .padding(16.dp),
@@ -386,7 +398,16 @@ private fun HomeScreen(resumeSeq: Int) {
                         stringResource(R.string.mode_full_desc),
                         Prefs.MODE_FULL, mode
                     ) {
-                        mode = it; Prefs.setMode(ctx, it); tick++
+                        if (PermissionHelper.hasOverlay(ctx)) {
+                            mode = it; Prefs.setMode(ctx, it)
+                        } else {
+                            // 全屏提醒依赖悬浮窗，先授权再切换
+                            pendingFull = true
+                            try {
+                                settingsLauncher.launch(overlayIntent())
+                            } catch (_: Exception) { pendingFull = false }
+                        }
+                        tick++
                     }
                     Spacer(Modifier.height(4.dp))
                     // 提醒时震动
@@ -563,7 +584,7 @@ private fun HomeScreen(resumeSeq: Int) {
                     ) {
                         requestLocation()
                     }
-                    if (mode == Prefs.MODE_POPUP)
+                    if (mode == Prefs.MODE_POPUP || mode == Prefs.MODE_FULL)
                         PermRow(
                             stringResource(R.string.perm_overlay_title),
                             stringResource(R.string.perm_overlay_desc),
@@ -653,23 +674,25 @@ private fun HomeScreen(resumeSeq: Int) {
             )
         }
 
-        // 位置引导
+        // 位置引导：精确位置优先于后台位置提示
         if (showLocDialog) {
-            val needAlways = PermissionHelper.requiresAlwaysLocation(ctx)
+            val needPrecise = !PermissionHelper.hasFineLocation(ctx)
+            val needAlways = PermissionHelper.requiresAlwaysLocation(ctx) &&
+                !PermissionHelper.hasBackgroundLocation(ctx)
+            val titleRes = when {
+                needPrecise -> R.string.loc_dialog_need_precise_title
+                needAlways -> R.string.loc_dialog_need_always_title
+                else -> R.string.loc_dialog_need_perm_title
+            }
+            val msgRes = when {
+                needPrecise -> R.string.loc_dialog_need_precise_msg
+                needAlways -> R.string.loc_dialog_need_always_msg
+                else -> R.string.loc_dialog_need_perm_msg
+            }
             AlertDialog(
                 onDismissRequest = { showLocDialog = false; pendingIndoor = false },
-                title = {
-                    Text(
-                        if (needAlways) stringResource(R.string.loc_dialog_need_always_title)
-                        else stringResource(R.string.loc_dialog_need_perm_title)
-                    )
-                },
-                text = {
-                    Text(
-                        if (needAlways) stringResource(R.string.loc_dialog_need_always_msg)
-                        else stringResource(R.string.loc_dialog_need_perm_msg)
-                    )
-                },
+                title = { Text(stringResource(titleRes)) },
+                text = { Text(stringResource(msgRes)) },
                 confirmButton = {
                     TextButton(onClick = {
                         showLocDialog = false
@@ -681,6 +704,26 @@ private fun HomeScreen(resumeSeq: Int) {
                 dismissButton = {
                     TextButton(onClick = { showLocDialog = false; pendingIndoor = false }) {
                         Text(stringResource(R.string.dialog_cancel))
+                    }
+                }
+            )
+        }
+
+        // 申请定位前的显著披露
+        if (showLocDisclosure) {
+            AlertDialog(
+                onDismissRequest = { showLocDisclosure = false; pendingIndoor = false },
+                title = { Text(stringResource(R.string.loc_disclosure_title)) },
+                text = { Text(stringResource(R.string.loc_disclosure_msg)) },
+                confirmButton = {
+                    TextButton(onClick = {
+                        showLocDisclosure = false
+                        requestLocationPermission()
+                    }) { Text(stringResource(R.string.loc_disclosure_continue)) }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showLocDisclosure = false; pendingIndoor = false }) {
+                        Text(stringResource(R.string.loc_disclosure_cancel))
                     }
                 }
             )
@@ -1119,6 +1162,10 @@ private fun AboutCard() {
                 stringResource(R.string.about_github),
                 stringResource(R.string.about_github_desc)
             ) { openUrl(ctx, "https://github.com/askfname/HeadsUp") }
+            AboutRow(
+                stringResource(R.string.about_privacy),
+                stringResource(R.string.about_privacy_desc)
+            ) { openUrl(ctx, "https://github.com/askfname/HeadsUp/blob/main/PRIVACY.md") }
             AboutRow(
                 stringResource(R.string.about_license),
                 stringResource(R.string.about_license_desc)

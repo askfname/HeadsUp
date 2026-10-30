@@ -15,7 +15,7 @@
     <string name="mode_popup_title">Notifica a comparsa</string>
     <string name="mode_popup_desc">Banner superiore; richiede l\'autorizzazione per notifiche a comparsa</string>
     <string name="mode_full_title">Promemoria a tutto schermo</string>
-    <string name="mode_full_desc">Interruzione forzata a tutto schermo, effetto massimo</string>
+    <string name="mode_full_desc">Promemoria fluttuante a tutto schermo; richiede l’autorizzazione di sovrapposizione</string>
     <string name="vibrate_title">Vibra al promemoria</string>
     <string name="vibrate_desc">Vibra all\'emissione di un promemoria</string>
     <string name="indoor_mute_title">Silenzia al chiuso</string>
@@ -87,11 +87,11 @@
     <string name="perm_activity_desc">Rileva camminata e scale</string>
     <string name="perm_notif_title">Notifiche</string>
     <string name="perm_notif_desc">Indispensabile per i promemoria</string>
-    <string name="perm_location_title">Posizione (facoltativa)</string>
-    <string name="perm_location_desc_always">Il silenzio al chiuso richiede «Consenti sempre»</string>
-    <string name="perm_location_desc_fg">Il silenzio al chiuso richiede l\'autorizzazione di posizione</string>
+    <string name="perm_location_title">Rilevamento interno/esterno</string>
+    <string name="perm_location_desc_always">Funzione principale: è necessario «Consenti sempre» per silenziare i promemoria al chiuso</string>
+    <string name="perm_location_desc_fg">Funzione principale: è necessaria l’autorizzazione di posizione per silenziare i promemoria al chiuso</string>
     <string name="perm_overlay_title">Mostra sopra le altre app</string>
-    <string name="perm_overlay_desc">Indispensabile per i promemoria a comparsa</string>
+    <string name="perm_overlay_desc">Indispensabile per i promemoria a comparsa e a tutto schermo</string>
     <string name="perm_open">Attiva</string>
     <string name="perm_granted">Concessa</string>
 
@@ -201,4 +201,14 @@
     <string name="guard_walking_format">Probabile camminata · passi %1$d/%2$d (%3$d s in corso)</string>
     <string name="guard_still_format">Fermo · passi %1$d/%2$d</string>
     <string name="guard_running_title">HeadsUp in esecuzione</string>
+
+    <!-- Privacy policy + location disclosure -->
+    <string name="about_privacy">Informativa sulla privacy</string>
+    <string name="about_privacy_desc">Come HeadsUp gestisce i tuoi dati</string>
+    <string name="loc_disclosure_title">Posizione per il rilevamento interno/esterno</string>
+    <string name="loc_disclosure_msg">HeadsUp usa la tua posizione, anche in background mentre il monitoraggio è attivo, per rilevare se sei al chiuso e silenziare lì i promemoria. La posizione viene elaborata solo su questo dispositivo e non viene mai caricata. Puoi disattivare il silenzio al chiuso o revocare l’accesso in qualsiasi momento.</string>
+    <string name="loc_disclosure_continue">Accetta e continua</string>
+    <string name="loc_disclosure_cancel">Non ora</string>
+    <string name="loc_dialog_need_precise_title">Posizione precisa necessaria</string>
+    <string name="loc_dialog_need_precise_msg">Il rilevamento interno/esterno richiede la posizione precisa. In Info app → Autorizzazioni → Posizione, attiva «Usa posizione precisa» e seleziona «Consenti sempre».</string>
 </resources>

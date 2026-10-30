@@ -15,7 +15,7 @@
     <string name="mode_popup_title">पॉप-अप सूचना</string>
     <string name="mode_popup_desc">शीर्ष बैनर; पॉप-अप सूचना अनुमति आवश्यक</string>
     <string name="mode_full_title">पूर्ण-स्क्रीन याद</string>
-    <string name="mode_full_desc">ज़बरदस्त पूर्ण-स्क्रीन व्यवधान, सबसे प्रभावी</string>
+    <string name="mode_full_desc">पूर्ण-स्क्रीन फ़्लोटिंग याद, अन्य ऐप्स पर दिखाने की अनुमति आवश्यक</string>
     <string name="vibrate_title">याद पर कंपन</string>
     <string name="vibrate_desc">याद जारी होने पर कंपन करें</string>
     <string name="indoor_mute_title">घर के अंदर याद न दिलाएं</string>
@@ -87,11 +87,11 @@
     <string name="perm_activity_desc">चलना / सीढ़ी चढ़ना पहचानें</string>
     <string name="perm_notif_title">सूचनाएँ</string>
     <string name="perm_notif_desc">याद हेतु आवश्यक</string>
-    <string name="perm_location_title">स्थान (वैकल्पिक)</string>
-    <string name="perm_location_desc_always">घर के अंदर मौन हेतु “हमेशा अनुमति दें” आवश्यक</string>
-    <string name="perm_location_desc_fg">घर के अंदर मौन हेतु स्थान अनुमति आवश्यक</string>
+    <string name="perm_location_title">अंदर/बाहर की पहचान</string>
+    <string name="perm_location_desc_always">मुख्य सुविधा: घर के अंदर याद रोकने के लिए “हमेशा अनुमति दें” आवश्यक है</string>
+    <string name="perm_location_desc_fg">मुख्य सुविधा: घर के अंदर याद रोकने के लिए स्थान अनुमति आवश्यक है</string>
     <string name="perm_overlay_title">अन्य ऐप्स पर दिखाएँ</string>
-    <string name="perm_overlay_desc">पॉप-अप याद हेतु आवश्यक</string>
+    <string name="perm_overlay_desc">पॉप-अप और पूर्ण-स्क्रीन याद के लिए आवश्यक</string>
     <string name="perm_open">चालू करें</string>
     <string name="perm_granted">अनुमत</string>
 
@@ -201,4 +201,14 @@
     <string name="guard_walking_format">संभावित चलना · लगातार कदम %1$d/%2$d (%3$d से जारी)</string>
     <string name="guard_still_format">स्थिर · लगातार कदम %1$d/%2$d</string>
     <string name="guard_running_title">HeadsUp चल रहा है</string>
+
+    <!-- Privacy policy + location disclosure -->
+    <string name="about_privacy">गोपनीयता नीति</string>
+    <string name="about_privacy_desc">HeadsUp आपके डेटा को कैसे संभालता है</string>
+    <string name="loc_disclosure_title">अंदर/बाहर की पहचान के लिए स्थान</string>
+    <string name="loc_disclosure_msg">HeadsUp निगरानी चालू रहने के दौरान (बैकग्राउंड सहित) आपके स्थान का उपयोग करता है, ताकि पता लगा सके कि आप अंदर हैं या नहीं और वहाँ याद रोक सके। स्थान केवल इसी डिवाइस पर संसाधित होता है और कभी अपलोड नहीं होता। आप कभी भी अंदर याद रोकना बंद कर सकते हैं या अनुमति वापस ले सकते हैं।</string>
+    <string name="loc_disclosure_continue">सहमत हों और जारी रखें</string>
+    <string name="loc_disclosure_cancel">अभी नहीं</string>
+    <string name="loc_dialog_need_precise_title">सटीक स्थान आवश्यक</string>
+    <string name="loc_dialog_need_precise_msg">अंदर/बाहर की पहचान के लिए सटीक स्थान आवश्यक है। ऐप जानकारी → अनुमतियाँ → स्थान में “सटीक स्थान का उपयोग करें” चालू करें और “हमेशा अनुमति दें” चुनें।</string>
 </resources>

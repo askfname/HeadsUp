@@ -15,7 +15,7 @@
     <string name="mode_popup_title">إشعار منبثق</string>
     <string name="mode_popup_desc">شريط علوي؛ يتطلب إذن الإشعارات المنبثقة</string>
     <string name="mode_full_title">تذكير بملء الشاشة</string>
-    <string name="mode_full_desc">مقاطعة إجبارية بملء الشاشة بأقصى تأثير</string>
+    <string name="mode_full_desc">تذكير عائم بملء الشاشة؛ يتطلب إذن العرض فوق التطبيقات</string>
     <string name="vibrate_title">الاهتزاز عند التذكير</string>
     <string name="vibrate_desc">الاهتزاز عند إصدار التذكير</string>
     <string name="indoor_mute_title">كتم الصوت في الأماكن المغلقة</string>
@@ -87,11 +87,11 @@
     <string name="perm_activity_desc">كشف المشي وصعود الدرج</string>
     <string name="perm_notif_title">الإشعارات</string>
     <string name="perm_notif_desc">ضرورية للتذكيرات</string>
-    <string name="perm_location_title">الموقع (اختياري)</string>
-    <string name="perm_location_desc_always">يتطلب كتم الأماكن المغلقة “السماح طوال الوقت”</string>
-    <string name="perm_location_desc_fg">يتطلب كتم الأماكن المغلقة إذن الموقع</string>
+    <string name="perm_location_title">كشف الأماكن الداخلية/الخارجية</string>
+    <string name="perm_location_desc_always">ميزة أساسية: يلزم اختيار «السماح طوال الوقت» لكتم التذكيرات في الأماكن المغلقة</string>
+    <string name="perm_location_desc_fg">ميزة أساسية: يلزم إذن الموقع لكتم التذكيرات في الأماكن المغلقة</string>
     <string name="perm_overlay_title">العرض فوق التطبيقات الأخرى</string>
-    <string name="perm_overlay_desc">ضروري للتذكيرات المنبثقة</string>
+    <string name="perm_overlay_desc">ضروري للتذكيرات المنبثقة وبملء الشاشة</string>
     <string name="perm_open">تفعيل</string>
     <string name="perm_granted">ممنوح</string>
 
@@ -201,4 +201,14 @@
     <string name="guard_walking_format">احتمال المشي · خطوات %1$d/%2$d (مستمر منذ %3$d ث)</string>
     <string name="guard_still_format">ثابت · خطوات %1$d/%2$d</string>
     <string name="guard_running_title">HeadsUp قيد التشغيل</string>
+
+    <!-- Privacy policy + location disclosure -->
+    <string name="about_privacy">سياسة الخصوصية</string>
+    <string name="about_privacy_desc">كيف يتعامل HeadsUp مع بياناتك</string>
+    <string name="loc_disclosure_title">الموقع المطلوب لكشف الأماكن الداخلية/الخارجية</string>
+    <string name="loc_disclosure_msg">يستخدم HeadsUp موقعك، بما في ذلك في الخلفية أثناء تشغيل المراقبة، لمعرفة ما إذا كنت في مكان مغلق وكتم التذكيرات هناك. تتم معالجة الموقع على هذا الجهاز فقط ولا يتم رفعه أبدًا. يمكنك إيقاف كتم الأماكن المغلقة أو سحب الإذن في أي وقت.</string>
+    <string name="loc_disclosure_continue">الموافقة والمتابعة</string>
+    <string name="loc_disclosure_cancel">ليس الآن</string>
+    <string name="loc_dialog_need_precise_title">يلزم الموقع الدقيق</string>
+    <string name="loc_dialog_need_precise_msg">يحتاج كشف الأماكن الداخلية/الخارجية إلى الموقع الدقيق. في معلومات التطبيق ← الأذونات ← الموقع، فعّل «استخدام الموقع الدقيق» واختر «السماح طوال الوقت».</string>
 </resources>

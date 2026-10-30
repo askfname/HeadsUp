@@ -54,8 +54,7 @@ app/src/main/java/com/playlab/headsup/
 │   ├── ActivityUpdateReceiver.kt
 │   └── BootReceiver.kt        # Boot auto-start/revive after kill
 ├── reminder/
-│   ├── ReminderManager.kt     # Three reminder styles (with indoor-suppression gate)
-│   └── ReminderActivity.kt    # Full-screen reminder page
+│   └── ReminderManager.kt     # Three reminder styles incl. full-screen overlay (with indoor-suppression gate)
 ├── worker/KeepAliveWorker.kt
 └── util/
     ├── IndoorDetector.kt      # GPS indoor detection (visible-strong-satellite median + cache + power-saving scheduling)

@@ -51,10 +51,10 @@ object PermissionHelper {
         } catch (_: Exception) { false }
     }
 
-    /** 室内判断要求始终允许：仅此次/仅使用时不算；不区分的系统以前台为准 */
+    /** 室内判断要求精确位置 + 始终允许：GNSS 需要精确位置，粗略位置无法判断室内外 */
     fun hasAlwaysLocation(ctx: Context) =
-        if (!requiresAlwaysLocation(ctx)) hasForegroundLocation(ctx)
-        else hasForegroundLocation(ctx) && hasBackgroundLocation(ctx)
+        hasFineLocation(ctx) &&
+            (!requiresAlwaysLocation(ctx) || hasBackgroundLocation(ctx))
 
     /** 室内判断会在服务中访问位置，必须具有当前系统要求的授权 */
     fun isLocationEnough(ctx: Context) = hasAlwaysLocation(ctx)

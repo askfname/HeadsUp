@@ -15,7 +15,7 @@
     <string name="mode_popup_title">Всплывающее уведомление</string>
     <string name="mode_popup_desc">Верхний баннер; требуется разрешение на всплывающие уведомления</string>
     <string name="mode_full_title">Полноэкранное напоминание</string>
-    <string name="mode_full_desc">Принудительное полноэкранное прерывание с максимальным эффектом</string>
+    <string name="mode_full_desc">Полноэкранное плавающее напоминание; требуется разрешение на отображение поверх приложений</string>
     <string name="vibrate_title">Вибрация при напоминании</string>
     <string name="vibrate_desc">Вибрация при выдаче напоминания</string>
     <string name="indoor_mute_title">Не напоминать в помещении</string>
@@ -87,11 +87,11 @@
     <string name="perm_activity_desc">Обнаружение ходьбы и лестниц</string>
     <string name="perm_notif_title">Уведомления</string>
     <string name="perm_notif_desc">Обязательны для напоминаний</string>
-    <string name="perm_location_title">Местоположение (необязательно)</string>
-    <string name="perm_location_desc_always">Для отключения в помещении требуется «Разрешить всегда»</string>
-    <string name="perm_location_desc_fg">Для отключения в помещении требуется разрешение на местоположение</string>
+    <string name="perm_location_title">Определение помещения/улицы</string>
+    <string name="perm_location_desc_always">Основная функция: для отключения напоминаний в помещении требуется «Разрешить всегда»</string>
+    <string name="perm_location_desc_fg">Основная функция: для отключения напоминаний в помещении требуется разрешение на местоположение</string>
     <string name="perm_overlay_title">Отображение поверх других приложений</string>
-    <string name="perm_overlay_desc">Обязательно для всплывающих напоминаний</string>
+    <string name="perm_overlay_desc">Требуется для всплывающих и полноэкранных напоминаний</string>
     <string name="perm_open">Включить</string>
     <string name="perm_granted">Разрешено</string>
 
@@ -201,4 +201,14 @@
     <string name="guard_walking_format">Вероятно ходьба · шагов подряд %1$d/%2$d (уже %3$d с)</string>
     <string name="guard_still_format">Неподвижно · шагов подряд %1$d/%2$d</string>
     <string name="guard_running_title">HeadsUp работает</string>
+
+    <!-- Privacy policy + location disclosure -->
+    <string name="about_privacy">Политика конфиденциальности</string>
+    <string name="about_privacy_desc">Как HeadsUp обрабатывает ваши данные</string>
+    <string name="loc_disclosure_title">Местоположение для определения помещения/улицы</string>
+    <string name="loc_disclosure_msg">HeadsUp использует ваше местоположение, в том числе в фоновом режиме, пока мониторинг включён, чтобы определить, находитесь ли вы в помещении, и отключить там напоминания. Местоположение обрабатывается только на этом устройстве и никогда не передаётся. Вы можете в любое время отключить режим «не напоминать в помещении» или отозвать разрешение.</string>
+    <string name="loc_disclosure_continue">Согласиться и продолжить</string>
+    <string name="loc_disclosure_cancel">Не сейчас</string>
+    <string name="loc_dialog_need_precise_title">Требуется точное местоположение</string>
+    <string name="loc_dialog_need_precise_msg">Для определения помещения/улицы требуется точное местоположение. В разделе «О приложении → Разрешения → Местоположение» включите «Точное местоположение» и выберите «Разрешить всегда».</string>
 </resources>

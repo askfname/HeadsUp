@@ -15,7 +15,7 @@
     <string name="mode_float_title">Rappel flottant</string>
     <string name="mode_float_desc">Carte flottante ; autorisation de surimpression requise</string>
     <string name="mode_full_title">Rappel en plein écran</string>
-    <string name="mode_full_desc">Interruption forcée en plein écran, effet maximal</string>
+    <string name="mode_full_desc">Rappel flottant en plein écran ; autorisation de surimpression requise</string>
     <string name="vibrate_title">Vibrer lors du rappel</string>
     <string name="vibrate_desc">Vibrer lors de l\'émission d\'un rappel</string>
     <string name="indoor_mute_title">Silence à l\'intérieur</string>
@@ -87,11 +87,11 @@
     <string name="perm_activity_desc">Détecter la marche et les escaliers</string>
     <string name="perm_notif_title">Notifications</string>
     <string name="perm_notif_desc">Indispensable pour les rappels</string>
-    <string name="perm_location_title">Localisation (facultatif)</string>
-    <string name="perm_location_desc_always">Le silence à l\'intérieur exige « Toujours autoriser »</string>
-    <string name="perm_location_desc_fg">Le silence à l\'intérieur exige l\'autorisation de localisation</string>
+    <string name="perm_location_title">Détection intérieur/extérieur</string>
+    <string name="perm_location_desc_always">Fonction principale : « Toujours autoriser » est requis pour couper les rappels à l’intérieur</string>
+    <string name="perm_location_desc_fg">Fonction principale : l’autorisation de localisation est requise pour couper les rappels à l’intérieur</string>
     <string name="perm_overlay_title">Afficher par-dessus les autres applications</string>
-    <string name="perm_overlay_desc">Indispensable pour les rappels contextuels</string>
+    <string name="perm_overlay_desc">Indispensable pour les rappels contextuels et en plein écran</string>
     <string name="perm_open">Activer</string>
     <string name="perm_granted">Accordée</string>
 
@@ -201,4 +201,14 @@
     <string name="guard_walking_format">Marche probable · pas consécutifs %1$d/%2$d (%3$d s en cours)</string>
     <string name="guard_still_format">Immobile · pas consécutifs %1$d/%2$d</string>
     <string name="guard_running_title">HeadsUp en cours d\'exécution</string>
+
+    <!-- Privacy policy + location disclosure -->
+    <string name="about_privacy">Politique de confidentialité</string>
+    <string name="about_privacy_desc">Comment HeadsUp traite vos données</string>
+    <string name="loc_disclosure_title">Localisation pour la détection intérieur/extérieur</string>
+    <string name="loc_disclosure_msg">HeadsUp utilise votre localisation, y compris en arrière-plan lorsque la surveillance est active, pour déterminer si vous êtes à l’intérieur et y couper les rappels. La localisation est traitée uniquement sur cet appareil et n’est jamais envoyée. Vous pouvez désactiver le silence à l’intérieur ou révoquer l’accès à tout moment.</string>
+    <string name="loc_disclosure_continue">Accepter et continuer</string>
+    <string name="loc_disclosure_cancel">Plus tard</string>
+    <string name="loc_dialog_need_precise_title">Localisation précise requise</string>
+    <string name="loc_dialog_need_precise_msg">La détection intérieur/extérieur nécessite la localisation précise. Dans Infos de l’application → Autorisations → Localisation, activez « Utiliser la position exacte » et sélectionnez « Toujours autoriser ».</string>
 </resources>

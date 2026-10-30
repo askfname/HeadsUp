@@ -15,7 +15,7 @@
     <string name="mode_popup_title">Notificação emergente</string>
     <string name="mode_popup_desc">Faixa superior; requer permissão de notificação emergente</string>
     <string name="mode_full_title">Lembrete em ecrã completo</string>
-    <string name="mode_full_desc">Interrupção forçada em ecrã completo, efeito máximo</string>
+    <string name="mode_full_desc">Lembrete flutuante em ecrã completo; requer permissão de sobreposição</string>
     <string name="vibrate_title">Vibrar ao alertar</string>
     <string name="vibrate_desc">Vibrar ao emitir um lembrete</string>
     <string name="indoor_mute_title">Silenciar em interiores</string>
@@ -87,11 +87,11 @@
     <string name="perm_activity_desc">Detetar caminhada e escadas</string>
     <string name="perm_notif_title">Notificações</string>
     <string name="perm_notif_desc">Essencial para lembretes</string>
-    <string name="perm_location_title">Localização (opcional)</string>
-    <string name="perm_location_desc_always">Silenciar em interiores requer «Permitir sempre»</string>
-    <string name="perm_location_desc_fg">Silenciar em interiores requer permissão de localização</string>
+    <string name="perm_location_title">Deteção de interior/exterior</string>
+    <string name="perm_location_desc_always">Funcionalidade principal: é necessário «Permitir sempre» para silenciar os lembretes em interiores</string>
+    <string name="perm_location_desc_fg">Funcionalidade principal: é necessária permissão de localização para silenciar os lembretes em interiores</string>
     <string name="perm_overlay_title">Apresentar sobre outras aplicações</string>
-    <string name="perm_overlay_desc">Essencial para lembretes emergentes</string>
+    <string name="perm_overlay_desc">Essencial para lembretes emergentes e em ecrã completo</string>
     <string name="perm_open">Ativar</string>
     <string name="perm_granted">Concedida</string>
 
@@ -201,4 +201,14 @@
     <string name="guard_walking_format">Possível marcha · passos %1$d/%2$d (%3$d s em curso)</string>
     <string name="guard_still_format">Parado · passos %1$d/%2$d</string>
     <string name="guard_running_title">HeadsUp em execução</string>
+
+    <!-- Privacy policy + location disclosure -->
+    <string name="about_privacy">Política de privacidade</string>
+    <string name="about_privacy_desc">Como o HeadsUp trata os seus dados</string>
+    <string name="loc_disclosure_title">Localização para deteção de interior/exterior</string>
+    <string name="loc_disclosure_msg">O HeadsUp utiliza a sua localização, incluindo em segundo plano enquanto a monitorização está ativa, para detetar se está em interiores e aí silenciar os lembretes. A localização é processada apenas neste dispositivo e nunca é enviada. Pode desativar o silêncio em interiores ou revogar o acesso a qualquer momento.</string>
+    <string name="loc_disclosure_continue">Aceitar e continuar</string>
+    <string name="loc_disclosure_cancel">Agora não</string>
+    <string name="loc_dialog_need_precise_title">Localização precisa necessária</string>
+    <string name="loc_dialog_need_precise_msg">A deteção de interior/exterior necessita de localização precisa. Em Informações da app → Permissões → Localização, ative «Usar localização precisa» e selecione «Permitir sempre».</string>
 </resources>

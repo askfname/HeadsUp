@@ -15,7 +15,7 @@
     <string name="mode_popup_title">Notificación emergente</string>
     <string name="mode_popup_desc">Banner superior; requiere permiso de notificación emergente</string>
     <string name="mode_full_title">Aviso a pantalla completa</string>
-    <string name="mode_full_desc">Interrupción forzada a pantalla completa, efecto máximo</string>
+    <string name="mode_full_desc">Recordatorio flotante a pantalla completa; requiere permiso de superposición</string>
     <string name="vibrate_title">Vibrar al avisar</string>
     <string name="vibrate_desc">Vibrar al emitir un aviso</string>
     <string name="indoor_mute_title">Silenciar en interiores</string>
@@ -87,11 +87,11 @@
     <string name="perm_activity_desc">Detectar caminata y escaleras</string>
     <string name="perm_notif_title">Notificaciones</string>
     <string name="perm_notif_desc">Imprescindible para los avisos</string>
-    <string name="perm_location_title">Ubicación (opcional)</string>
-    <string name="perm_location_desc_always">Silenciar en interiores requiere «Permitir siempre»</string>
-    <string name="perm_location_desc_fg">Silenciar en interiores requiere permiso de ubicación</string>
+    <string name="perm_location_title">Detección de interiores/exteriores</string>
+    <string name="perm_location_desc_always">Función principal: se requiere «Permitir siempre» para silenciar los avisos en interiores</string>
+    <string name="perm_location_desc_fg">Función principal: se requiere permiso de ubicación para silenciar los avisos en interiores</string>
     <string name="perm_overlay_title">Mostrar sobre otras apps</string>
-    <string name="perm_overlay_desc">Imprescindible para avisos emergentes</string>
+    <string name="perm_overlay_desc">Imprescindible para avisos emergentes y a pantalla completa</string>
     <string name="perm_open">Habilitar</string>
     <string name="perm_granted">Concedido</string>
 
@@ -201,4 +201,14 @@
     <string name="guard_walking_format">Posible marcha · pasos consecutivos %1$d/%2$d (%3$d s en curso)</string>
     <string name="guard_still_format">Detenido · pasos consecutivos %1$d/%2$d</string>
     <string name="guard_running_title">HeadsUp en ejecución</string>
+
+    <!-- Privacy policy + location disclosure -->
+    <string name="about_privacy">Política de privacidad</string>
+    <string name="about_privacy_desc">Cómo trata HeadsUp tus datos</string>
+    <string name="loc_disclosure_title">Ubicación para la detección de interiores/exteriores</string>
+    <string name="loc_disclosure_msg">HeadsUp usa tu ubicación, incluso en segundo plano mientras la supervisión está activa, para detectar si estás en interiores y silenciar allí los avisos. La ubicación se procesa solo en este dispositivo y nunca se sube. Puedes desactivar el silencio en interiores o revocar el acceso en cualquier momento.</string>
+    <string name="loc_disclosure_continue">Aceptar y continuar</string>
+    <string name="loc_disclosure_cancel">Ahora no</string>
+    <string name="loc_dialog_need_precise_title">Se requiere ubicación precisa</string>
+    <string name="loc_dialog_need_precise_msg">La detección de interiores/exteriores necesita la ubicación precisa. En Información de la app → Permisos → Ubicación, activa «Usar ubicación precisa» y selecciona «Permitir siempre».</string>
 </resources>

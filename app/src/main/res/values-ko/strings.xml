@@ -15,7 +15,7 @@
     <string name="mode_popup_title">팝업 알림</string>
     <string name="mode_popup_desc">상단 배너, 팝업 알림 권한 필요</string>
     <string name="mode_full_title">전체 화면 알림</string>
-    <string name="mode_full_desc">강제 전체 화면 차단, 가장 강력한 효과</string>
+    <string name="mode_full_desc">전체 화면 플로팅 알림, 다른 앱 위에 표시 권한 필요</string>
     <string name="vibrate_title">알림 시 진동</string>
     <string name="vibrate_desc">알림 발송 시 진동합니다</string>
     <string name="indoor_mute_title">실내에서는 알림 끄기</string>
@@ -87,11 +87,11 @@
     <string name="perm_activity_desc">보행 / 계단 오르내림 감지</string>
     <string name="perm_notif_title">알림</string>
     <string name="perm_notif_desc">알림에 필수</string>
-    <string name="perm_location_title">위치 (선택)</string>
-    <string name="perm_location_desc_always">실내 무음에는 “항상 허용” 필요</string>
-    <string name="perm_location_desc_fg">실내 무음에는 위치 권한 필요</string>
+    <string name="perm_location_title">실내/실외 감지</string>
+    <string name="perm_location_desc_always">핵심 기능: 실내에서 알림을 중지하려면 “항상 허용”이 필요합니다</string>
+    <string name="perm_location_desc_fg">핵심 기능: 실내에서 알림을 중지하려면 위치 권한이 필요합니다</string>
     <string name="perm_overlay_title">다른 앱 위에 표시</string>
-    <string name="perm_overlay_desc">팝업 알림에 필수</string>
+    <string name="perm_overlay_desc">팝업 및 전체 화면 알림에 필요</string>
     <string name="perm_open">사용 설정</string>
     <string name="perm_granted">허용됨</string>
 
@@ -201,4 +201,14 @@
     <string name="guard_walking_format">보행 의심 · 연속 걸음 %1$d/%2$d (%3$d초 지속)</string>
     <string name="guard_still_format">정지 · 연속 걸음 %1$d/%2$d</string>
     <string name="guard_running_title">HeadsUp 실행 중</string>
+
+    <!-- Privacy policy + location disclosure -->
+    <string name="about_privacy">개인정보 처리방침</string>
+    <string name="about_privacy_desc">HeadsUp의 데이터 처리 방식</string>
+    <string name="loc_disclosure_title">실내/실외 감지를 위한 위치 정보</string>
+    <string name="loc_disclosure_msg">HeadsUp은 모니터링이 켜져 있는 동안(백그라운드 포함) 위치 정보를 사용하여 실내 여부를 판단하고 실내에서는 알림을 중지합니다. 위치 정보는 이 기기에서만 처리되며 업로드되지 않습니다. 언제든지 실내 알림 중지를 끄거나 권한을 철회할 수 있습니다.</string>
+    <string name="loc_disclosure_continue">동의하고 계속</string>
+    <string name="loc_disclosure_cancel">나중에</string>
+    <string name="loc_dialog_need_precise_title">정확한 위치 필요</string>
+    <string name="loc_dialog_need_precise_msg">실내/실외 감지에는 정확한 위치가 필요합니다. 앱 정보 → 권한 → 위치에서 “정확한 위치 사용”을 켜고 “항상 허용”을 선택하세요.</string>
 </resources>

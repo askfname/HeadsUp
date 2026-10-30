@@ -15,7 +15,7 @@
     <string name="mode_popup_title">Pop-up-Benachrichtigung</string>
     <string name="mode_popup_desc">Banner oben; Berechtigung für Pop-up-Benachrichtigung erforderlich</string>
     <string name="mode_full_title">Vollbilderinnerung</string>
-    <string name="mode_full_desc">Erzwungene Vollbildunterbrechung mit stärkster Wirkung</string>
+    <string name="mode_full_desc">Schwebende Vollbilderinnerung; Berechtigung zur Anzeige über Apps erforderlich</string>
     <string name="vibrate_title">Bei Erinnerung vibrieren</string>
     <string name="vibrate_desc">Beim Ausgeben einer Erinnerung vibrieren</string>
     <string name="indoor_mute_title">In Innenräumen stumm</string>
@@ -87,11 +87,11 @@
     <string name="perm_activity_desc">Gehen und Treppensteigen erkennen</string>
     <string name="perm_notif_title">Benachrichtigungen</string>
     <string name="perm_notif_desc">Für Erinnerungen erforderlich</string>
-    <string name="perm_location_title">Standort (optional)</string>
-    <string name="perm_location_desc_always">Stummschaltung in Innenräumen erfordert „Immer zulassen“</string>
-    <string name="perm_location_desc_fg">Stummschaltung in Innenräumen erfordert Standortberechtigung</string>
+    <string name="perm_location_title">Innen-/Außen-Erkennung</string>
+    <string name="perm_location_desc_always">Kernfunktion: „Immer zulassen“ ist erforderlich, um Erinnerungen in Innenräumen stummzuschalten</string>
+    <string name="perm_location_desc_fg">Kernfunktion: Standortberechtigung ist erforderlich, um Erinnerungen in Innenräumen stummzuschalten</string>
     <string name="perm_overlay_title">Über anderen Apps anzeigen</string>
-    <string name="perm_overlay_desc">Für Pop-up-Erinnerungen erforderlich</string>
+    <string name="perm_overlay_desc">Erforderlich für Pop-up- und Vollbilderinnerungen</string>
     <string name="perm_open">Aktivieren</string>
     <string name="perm_granted">Gewährt</string>
 
@@ -201,4 +201,14 @@
     <string name="guard_walking_format">Vermutlich Gehen · Schritte %1$d/%2$d (seit %3$d s)</string>
     <string name="guard_still_format">Stillstand · Schritte %1$d/%2$d</string>
     <string name="guard_running_title">HeadsUp wird ausgeführt</string>
+
+    <!-- Privacy policy + location disclosure -->
+    <string name="about_privacy">Datenschutzerklärung</string>
+    <string name="about_privacy_desc">Wie HeadsUp mit Ihren Daten umgeht</string>
+    <string name="loc_disclosure_title">Standort für die Innen-/Außen-Erkennung</string>
+    <string name="loc_disclosure_msg">HeadsUp verwendet Ihren Standort, auch im Hintergrund, solange die Überwachung aktiv ist, um zu erkennen, ob Sie sich in Innenräumen befinden, und dort Erinnerungen stummzuschalten. Der Standort wird nur auf diesem Gerät verarbeitet und niemals hochgeladen. Sie können die Stummschaltung in Innenräumen jederzeit deaktivieren oder den Zugriff widerrufen.</string>
+    <string name="loc_disclosure_continue">Zustimmen und fortfahren</string>
+    <string name="loc_disclosure_cancel">Nicht jetzt</string>
+    <string name="loc_dialog_need_precise_title">Genauer Standort erforderlich</string>
+    <string name="loc_dialog_need_precise_msg">Die Innen-/Außen-Erkennung benötigt den genauen Standort. Aktivieren Sie in App-Info → Berechtigungen → Standort „Genauen Standort verwenden“ und wählen Sie „Immer zulassen“.</string>
 </resources>

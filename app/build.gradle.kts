@@ -36,12 +36,12 @@ if (releaseSigningConfigured) {
 
 android {
     namespace = "com.playlab.headsup"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.playlab.headsup"
         minSdk = 29
-        targetSdk = 34
+        targetSdk = 36
         versionCode = 2
         versionName = "2.1"
     }

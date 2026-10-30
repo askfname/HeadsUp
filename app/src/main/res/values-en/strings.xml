@@ -18,7 +18,7 @@
     <string name="mode_popup_title">Pop-up notification</string>
     <string name="mode_popup_desc">Top banner; pop-up notification permission required</string>
     <string name="mode_full_title">Full-screen reminder</string>
-    <string name="mode_full_desc">Forced full-screen interruption for the strongest effect</string>
+    <string name="mode_full_desc">Full-screen floating reminder; display-over-apps permission required</string>
     <string name="vibrate_title">Vibrate on reminder</string>
     <string name="vibrate_desc">Vibrate when a reminder is issued</string>
     <string name="indoor_mute_title">Mute indoors</string>
@@ -92,11 +92,11 @@
     <string name="perm_activity_desc">Detect walking and stair activity</string>
     <string name="perm_notif_title">Notifications</string>
     <string name="perm_notif_desc">Required for reminders</string>
-    <string name="perm_location_title">Location (optional)</string>
-    <string name="perm_location_desc_always">Muting indoors requires “Allow all the time”</string>
-    <string name="perm_location_desc_fg">Muting indoors requires location permission</string>
+    <string name="perm_location_title">Indoor/outdoor detection</string>
+    <string name="perm_location_desc_always">Core feature: “Allow all the time” is required to mute reminders indoors</string>
+    <string name="perm_location_desc_fg">Core feature: location permission is required to mute reminders indoors</string>
     <string name="perm_overlay_title">Display over other apps</string>
-    <string name="perm_overlay_desc">Required for pop-up reminders</string>
+    <string name="perm_overlay_desc">Required for pop-up and full-screen reminders</string>
     <string name="perm_open">Enable</string>
     <string name="perm_granted">Granted</string>
 
@@ -212,4 +212,14 @@
     <string name="guard_walking_format">Possibly walking · continuous steps %1$d/%2$d (ongoing %3$ds)</string>
     <string name="guard_still_format">Stationary · continuous steps %1$d/%2$d</string>
     <string name="guard_running_title">HeadsUp is running</string>
+
+    <!-- Privacy policy + location disclosure -->
+    <string name="about_privacy">Privacy policy</string>
+    <string name="about_privacy_desc">How HeadsUp handles your data</string>
+    <string name="loc_disclosure_title">Location for indoor/outdoor detection</string>
+    <string name="loc_disclosure_msg">HeadsUp uses your location, including in the background while monitoring is on, to detect whether you are indoors and mute reminders there. Location is processed only on this device and is never uploaded. You can turn off indoor muting or revoke access at any time.</string>
+    <string name="loc_disclosure_continue">Agree and continue</string>
+    <string name="loc_disclosure_cancel">Not now</string>
+    <string name="loc_dialog_need_precise_title">Precise location required</string>
+    <string name="loc_dialog_need_precise_msg">Indoor/outdoor detection needs precise location. In App info → Permissions → Location, enable “Use precise location” and select “Allow all the time”.</string>
 </resources>

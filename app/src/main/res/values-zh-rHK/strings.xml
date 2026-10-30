@@ -15,7 +15,7 @@
     <string name="mode_popup_title">浮動通知</string>
     <string name="mode_popup_desc">頂部橫幅，需懸浮通知權限</string>
     <string name="mode_full_title">全螢幕提醒</string>
-    <string name="mode_full_desc">強制全螢幕中斷，效果最強</string>
+    <string name="mode_full_desc">全螢幕懸浮提醒，需懸浮窗權限</string>
     <string name="vibrate_title">提醒時震動</string>
     <string name="vibrate_desc">發出提醒的同時震動</string>
     <string name="indoor_mute_title">室內不提醒</string>
@@ -87,11 +87,11 @@
     <string name="perm_activity_desc">偵測步行/上下樓</string>
     <string name="perm_notif_title">通知</string>
     <string name="perm_notif_desc">傳送提醒所必需</string>
-    <string name="perm_location_title">定位（選用）</string>
-    <string name="perm_location_desc_always">室內不提醒需一律允許</string>
-    <string name="perm_location_desc_fg">室內不提醒需要定位權限</string>
+    <string name="perm_location_title">室內外辨識</string>
+    <string name="perm_location_desc_always">核心功能：需「一律允許」才能在室內暫停提醒</string>
+    <string name="perm_location_desc_fg">核心功能：需定位權限才能在室內暫停提醒</string>
     <string name="perm_overlay_title">懸浮窗</string>
-    <string name="perm_overlay_desc">彈窗提醒所必需</string>
+    <string name="perm_overlay_desc">彈窗與全螢幕提醒所必需</string>
     <string name="perm_open">前往開啟</string>
     <string name="perm_granted">已允許</string>
 
@@ -201,4 +201,14 @@
     <string name="guard_walking_format">疑似行走 · 連貫步數 %1$d/%2$d（已持續 %3$d秒）</string>
     <string name="guard_still_format">靜止 · 連貫步數 %1$d/%2$d</string>
     <string name="guard_running_title">看路提醒執行中</string>
+
+    <!-- Privacy policy + location disclosure -->
+    <string name="about_privacy">私隱政策</string>
+    <string name="about_privacy_desc">了解 HeadsUp 如何處理你的資料</string>
+    <string name="loc_disclosure_title">室內外辨識所需的定位權限</string>
+    <string name="loc_disclosure_msg">HeadsUp 會在監測開啟期間使用定位資訊（包括背景定位），用於判斷你是否在室內並在室內暫停提醒。定位資訊僅在本機處理，不會上傳。你可以隨時關閉室內靜音或撤銷授權。</string>
+    <string name="loc_disclosure_continue">同意並繼續</string>
+    <string name="loc_disclosure_cancel">暫不</string>
+    <string name="loc_dialog_need_precise_title">需要精確定位</string>
+    <string name="loc_dialog_need_precise_msg">室內外辨識需要精確定位。請在「應用程式資訊 → 權限 → 定位」中開啟「使用精確定位」，並選擇「一律允許」。</string>
 </resources>

@@ -15,7 +15,7 @@
     <string name="mode_popup_title">Notifikasi pop-up</string>
     <string name="mode_popup_desc">Spanduk atas; memerlukan izin notifikasi pop-up</string>
     <string name="mode_full_title">Pengingat layar penuh</string>
-    <string name="mode_full_desc">Gangguan layar penuh paksa dengan efek terkuat</string>
+    <string name="mode_full_desc">Pengingat mengambang layar penuh; memerlukan izin tampil di atas aplikasi</string>
     <string name="vibrate_title">Bergetar saat pengingat</string>
     <string name="vibrate_desc">Bergetar saat pengingat dikeluarkan</string>
     <string name="indoor_mute_title">Bisukan di dalam ruangan</string>
@@ -87,11 +87,11 @@
     <string name="perm_activity_desc">Mendeteksi berjalan dan tangga</string>
     <string name="perm_notif_title">Notifikasi</string>
     <string name="perm_notif_desc">Wajib untuk pengingat</string>
-    <string name="perm_location_title">Lokasi (opsional)</string>
-    <string name="perm_location_desc_always">Bisukan di dalam ruangan memerlukan “Selalu izinkan”</string>
-    <string name="perm_location_desc_fg">Bisukan di dalam ruangan memerlukan izin lokasi</string>
+    <string name="perm_location_title">Deteksi dalam/luar ruangan</string>
+    <string name="perm_location_desc_always">Fitur inti: “Selalu izinkan” diperlukan untuk membisukan pengingat di dalam ruangan</string>
+    <string name="perm_location_desc_fg">Fitur inti: izin lokasi diperlukan untuk membisukan pengingat di dalam ruangan</string>
     <string name="perm_overlay_title">Tampil di atas aplikasi lain</string>
-    <string name="perm_overlay_desc">Wajib untuk pengingat pop-up</string>
+    <string name="perm_overlay_desc">Wajib untuk pengingat pop-up dan layar penuh</string>
     <string name="perm_open">Aktifkan</string>
     <string name="perm_granted">Diizinkan</string>
 
@@ -201,4 +201,14 @@
     <string name="guard_walking_format">Diduga berjalan · langkah %1$d/%2$d (%3$d dtk berlangsung)</string>
     <string name="guard_still_format">Diam · langkah %1$d/%2$d</string>
     <string name="guard_running_title">HeadsUp berjalan</string>
+
+    <!-- Privacy policy + location disclosure -->
+    <string name="about_privacy">Kebijakan privasi</string>
+    <string name="about_privacy_desc">Cara HeadsUp menangani data Anda</string>
+    <string name="loc_disclosure_title">Lokasi untuk deteksi dalam/luar ruangan</string>
+    <string name="loc_disclosure_msg">HeadsUp menggunakan lokasi Anda, termasuk di latar belakang selama pemantauan aktif, untuk mendeteksi apakah Anda berada di dalam ruangan dan membisukan pengingat di sana. Lokasi hanya diproses di perangkat ini dan tidak pernah diunggah. Anda dapat menonaktifkan bisukan di dalam ruangan atau mencabut izin kapan saja.</string>
+    <string name="loc_disclosure_continue">Setuju dan lanjutkan</string>
+    <string name="loc_disclosure_cancel">Nanti saja</string>
+    <string name="loc_dialog_need_precise_title">Lokasi presisi diperlukan</string>
+    <string name="loc_dialog_need_precise_msg">Deteksi dalam/luar ruangan memerlukan lokasi presisi. Di Info aplikasi → Izin → Lokasi, aktifkan “Gunakan lokasi presisi” dan pilih “Selalu izinkan”.</string>
 </resources>

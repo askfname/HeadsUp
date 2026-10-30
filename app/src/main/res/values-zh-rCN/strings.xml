@@ -16,7 +16,7 @@
     <string name="mode_popup_title">浮动通知</string>
     <string name="mode_popup_desc">顶部横幅，需悬浮通知权限</string>
     <string name="mode_full_title">全屏提醒</string>
-    <string name="mode_full_desc">强制全屏打断，效果最强</string>
+    <string name="mode_full_desc">全屏悬浮提醒，需悬浮窗权限</string>
     <string name="vibrate_title">提醒时震动</string>
     <string name="vibrate_desc">发出提醒的同时震动</string>
     <string name="indoor_mute_title">室内不提醒</string>
@@ -88,11 +88,11 @@
     <string name="perm_activity_desc">检测步行/上下楼</string>
     <string name="perm_notif_title">通知</string>
     <string name="perm_notif_desc">发送提醒必备</string>
-    <string name="perm_location_title">位置（可选）</string>
-    <string name="perm_location_desc_always">室内不提醒需始终允许</string>
-    <string name="perm_location_desc_fg">室内不提醒需要位置权限</string>
+    <string name="perm_location_title">室内外识别</string>
+    <string name="perm_location_desc_always">核心功能：需始终允许才能在室内暂停提醒</string>
+    <string name="perm_location_desc_fg">核心功能：需位置权限才能在室内暂停提醒</string>
     <string name="perm_overlay_title">悬浮窗</string>
-    <string name="perm_overlay_desc">弹窗提醒必须</string>
+    <string name="perm_overlay_desc">弹窗与全屏提醒所必需</string>
     <string name="perm_open">去开启</string>
     <string name="perm_granted">已允许</string>
 
@@ -202,4 +202,14 @@
     <string name="guard_walking_format">疑似行走 · 连贯步数 %1$d/%2$d（已持续 %3$d秒）</string>
     <string name="guard_still_format">静止 · 连贯步数 %1$d/%2$d</string>
     <string name="guard_running_title">看路提醒运行中</string>
+
+    <!-- Privacy policy + location disclosure -->
+    <string name="about_privacy">隐私政策</string>
+    <string name="about_privacy_desc">了解 HeadsUp 如何处理你的数据</string>
+    <string name="loc_disclosure_title">室内外识别所需的位置权限</string>
+    <string name="loc_disclosure_msg">HeadsUp 会在监测开启期间使用位置信息（包括后台位置），用于判断你是否在室内并在室内暂停提醒。位置信息仅在本机处理，不会上传。你可以随时关闭室内静音或撤销授权。</string>
+    <string name="loc_disclosure_continue">同意并继续</string>
+    <string name="loc_disclosure_cancel">暂不</string>
+    <string name="loc_dialog_need_precise_title">需要精确位置</string>
+    <string name="loc_dialog_need_precise_msg">室内外识别需要精确位置。请在“应用信息 → 权限 → 位置”中开启“使用精确位置”，并选择“始终允许”。</string>
 </resources>
