@@ -1,8 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">HeadsUp</string>
-    <string name="desc">歩行中のスマートフォン利用時に適時リマインドし、前方を確認しましょう</string>
-    <string name="disclaimer">リマインドは注意力を代替しません。歩行中のスマートフォン利用は最小限にしてください。</string>
 
     <string name="home_status_on">保護中</string>
     <string name="home_status_off">オフ</string>

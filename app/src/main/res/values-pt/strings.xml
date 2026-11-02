@@ -1,8 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">HeadsUp</string>
-    <string name="desc">Lembretes oportunos ao usar o telemóvel a caminhar — olhe para o caminho</string>
-    <string name="disclaimer">Os lembretes não substituem a atenção. Minimize o uso do telemóvel ao caminhar.</string>
 
     <string name="home_status_on">Proteção ativa</string>
     <string name="home_status_off">Desativado</string>

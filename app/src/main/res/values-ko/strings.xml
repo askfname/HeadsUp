@@ -1,8 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">HeadsUp</string>
-    <string name="desc">보행 중 스마트폰 사용 시 적시에 알림을 제공하여 전방을 확인하세요</string>
-    <string name="disclaimer">알림은 주의를 대체하지 않습니다. 보행 중 스마트폰 사용을 최소화하십시오.</string>
 
     <string name="home_status_on">보호 중</string>
     <string name="home_status_off">꺼짐</string>

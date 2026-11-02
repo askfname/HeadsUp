@@ -1,8 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">HeadsUp</string>
-    <string name="desc">Rappels opportuns lors de l\'utilisation du téléphone en marchant — levez les yeux</string>
-    <string name="disclaimer">Les rappels ne remplacent pas l\'attention. Limitez l\'usage du téléphone en marchant.</string>
 
     <string name="home_status_on">Protection active</string>
     <string name="home_status_off">Désactivé</string>

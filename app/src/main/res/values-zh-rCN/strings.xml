@@ -2,8 +2,6 @@
 <resources>
     <!-- 中文环境使用中文应用名称与开发者名称 -->
     <string name="app_name">看路提醒</string>
-    <string name="desc">走路玩手机时及时提醒，抬头看看路</string>
-    <string name="disclaimer">提醒不能替代注意力，走路时请尽量少看手机。</string>
 
     <string name="home_status_on">守护中</string>
     <string name="home_status_off">已关闭</string>

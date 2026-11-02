@@ -5,10 +5,10 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import android.os.PowerManager
 import android.provider.Settings
+import androidx.core.net.toUri
 import com.playlab.headsup.R
 
 /** 后台限制设置引导。系统和厂商策略不能由应用自行绕过 */
@@ -285,7 +285,7 @@ object KeepAliveHelper {
     /** 应用详情页意图（供设置返回回调启动，返回后可立即刷新状态） */
     fun appDetailsIntent(ctx: Context) =
         Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-            data = Uri.parse("package:${ctx.packageName}")
+            data = "package:${ctx.packageName}".toUri()
         }
 
     // 机型匹配用包含而非相等：子品牌/代工机 MANUFACTURER 写法各异

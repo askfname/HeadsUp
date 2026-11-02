@@ -33,16 +33,13 @@ object PermissionHelper {
             ContextCompat.checkSelfPermission(ctx, Manifest.permission.ACCESS_COARSE_LOCATION) ==
             PackageManager.PERMISSION_GRANTED
 
-    /** 后台位置即“始终允许”（29 以下无区分，有前台即算始终） */
-    fun hasBackgroundLocation(ctx: Context): Boolean {
-        if (Build.VERSION.SDK_INT < 29) return hasForegroundLocation(ctx)
-        return ContextCompat.checkSelfPermission(ctx, Manifest.permission.ACCESS_BACKGROUND_LOCATION) ==
+    /** 后台位置即“始终允许” */
+    fun hasBackgroundLocation(ctx: Context): Boolean =
+        ContextCompat.checkSelfPermission(ctx, Manifest.permission.ACCESS_BACKGROUND_LOCATION) ==
             PackageManager.PERMISSION_GRANTED
-    }
 
-    /** 系统是否区分“始终允许”：29 以下或框架无此权限时只有允许/拒绝，前台授权即够用 */
+    /** 系统是否区分“始终允许”：框架无此权限时只有允许/拒绝，前台授权即够用 */
     fun requiresAlwaysLocation(ctx: Context): Boolean {
-        if (Build.VERSION.SDK_INT < 29) return false
         return try {
             ctx.packageManager.getPermissionInfo(
                 Manifest.permission.ACCESS_BACKGROUND_LOCATION, 0

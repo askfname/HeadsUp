@@ -1,6 +1,7 @@
 package com.playlab.headsup.data
 
 import android.content.Context
+import androidx.core.content.edit
 
 /** 存储：开关 / 提醒方式 / 冷却间隔 */
 object Prefs {
@@ -19,24 +20,24 @@ object Prefs {
 
     fun isEnabled(ctx: Context) = sp(ctx).getBoolean(K_ENABLED, false)
     fun setEnabled(ctx: Context, v: Boolean) =
-        sp(ctx).edit().putBoolean(K_ENABLED, v).apply()
+        sp(ctx).edit { putBoolean(K_ENABLED, v) }
 
     fun getMode(ctx: Context) = sp(ctx).getInt(K_MODE, MODE_FLOAT)
-    fun setMode(ctx: Context, v: Int) = sp(ctx).edit().putInt(K_MODE, v).apply()
+    fun setMode(ctx: Context, v: Int) = sp(ctx).edit { putInt(K_MODE, v) }
 
     fun getCooldown(ctx: Context) = sp(ctx).getInt(K_COOLDOWN, 90)
     fun setCooldown(ctx: Context, v: Int) =
-        sp(ctx).edit().putInt(K_COOLDOWN, v.coerceIn(30, 300)).apply()
+        sp(ctx).edit { putInt(K_COOLDOWN, v.coerceIn(30, 300)) }
 
     /** 室内不提醒：开 + GPS 授权才抑制；关则完全不用 GPS，走正常逻辑 */
     fun isIndoorMute(ctx: Context) = sp(ctx).getBoolean("indoor_mute", false)
     fun setIndoorMute(ctx: Context, v: Boolean) =
-        sp(ctx).edit().putBoolean("indoor_mute", v).apply()
+        sp(ctx).edit { putBoolean("indoor_mute", v) }
 
     /** 提醒时震动：默认开 */
     fun isVibrate(ctx: Context) = sp(ctx).getBoolean("vibrate", true)
     fun setVibrate(ctx: Context, v: Boolean) =
-        sp(ctx).edit().putBoolean("vibrate", v).apply()
+        sp(ctx).edit { putBoolean("vibrate", v) }
 
     /** 室内判断参数：只判室内，达阈值即室内，其余按室外 */
     data class IndoorParams(
@@ -88,25 +89,25 @@ object Prefs {
         visIndoor: Int?, ratioIndoor: Float?, gpsAcc: Float?,
         visCn0: Float? = null,
     ) {
-        val e = sp(ctx).edit()
-        if (visIndoor == null) e.remove(K_IN_VIS_IN) else e.putInt(K_IN_VIS_IN, visIndoor.coerceIn(3, 10))
-        if (ratioIndoor == null) e.remove(K_IN_RATIO_IN) else e.putFloat(K_IN_RATIO_IN, ratioIndoor.finiteOrDefault(IndoorParams().ratioIndoor).coerceIn(0.2f, 0.6f))
-        if (gpsAcc == null) e.remove(K_IN_GPS_ACC) else e.putFloat(K_IN_GPS_ACC, gpsAcc.finiteOrDefault(IndoorParams().gpsAcc).coerceIn(5f, 20f))
-        if (visCn0 == null) e.remove(K_IN_VIS_CN0) else e.putFloat(K_IN_VIS_CN0, visCn0.finiteOrDefault(IndoorParams().visCn0).coerceIn(20f, 35f))
-        e.remove(K_IN_VIS_OUT_OLD).remove(K_IN_FIX_OUT_OLD)
-            .remove(K_IN_RATIO_OUT_OLD).remove(K_IN_CONFIRM_OLD)
-            .remove(K_IN_FIX_CN0_OLD)
-        e.apply()
+        sp(ctx).edit {
+            if (visIndoor == null) remove(K_IN_VIS_IN) else putInt(K_IN_VIS_IN, visIndoor.coerceIn(3, 10))
+            if (ratioIndoor == null) remove(K_IN_RATIO_IN) else putFloat(K_IN_RATIO_IN, ratioIndoor.finiteOrDefault(IndoorParams().ratioIndoor).coerceIn(0.2f, 0.6f))
+            if (gpsAcc == null) remove(K_IN_GPS_ACC) else putFloat(K_IN_GPS_ACC, gpsAcc.finiteOrDefault(IndoorParams().gpsAcc).coerceIn(5f, 20f))
+            if (visCn0 == null) remove(K_IN_VIS_CN0) else putFloat(K_IN_VIS_CN0, visCn0.finiteOrDefault(IndoorParams().visCn0).coerceIn(20f, 35f))
+            remove(K_IN_VIS_OUT_OLD).remove(K_IN_FIX_OUT_OLD)
+                .remove(K_IN_RATIO_OUT_OLD).remove(K_IN_CONFIRM_OLD)
+                .remove(K_IN_FIX_CN0_OLD)
+        }
     }
 
     fun clearIndoorParams(ctx: Context) {
-        sp(ctx).edit()
-            .remove(K_IN_VIS_IN).remove(K_IN_RATIO_IN)
-            .remove(K_IN_GPS_ACC).remove(K_IN_VIS_CN0)
-            .remove(K_IN_VIS_OUT_OLD).remove(K_IN_FIX_OUT_OLD)
-            .remove(K_IN_RATIO_OUT_OLD).remove(K_IN_CONFIRM_OLD)
-            .remove(K_IN_FIX_CN0_OLD)
-            .apply()
+        sp(ctx).edit {
+            remove(K_IN_VIS_IN).remove(K_IN_RATIO_IN)
+                .remove(K_IN_GPS_ACC).remove(K_IN_VIS_CN0)
+                .remove(K_IN_VIS_OUT_OLD).remove(K_IN_FIX_OUT_OLD)
+                .remove(K_IN_RATIO_OUT_OLD).remove(K_IN_CONFIRM_OLD)
+                .remove(K_IN_FIX_CN0_OLD)
+        }
     }
 
     /** 申请过的权限：系统不再弹窗（不再询问）时直接引导去设置 */
@@ -115,13 +116,13 @@ object Prefs {
 
     fun markAsked(ctx: Context, perm: String) {
         val cur = sp(ctx).getStringSet("asked_perms", emptySet()).orEmpty().toMutableSet()
-        if (cur.add(perm)) sp(ctx).edit().putStringSet("asked_perms", cur).apply()
+        if (cur.add(perm)) sp(ctx).edit { putStringSet("asked_perms", cur) }
     }
 
     /** 灵敏度三档：0=灵敏/ 1=标准 / 2=严格 */
     fun getSensitivity(ctx: Context) = sp(ctx).getInt("sensitivity", 1)
     fun setSensitivity(ctx: Context, v: Int) =
-        sp(ctx).edit().putInt("sensitivity", v.coerceIn(0, 2)).apply()
+        sp(ctx).edit { putInt("sensitivity", v.coerceIn(0, 2)) }
 
     /** 灵敏度联动参数：触发步数 / 步频窗 / 节律容差 / 动作门限 / 显示门限 / 单次容错 / 停走延迟 */
     data class GaitParams(
@@ -153,8 +154,8 @@ object Prefs {
     }
 
     fun markTriggered(ctx: Context) =
-        sp(ctx).edit().putLong(K_LAST, System.currentTimeMillis()).apply()
+        sp(ctx).edit { putLong(K_LAST, System.currentTimeMillis()) }
 
     fun resetCooldown(ctx: Context) =
-        sp(ctx).edit().putLong(K_LAST, 0).apply()
+        sp(ctx).edit { putLong(K_LAST, 0) }
 }

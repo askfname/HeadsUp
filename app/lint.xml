@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<lint>
+    <!-- 印尼语 BCP 47 代码为 id，values-b+id 与 localeConfig 保持一致，不用废弃的 in -->
+    <issue id="LocaleFolder">
+        <ignore path="src/main/res/values-b+id" />
+    </issue>
+    <!-- 依赖与 Gradle 版本为本项目验证过的固定组合（Kotlin 2.0.21 + Compose BOM 2024.06.00），
+         整体升级需单独验证，不随本次 lint 修复变更 -->
+    <issue id="GradleDependency" severity="ignore" />
+    <issue id="AndroidGradlePluginVersion" severity="ignore" />
+</lint>

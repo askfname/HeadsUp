@@ -1,8 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">HeadsUp</string>
-    <string name="desc">Rechtzeitige Erinnerungen bei der Handynutzung im Gehen — blicken Sie auf</string>
-    <string name="disclaimer">Erinnerungen ersetzen keine Aufmerksamkeit. Bitte minimieren Sie die Handynutzung im Gehen.</string>
 
     <string name="home_status_on">Schutz aktiv</string>
     <string name="home_status_off">Deaktiviert</string>

@@ -1,8 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">HeadsUp</string>
-    <string name="desc">Pengingat tepat waktu saat menggunakan ponsel sambil berjalan — lihat jalan</string>
-    <string name="disclaimer">Pengingat tidak menggantikan perhatian. Minimalkan penggunaan ponsel saat berjalan.</string>
 
     <string name="home_status_on">Perlindungan aktif</string>
     <string name="home_status_off">Nonaktif</string>

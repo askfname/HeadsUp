@@ -664,14 +664,11 @@ object IndoorDetector {
 
         if (gnssOn) {
 
-            if (Build.VERSION.SDK_INT >= 24) {
-
-                try {
-                    locationMgr?.unregisterGnssStatusCallback(
-                        gnssCallback
-                    )
-                } catch (_: Exception) {
-                }
+            try {
+                locationMgr?.unregisterGnssStatusCallback(
+                    gnssCallback
+                )
+            } catch (_: Exception) {
             }
 
             gnssOn = false

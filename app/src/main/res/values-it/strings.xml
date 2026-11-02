@@ -1,8 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">HeadsUp</string>
-    <string name="desc">Promemoria tempestivi quando usi il telefono camminando: guarda la strada</string>
-    <string name="disclaimer">I promemoria non sostituiscono l\'attenzione. Riduci l\'uso del telefono mentre cammini.</string>
 
     <string name="home_status_on">Protezione attiva</string>
     <string name="home_status_off">Disattivata</string>

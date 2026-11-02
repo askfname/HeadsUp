@@ -1,8 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">HeadsUp</string>
-    <string name="desc">Avisos oportunos al usar el móvil caminando: levanta la vista del camino</string>
-    <string name="disclaimer">Los avisos no sustituyen la atención. Evite usar el móvil al caminar.</string>
 
     <string name="home_status_on">Protección activa</string>
     <string name="home_status_off">Desactivado</string>

@@ -5,7 +5,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -45,6 +44,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import com.playlab.headsup.data.Prefs
 import com.playlab.headsup.R
 import com.playlab.headsup.detection.DetectState
@@ -87,9 +87,9 @@ class MainActivity : ComponentActivity() {
 private fun HomeScreen(resumeSeq: Int) {
     val ctx = LocalContext.current
     var enabled by remember { mutableStateOf(Prefs.isEnabled(ctx)) }
-    var mode by remember { mutableStateOf(Prefs.getMode(ctx)) }
-    var cooldown by remember { mutableStateOf(Prefs.getCooldown(ctx)) }
-    var sens by remember { mutableStateOf(Prefs.getSensitivity(ctx)) }
+    var mode by remember { mutableIntStateOf(Prefs.getMode(ctx)) }
+    var cooldown by remember { mutableIntStateOf(Prefs.getCooldown(ctx)) }
+    var sens by remember { mutableIntStateOf(Prefs.getSensitivity(ctx)) }
     var indoorMute by remember { mutableStateOf(Prefs.isIndoorMute(ctx)) }
     var vibrate by remember { mutableStateOf(Prefs.isVibrate(ctx)) }
     var pendingIndoor by remember { mutableStateOf(false) } // 权限不足，授权后自动补开
@@ -341,7 +341,7 @@ private fun HomeScreen(resumeSeq: Int) {
     }
 
     fun overlayIntent() = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION).apply {
-        data = Uri.parse("package:${ctx.packageName}")
+        data = "package:${ctx.packageName}".toUri()
     }
 
     // 沉浸滚动：Scaffold 不预留固定边框，系统边衬随内容一起滚，滚动时内容滑入透明系统栏之下
@@ -587,13 +587,14 @@ private fun HomeScreen(resumeSeq: Int) {
                         stringResource(R.string.perm_notif_desc),
                         PermissionHelper.hasNotification(ctx)
                     ) {
-                        if (notificationRuntimeGranted()) openNotificationSettings()
-                        else requestRuntime(
-                            arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-                            onDead = { showCoreDialog = true }
-                        ) {
-                            permLauncher.launch(arrayOf(Manifest.permission.POST_NOTIFICATIONS))
-                        }
+                        if (Build.VERSION.SDK_INT >= 33 && !notificationRuntimeGranted()) {
+                            requestRuntime(
+                                arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                                onDead = { showCoreDialog = true }
+                            ) {
+                                permLauncher.launch(arrayOf(Manifest.permission.POST_NOTIFICATIONS))
+                            }
+                        } else openNotificationSettings()
                     }
                     PermRow(
                         stringResource(R.string.perm_location_title),
@@ -1108,7 +1109,7 @@ private fun AboutCard() {
     val version = remember {
         try {
             val pi = ctx.packageManager.getPackageInfo(ctx.packageName, 0)
-            val code = if (Build.VERSION.SDK_INT >= 28) pi.longVersionCode else pi.versionCode.toLong()
+            val code = pi.longVersionCode
             "${pi.versionName} ($code)"
         } catch (_: Exception) { "2.1 (2)" }
     }
@@ -1308,7 +1309,7 @@ private fun DonateChannel(title: String, desc: String, url: String, btn: String)
 // 浏览器打开链接
 private fun openUrl(ctx: Context, url: String) {
     try {
-        ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+        ctx.startActivity(Intent(Intent.ACTION_VIEW, url.toUri()).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         })
     } catch (_: Exception) { }

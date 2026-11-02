@@ -1,5 +1,6 @@
 package com.playlab.headsup.reminder
 
+import android.annotation.SuppressLint
 import android.app.KeyguardManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -17,6 +18,9 @@ import android.os.VibratorManager
 import android.view.Gravity
 import android.view.WindowManager
 import androidx.core.app.NotificationCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.playlab.headsup.MainActivity
 import com.playlab.headsup.R
 import com.playlab.headsup.data.Prefs
@@ -45,6 +49,7 @@ object ReminderManager {
     private fun dp(ctx: Context, v: Int) = (v * ctx.resources.displayMetrics.density).toInt()
 
     // 取系统动态色（壁纸取色），低版本回退 M3 基准色
+    @SuppressLint("DiscouragedApi")
     private fun sysColor(ctx: Context, name: String, fallback: Int): Int {
         if (Build.VERSION.SDK_INT >= 31) {
             try {
@@ -83,7 +88,6 @@ object ReminderManager {
     }
 
     fun ensureChannels(ctx: Context) {
-        if (Build.VERSION.SDK_INT < 26) return
         val nm = ctx.getSystemService(NotificationManager::class.java) ?: return
         nm.createNotificationChannel(
             NotificationChannel(CH_GUARD, ctx.getString(R.string.channel_guard), NotificationManager.IMPORTANCE_LOW)
@@ -320,7 +324,7 @@ object ReminderManager {
         } catch (_: Exception) { return false }
     }
 
-    // ---- 方式3：全屏提醒（全屏悬浮窗，避免后台启动 Activity 限制） ----
+    // ---- 方式3：全屏提醒（整页悬浮窗，避免后台启动 Activity 限制） ----
     fun showFullOverlay(ctx: Context): Boolean {
         if (!android.provider.Settings.canDrawOverlays(ctx)) return false
         return try {
@@ -335,20 +339,15 @@ object ReminderManager {
             val onSurfaceVariant = c.onSurfaceVariant
             val onPrimary = c.onPrimary
 
+            // 整页式：根视图铺满屏幕
             val root = android.widget.FrameLayout(ctx).apply {
-                setBackgroundColor(0x99000000.toInt())
+                setBackgroundColor(container)
                 isClickable = true
             }
-            val card = android.widget.LinearLayout(ctx).apply {
+            val page = android.widget.LinearLayout(ctx).apply {
                 orientation = android.widget.LinearLayout.VERTICAL
                 gravity = Gravity.CENTER_HORIZONTAL
-                setPadding(dp(28), dp(32), dp(28), dp(24))
-                background = android.graphics.drawable.GradientDrawable().apply {
-                    shape = android.graphics.drawable.GradientDrawable.RECTANGLE
-                    cornerRadius = dp(28).toFloat()
-                    setColor(container)
-                }
-                elevation = dp(6).toFloat()
+                setPadding(dp(32), dp(32), dp(32), dp(32))
             }
             val iconWrap = android.widget.FrameLayout(ctx).apply {
                 layoutParams = android.widget.LinearLayout.LayoutParams(dp(96), dp(96))
@@ -395,47 +394,69 @@ object ReminderManager {
                 isClickable = true
                 isFocusable = true
             }
-            card.addView(iconWrap)
-            card.addView(title)
-            card.addView(content)
-            card.addView(btn, android.widget.LinearLayout.LayoutParams(
+            page.addView(iconWrap)
+            page.addView(title)
+            page.addView(content)
+            page.addView(btn, android.widget.LinearLayout.LayoutParams(
                 android.widget.LinearLayout.LayoutParams.MATCH_PARENT, dp(52)
             ).apply { topMargin = dp(24) })
-            root.addView(card, android.widget.FrameLayout.LayoutParams(
+            root.addView(page, android.widget.FrameLayout.LayoutParams(
                 android.widget.FrameLayout.LayoutParams.MATCH_PARENT,
                 android.widget.FrameLayout.LayoutParams.WRAP_CONTENT,
                 Gravity.CENTER
-            ).apply { leftMargin = dp(28); rightMargin = dp(28) })
+            ))
             val params = WindowManager.LayoutParams(
                 WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
                 WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
                     WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS or
-                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                    WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 PixelFormat.TRANSLUCENT
-            )
+            ).apply {
+                if (Build.VERSION.SDK_INT >= 30) {
+                    setFitInsetsTypes(0)
+                    layoutInDisplayCutoutMode =
+                        WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
+                } else {
+                    layoutInDisplayCutoutMode =
+                        WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+                }
+            }
             wm.addView(root, params)
+            // 隐藏状态栏与导航栏，窗口铺满整个屏幕
+            root.post {
+                ViewCompat.getWindowInsetsController(root)?.apply {
+                    hide(WindowInsetsCompat.Type.systemBars())
+                    systemBarsBehavior =
+                        WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                }
+            }
             root.alpha = 0f
             root.animate().alpha(1f).setDuration(220).start()
-            val main = Handler(Looper.getMainLooper())
             var dismissed = false
             fun dismiss() {
                 if (dismissed) return
                 dismissed = true
-                main.removeCallbacksAndMessages(null)
                 try {
-                    root.animate().alpha(0f).setDuration(180)
-                        .withEndAction { try { wm.removeView(root) } catch (_: Exception) { } }
+                    root.animate().alpha(0f).setDuration(200)
+                        .setInterpolator(android.view.animation.DecelerateInterpolator())
+                        .withEndAction {
+                            // 透明后多留两帧再移除，等下层界面完成合成，避免结束瞬间黑一帧
+                            root.postDelayed({
+                                try { wm.removeView(root) } catch (_: Exception) { }
+                            }, 64)
+                        }
                         .start()
+                    ViewCompat.getWindowInsetsController(root)
+                        ?.show(WindowInsetsCompat.Type.systemBars())
                 } catch (_: Exception) {
                     try { wm.removeViewImmediate(root) } catch (_: Exception) { }
                 }
             }
-            root.setOnClickListener { dismiss() }
+            // 空白区域只拦截触摸，不关闭提醒
+            root.setOnClickListener { }
             btn.setOnClickListener { dismiss() }
-            // 自动消失，避免长时间遮挡屏幕
-            main.postDelayed({ dismiss() }, 15_000)
             true
         } catch (_: Exception) {
             false

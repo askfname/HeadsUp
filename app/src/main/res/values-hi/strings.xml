@@ -1,8 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">HeadsUp</string>
-    <string name="desc">चलते समय फ़ोन देखने पर समय पर याद दिलाए — सिर उठाकर रास्ता देखें</string>
-    <string name="disclaimer">याद दिलाना ध्यान का विकल्प नहीं है। कृपया चलते समय फ़ोन का उपयोग कम करें।</string>
 
     <string name="home_status_on">सुरक्षा चालू</string>
     <string name="home_status_off">बंद</string>

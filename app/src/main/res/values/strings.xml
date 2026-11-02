@@ -1,9 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- App identity: non-Chinese locales use the English name HeadsUp and developer PlayLab -->
     <string name="app_name">HeadsUp</string>
-    <string name="desc">Timely reminders when using your phone while walking — look up at the road</string>
-    <string name="disclaimer">Reminders do not replace attention. Please minimize phone use while walking.</string>
 
     <!-- Home: status card -->
     <string name="home_status_on">Guarding</string>
@@ -23,7 +21,8 @@
     <string name="vibrate_desc">Vibrate when a reminder is issued</string>
     <string name="indoor_mute_title">Mute indoors</string>
     <string name="indoor_mute_desc">Indoor areas may still contain tripping hazards such as furniture</string>
-    <string name="cooldown_format">Reminder interval: %1$d seconds</string>
+    <!-- 冷却时间固定为 30–300 秒，不涉及单复数 -->
+    <string name="cooldown_format" tools:ignore="PluralsCandidate">Reminder interval: %1$d seconds</string>
     <string name="sensitivity_title">Sensitivity</string>
     <string name="sens_low">Sensitive</string>
     <string name="sens_mid">Standard</string>

@@ -1,8 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">HeadsUp</string>
-    <string name="desc">Своевременные напоминания при использовании телефона на ходу — поднимите взгляд</string>
-    <string name="disclaimer">Напоминания не заменяют внимательность. По возможности не пользуйтесь телефоном на ходу.</string>
 
     <string name="home_status_on">Защита включена</string>
     <string name="home_status_off">Выключено</string>

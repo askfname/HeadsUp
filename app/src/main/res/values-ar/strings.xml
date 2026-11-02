@@ -1,8 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">HeadsUp</string>
-    <string name="desc">تذكيرات في الوقت المناسب عند استخدام الهاتف أثناء المشي — انظر إلى الطريق</string>
-    <string name="disclaimer">التذكيرات لا تغني عن الانتباه. يرجى تقليل استخدام الهاتف أثناء المشي.</string>
 
     <string name="home_status_on">الحماية نشطة</string>
     <string name="home_status_off">متوقفة</string>
